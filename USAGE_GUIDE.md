@@ -294,8 +294,6 @@ The generated PLCOpen XML includes:
 For detailed OpenPLC instructions, see the **Working with OpenPLC** section in `README.md`.
 
 ## Next Steps
-
-- See `CLAUDE.md` for detailed architecture documentation
 - Examine `data/BASIC_LIB/specification/` for available function blocks
 - Review `data/prompt-sets/openplc-fbd.txt` to understand the LLM prompt chain
 - Study generated `prompt_chain_log.md` files to debug LLM behavior

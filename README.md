@@ -33,6 +33,7 @@ start-backend.bat    # Windows
 - Auto-layout engine with IEC 61131-3 semantic awareness
 - OpenPLC compatible output
 - Configurable via YAML or command-line arguments
+- **[Spec2Control-Screencast.mp4](docs/Spec2Control-Screencast.mp4)**: screencast with a test run (2:17 min)
 
 ## Experiment Data
 
