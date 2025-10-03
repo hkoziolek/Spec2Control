@@ -1,0 +1,80 @@
+* Function Blocks *
+ANALOG_IN TIT-101
+PID_BASIC TC-401
+VALVE_ELECTRIC FV-401
+ANALOG_IN PT-402
+ANALOG_IN PT-403
+PID_BASIC PC-401
+DIGITAL_IN FT-401A
+DIGITAL_IN FT-401B
+TON FuelGasInterlockDelay_TON
+TON TIT101_HighAlarmDelay_TON
+TON TIT101_LowAlarmDelay_TON
+
+* Variables *
+REAL TIT101_FurnaceOutletTemp_PV_C
+REAL TC401_FV401_FuelGas_MV_Pct
+REAL PT402_FurnaceDraft_PV_kPa
+REAL PT403_DischargePressure_PV_bar
+REAL PC401_FuelGasPressure_PV_bar
+BOOL TIT101_HighTempAlarm_3s
+BOOL TIT101_LowTempAlarm_3s
+
+* Functions *
+AND FlameLitPermissive_AND
+NOT FlameNotLit_NOT
+OR FuelGasPermissiveViolations_OR
+OR MasterInhibit_OR
+
+* Data Connections * 
+TIT-101.PV, TC-401.PV
+TC-401.XOUT, FV-401.Control_Signal
+FV-401.Feedback_Pos, TC-401.X0
+PC401_FuelGasPressure_PV_bar, PC-401.PV
+FT-401A.DI_Out, FlameLitPermissive_AND.IN1
+FT-401B.DI_Out, FlameLitPermissive_AND.IN2
+FlameLitPermissive_AND.OUT, FlameNotLit_NOT.IN
+PC-401.PV_High_Alarm, FuelGasPermissiveViolations_OR.IN1
+PC-401.PV_Low_Alarm, FuelGasPermissiveViolations_OR.IN2
+PT-402.High_Alarm, FuelGasPermissiveViolations_OR.IN3
+PT-402.Low_Alarm, FuelGasPermissiveViolations_OR.IN4
+PT-403.Low_Alarm, FuelGasPermissiveViolations_OR.IN5
+FuelGasPermissiveViolations_OR.OUT, FuelGasInterlockDelay_TON.IN
+TC-401.PV_High_Alarm, MasterInhibit_OR.IN1
+FuelGasInterlockDelay_TON.Q, MasterInhibit_OR.IN2
+FlameNotLit_NOT.OUT, MasterInhibit_OR.IN3
+TIT-101.General_Fault, MasterInhibit_OR.IN4
+MasterInhibit_OR.OUT, FV-401.Inhibit
+MasterInhibit_OR.OUT, TC-401.Inhibit
+TIT-101.PV, TIT101_FurnaceOutletTemp_PV_C
+TC-401.XOUT, TC401_FV401_FuelGas_MV_Pct
+PT-402.PV, PT402_FurnaceDraft_PV_kPa
+PT-403.PV, PT403_DischargePressure_PV_bar
+TIT-101.High_Alarm, TIT101_HighAlarmDelay_TON.IN
+TIT-101.Low_Alarm, TIT101_LowAlarmDelay_TON.IN
+TIT101_HighAlarmDelay_TON.Q, TIT101_HighTempAlarm_3s
+TIT101_LowAlarmDelay_TON.Q, TIT101_LowTempAlarm_3s
+
+* Parameter Data Connections *
+9.375, TIT-101.Scaling_Slope
+362.5, TIT-101.Scaling_Offset
+510.0, TIT-101.PV_High
+480.0, TIT-101.PV_Low
+TRUE, TIT-101.Alarm_Enable
+495.0, TC-401.SP
+2.0, TC-401.Deviation_Limit
+0.0, TC-401.MV_MIN
+100.0, TC-401.MV_MAX
+3.2, TC-401.KP
+0.9, TC-401.TR
+0.3, TC-401.TD
+TRUE, TC-401.AUTO
+FALSE, FV-401.Manual_Mode
+100.0, FV-401.Open_Limit
+0.0, FV-401.Close_Limit
+TRUE, PT-402.Alarm_Enable
+TRUE, PT-403.Alarm_Enable
+T#5s, FuelGasInterlockDelay_TON.PT
+T#3s, TIT101_HighAlarmDelay_TON.PT
+T#3s, TIT101_LowAlarmDelay_TON.PT
+

@@ -1,0 +1,95 @@
+Evaluation Results for paper-machine - chapter_6
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_6\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_6\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_6\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(5), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_6\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN CT-501
+ANALOG_IN LT-501
+ANALOG_IN PT-502
+ANALOG_IN PG-501
+ANALOG_IN SEL-501
+PID_BASIC FC-502
+PID_BASIC SELC-501
+VALVE_ELECTRIC FV-502
+VALVE_ELECTRIC PGA-501
+MOTOR_ON_OFF M-501
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN CT-501
+ANALOG_IN LT-501
+ANALOG_IN PT-502
+ANALOG_IN PG-501
+ANALOG_IN SEL-501
+PID_BASIC FC-502
+PID_BASIC SELC-501
+VALVE_ELECTRIC FV-502
+VALVE_ELECTRIC PGA-501
+
+ALL DATA CONNECTIONS:
+CT-501.PV, FC-502.PV
+FC-502.XOUT, FV-502.Control_Signal
+SEL-501.PV, SELC-501.PV
+SELC-501.XOUT, PGA-501.Control_Signal
+PG-501.High_Alarm, PG_Alarms_OR.IN1
+PG-501.Low_Alarm, PG_Alarms_OR.IN2
+M-501.FB_Running, M_Run_NOT.IN
+M_Run_NOT.OUT, SELC_FinalInhibit_OR.IN1
+PG_Alarms_OR.OUT, SELC_FinalInhibit_OR.IN2
+SELC_FinalInhibit_OR.OUT, SELC-501.Inhibit
+SELC_FinalInhibit_OR.OUT, PGA-501.Inhibit
+PG_Alarms_OR.OUT, M-501.Inhibit
+PT-502.High_Alarm, Pressure_OOR_OR.IN1
+PT-502.Low_Alarm, Pressure_OOR_OR.IN2
+LT-501.Low_Alarm, FC_Inhibit_OR1.IN1
+Pressure_OOR_OR.OUT, FC_Inhibit_OR1.IN2
+FC_Inhibit_OR1.OUT, FC_FinalInhibit_OR.IN1
+CT-501.General_Fault, FC_FinalInhibit_OR.IN2
+FC_FinalInhibit_OR.OUT, FC-502.Inhibit
+FC_FinalInhibit_OR.OUT, FV-502.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV → PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 -> CT-501; PID_BASIC1 -> FC-502
+- Actual Connection: CT-501.PV, FC-502.PV
+- Notes: This PV path is direct. A second loop of the same type also exists: SEL-501.PV → SELC-501.PV. Inhibit/interlock logic is present but does not affect the PV wiring.
+
+Intended connection: PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1 -> FC-502; VALVE_ELECTRIC1 -> FV-502
+- Actual Connection: FC-502.XOUT, FV-502.Control_Signal
+- Notes: The allowed indirect alternative (PID_BASIC.XOUT → MOTOR_VSD.Speed_SP) is not used; a direct valve actuation path is implemented. A second loop of the same type also exists: SELC-501.XOUT → PGA-501.Control_Signal. Inhibit paths are implemented for both valves (FC_FinalInhibit_OR.OUT → FV-502.Inhibit; SELC_FinalInhibit_OR.OUT → PGA-501.Inhibit), indicating good safety interlock practice.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Both intended connections are implemented directly and consistently, with well-integrated inhibit/interlock logic. The presence of a second, similarly structured loop reinforces design consistency.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

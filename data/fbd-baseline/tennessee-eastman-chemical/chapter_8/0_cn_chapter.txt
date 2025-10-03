@@ -1,0 +1,37 @@
+## 8 **Decanter 2**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-008 | Flow Controller | Maintains constant product flow rate downstream of Decanter 2 |
+|FIT-105 | Flow Transmitter | Measures flow rate with a range of 0-150 L/min |
+|LIC-106 | Level Controller | Regulates Decanter 2 liquid level by modulating XV-101 |
+|LT-102 | Level Transmitter | Provides level measurement for Decanter 2 |
+|LT-103 | Level Transmitter | Additional level measurement (context not specified) |
+|LT-107 | Level Transmitter | Additional level measurement (context not specified) |
+|PV-104 | Pressure Valve | Pressure control valve (context not specified) |
+|XV-101 | On-Off Valve | Modulates flow to control Decanter 2 level, fail-closed |
+
+### 8.1) Control Strategy Description
+
+The decanter level control is implemented using LIC-106, which regulates the liquid level in Decanter 2 by modulating XV-101. The process variable (PV) is the level measurement provided by LT-102, with a transmitter range of 0-100% corresponding to a 4-20mA signal. The setpoint (SP) for LIC-106 is fixed at 65% to maintain optimal separation efficiency. LIC-106 is configured as a reverse-acting controller, ensuring that an increase in level decreases the valve opening.
+
+PID tuning parameters for LIC-106 are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.0 minutes. The controller output (MV) is clamped between 0% and 100%, with bumpless transfer logic implemented for smooth transitions between manual and automatic modes. Anti-windup protection is enabled to prevent integral windup during saturation conditions.
+
+XV-101 is a fail-closed valve, ensuring safety in the event of actuator or signal failure. The valve response time is calibrated for a settling time of 10 seconds to minimize oscillations. Signal scaling is applied to normalize the LT-102 output range to match the LIC-106 input requirements.
+
+Flow regulation is managed by FC-8, which maintains a constant product flow rate downstream of Decanter 2. FIT-105 provides the flow measurement, with a transmitter range of 0-150 L/min corresponding to a 4-20mA signal. FC-8 is configured as a direct-acting PID controller with tuning parameters set to Kp = 2.5, Ki = 0.8 minutes, and Kd = 0.2 minutes. The SP for FC-8 is fixed at 120 L/min, and the controller output modulates PV-104, a fail-open control valve.
+
+### 8.2) Interlocks and Permissives
+
+The operation of LIC-106 is interlocked with LT-103 to prevent overflow conditions. If LT-103 detects a level exceeding 90%, LIC-106 output is forced to 0%, fully closing XV-101. Similarly, FIT-105 is interlocked with LT-107 to ensure adequate flow conditions; if LT-107 detects a level below 20%, FC-8 output is forced to 0%, closing PV-104.
+
+Permissives for LIC-106 include confirmation that LT-102 is transmitting a valid signal within its calibrated range (4-20mA). If LT-102 signal is lost or falls outside the range, LIC-106 enters manual mode, and XV-101 is closed. FC-8 operation is permitted only when FIT-105 signal is valid and Decanter 2 is online.
+
+A 14-second delay is imposed on LIC-106 and FC-8 activation following system startup to allow stabilization of upstream conditions. Mode selection logic ensures that manual overrides on LIC-106 and FC-8 are prioritized during maintenance operations.
+
+### 8.3) Alarm and Fault Handling
+
+High-level alarms are triggered by LT-103 when the level in Decanter 2 exceeds 85%, generating an audible and visual alert in the control room. Low-level alarms are activated by LT-107 if the level drops below 15%, indicating potential flow disruption. FIT-105 generates a flow deviation alarm if the measured flow deviates by more than ±10% from the setpoint.
+
+Fault conditions for LIC-106 include transmitter failure from LT-102 or valve actuator failure on XV-101. In either case, LIC-106 output is forced to 0%, closing XV-101. FC-8 fault conditions include signal loss from FIT-105 or actuator failure on PV-104, resulting in FC-8 output being forced to 100%, fully opening PV-104 to ensure bypass flow.
+
+Alarm acknowledgment requires operator intervention, and system reset logic ensures that LIC-106 and FC-8 resume normal operation only after fault conditions are cleared.

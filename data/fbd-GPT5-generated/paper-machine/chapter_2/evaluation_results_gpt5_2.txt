@@ -1,0 +1,105 @@
+Evaluation Results for paper-machine - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_2\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), MOTOR_VSD(1), PID_BASIC(1), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(1), MOTOR_VSD(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 0.80%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LT-101
+PID_BASIC FC-101
+MOTOR_VSD M-102
+VALVE_ELECTRIC FV-106
+VALVE_ON_OFF XV-102
+VALVE_ON_OFF XV-104
+VALVE_ON_OFF XV-105
+BOOL_IN ILK-FC-101-XV-102-OPEN
+BOOL_IN ILK-FC-101-XV-104-OPEN
+BOOL_IN ILK-FC-101-LT-101-VALID
+BOOL_IN PERM-M-102-LEVEL-ABOVE-20
+BOOL_IN PERM-M-102-XV-105-CLOSED
+TON M102RestartDelay_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LT-101
+PID_BASIC FC-101
+VALVE_ELECTRIC FV-106
+
+ALL DATA CONNECTIONS:
+LT-101.PV, FC-101.PV
+FC-101.XOUT, M-102.Speed_SP
+XV-102.FB_Opened, ILK-FC-101-XV-102-OPEN.Bool_In
+XV-104.FB_Opened, ILK-FC-101-XV-104-OPEN.Bool_In
+LT-101.General_Fault, LT101Valid_NOT.IN
+LT101Valid_NOT.OUT, ILK-FC-101-LT-101-VALID.Bool_In
+ILK-FC-101-XV-102-OPEN.Bool_Out, FC101ValvesOpen_AND.IN1
+ILK-FC-101-XV-104-OPEN.Bool_Out, FC101ValvesOpen_AND.IN2
+FC101ValvesOpen_AND.OUT, FC101Interlock_AND.IN1
+ILK-FC-101-LT-101-VALID.Bool_Out, FC101Interlock_AND.IN2
+FC101Interlock_AND.OUT, FC-101.AUTO
+FC101Interlock_AND.OUT, FC101Inhibit_NOT.IN
+FC101Inhibit_NOT.OUT, FC101Fault_OR.IN1
+M-102.FB_Fault, FC101Fault_OR.IN2
+FC101Fault_OR.OUT, FC-101.Inhibit
+XV-105.FB_Closed, PERM-M-102-XV-105-CLOSED.Bool_In
+PERM-M-102-LEVEL-ABOVE-20.Bool_Out, M102Permissive_AND.IN1
+PERM-M-102-XV-105-CLOSED.Bool_Out, M102Permissive_AND.IN2
+M102Permissive_AND.OUT, M102Permissive_NOT.IN
+M102Permissive_NOT.OUT, M102Inhibit_OR.IN1
+LT-101.General_Fault, M102Fault_OR.IN1
+M-102.FB_Fault, M102Fault_OR.IN2
+M102Fault_OR.OUT, M102Inhibit_OR.IN2
+M102Inhibit_OR.OUT, M-102.Inhibit
+M102Inhibit_OR.OUT, M-102.Stop_Cmd
+M102Inhibit_OR.OUT, M102AllowedRun_NOT.IN
+M102AllowedRun_NOT.OUT, M102RestartDelay_TON.IN
+M102AllowedRun_NOT.OUT, M102Start_AND.IN1
+M102RestartDelay_TON.Q, M102Start_AND.IN2
+M102Start_AND.OUT, M-102.Start_Cmd
+M-102.FB_Fault, XV-102.Inhibit
+M-102.FB_Fault, XV-104.Inhibit
+LT-101.General_Fault, FV-106.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN = LT-101, PID_BASIC = FC-101
+- Actual Connection: LT-101.PV, FC-101.PV
+- Notes: Direct PV feed is correctly implemented. Additional validity/interlock logic exists around FC-101 (e.g., FC101Interlock_AND driving AUTO/Inhibit), but the PV path itself is direct and correct.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND INDIRECT
+- Mapping: PID_BASIC = FC-101, VALVE_ELECTRIC = FV-106
+- Actual Connection: FC-101.XOUT, M-102.Speed_SP
+- Notes: No direct FC-101.XOUT to FV-106.Control_Signal found. However, the PID output is routed to a motor VSD setpoint (M-102.Speed_SP), which is explicitly allowed as a valid indirect implementation. FV-106 is only tied to LT-101.General_Fault via FV-106.Inhibit and does not receive the PID output directly.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: PV mapping is correct and implemented directly. The PID output is implemented via a motor VSD setpoint rather than the valve; this aligns with the allowed indirect pattern but suggests the valve is not actively controlled by the PID loop. Interlocks and inhibits around FC-101 and FV-106 are present, indicating attention to safety.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

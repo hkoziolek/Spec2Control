@@ -1,0 +1,101 @@
+Evaluation Results for paper-machine - chapter_10
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_10\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_10\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_10\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_10\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_10\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_10\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-901
+ANALOG_IN FT-902
+ANALOG_IN CW-901
+RATIO_CONTROL FFIC-903
+PID_BASIC FIC-904
+VALVE_ELECTRIC FV-104
+VALVE_ON_OFF XV-105
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-901
+ANALOG_IN FT-902
+ANALOG_IN CW-901
+RATIO_CONTROL FFIC-903
+PID_BASIC FIC-904
+VALVE_ELECTRIC FV-104
+
+ALL DATA CONNECTIONS:
+XV-105.FB_Opened, XV105Closed_NOT.IN
+XV105Closed_NOT.OUT, RatioLoopInhibit_OR.IN1
+FT-901.Low_Alarm, RatioLoopInhibit_OR.IN2
+CW-901.High_Alarm, RatioLoopInhibit_OR.IN3
+CW-901.Low_Alarm, RatioLoopInhibit_OR.IN4
+FT-901.General_Fault, RatioLoopInhibit_OR.IN5
+FT-902.General_Fault, RatioLoopInhibit_OR.IN6
+CW-901.General_Fault, RatioLoopInhibit_OR.IN7
+RatioLoopInhibit_OR.OUT, FFIC-903.Inhibit
+RatioLoopInhibit_OR.OUT, FV-104.Inhibit
+RatioLoopInhibit_OR.OUT, RatioLoopEnable_NOT.IN
+RatioLoopEnable_NOT.OUT, FFIC-903.Auto
+RatioLoopEnable_NOT.OUT, FIC-904.AUTO
+FT-901.PV, FFIC-903.PrimaryPV
+FT-902.PV, FFIC-903.SecondaryPV
+FFIC-903.SlaveSP, FIC-904.SP
+FT-902.PV, FIC-904.PV
+FIC-904.XOUT, FV-104.Control_Signal
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 -> FT-901, RATIO_CONTROL -> FFIC-903
+   Actual Connection: FT-901.PV, FFIC-903.PrimaryPV
+   Notes: Primary flow transmitter FT-901 feeds the ratio controller FFIC-903 directly.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2 -> FT-902, RATIO_CONTROL -> FFIC-903
+   Actual Connection: FT-902.PV, FFIC-903.SecondaryPV
+   Notes: Secondary flow transmitter FT-902 feeds the ratio controller FFIC-903 directly.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL -> FFIC-903, PID_BASIC -> FIC-904
+   Actual Connection: FFIC-903.SlaveSP, FIC-904.SP
+   Notes: Ratio controller’s slave setpoint drives the slave PID’s SP as intended.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC -> FIC-904, VALVE_ELECTRIC -> FV-104
+   Actual Connection: FIC-904.XOUT, FV-104.Control_Signal
+   Notes: Direct output from the PID to the control valve. The allowed indirect alternative via MOTOR_VSD is not used here, but not required.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: Connections are cleanly implemented and consistent with a standard ratio control architecture. Additional logic provides inhibiting/auto-handshake interlocks (alarms/faults drive FFIC-903 and FV-104 inhibit and loop auto states), which is a good practice. The slave PID PV is sourced from FT-902, aligning with the ratio control intent.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

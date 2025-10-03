@@ -1,0 +1,41 @@
+## 5 **Heavy-Hydrocarbon and NGL Recovery**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|DA-401A | Pressure Transmitter | Measures pressure in the de-ethanizer system. |
+|DA-401B | Pressure Transmitter | Redundant pressure measurement for de-ethanizer system. |
+|DA-401C | Pressure Transmitter | Third redundant transmitter for pressure monitoring. |
+|DA-402 | Pressure Transmitter | Monitors pressure in the heavy-hydrocarbon recovery system. |
+|DA-402A | Pressure Transmitter | Redundant pressure measurement for heavy-hydrocarbon system. |
+|DA-402B | Pressure Transmitter | Secondary redundant pressure transmitter. |
+|DA-402C | Pressure Transmitter | Third redundant transmitter for pressure monitoring. |
+|FA-401 | Flow Transmitter | Measures flow rate in the recovery system. |
+|FA-402A | Flow Transmitter | Redundant flow measurement for system reliability. |
+|FA-402B | Flow Transmitter | Secondary redundant flow transmitter. |
+|FA-402C | Flow Transmitter | Third redundant transmitter for flow monitoring. |
+|FV-107 | Flow Valve | Regulates flow in the recovery system. |
+|I-401 | Interlock | Prevents PV-102 from opening unless PVT-401 is valid. |
+|I-402 | Interlock | Ensures operational safety in the recovery system. |
+|MA-401 | General Alarm | Alerts for system malfunctions or deviations. |
+|PT-401 | Pressure Transmitter | Measures pressure in the de-ethanizer column. |
+|PT-401A | Pressure Transmitter | Redundant pressure measurement for 2oo3 voting logic. |
+|PT-401B | Pressure Transmitter | Secondary redundant pressure transmitter for voting logic. |
+|PT-401C | Pressure Transmitter | Third redundant transmitter for pressure voting logic. |
+|PV-102 | Pressure Valve | Modulates pressure in the de-ethanizer column. |
+|PVT-401 | Pressure Voting Transmitter | Voted pressure signal for column control. |
+|TT-105 | Temperature Transmitter | Measures temperature in the de-propanizer column. |
+|TT-106 | Temperature Transmitter | Redundant temperature measurement for column control. |
+|TT-107 | Temperature Transmitter | Third redundant transmitter for temperature monitoring. |
+|TVT-402 | Temperature Voting Transmitter | Voted temperature signal for column control. |
+|XV-104 | On-Off Valve | Isolation valve for emergency shutdown. |
+
+### 5.1) Control Strategy Description
+
+The heavy-hydrocarbon and NGL recovery system employs redundant pressure transmitters PT-401A, PT-401B, and PT-401C to monitor de-ethanizer column pressure, utilizing a 2oo3 voting scheme for critical pressure control. The voted pressure signal (PVT-401) is used to modulate pressure control valve PV-102, maintaining the column pressure setpoint at 1.8 MPa. The voting logic requires at least two of the three transmitters to agree within a ±5% deviation range to produce a valid output. If two transmitters agree and the third deviates beyond the allowable range, the system automatically excludes the faulty transmitter from the voting calculation. In degraded mode, if one transmitter fails or produces a bad PV signal (<3.8 mA or >20.5 mA), the 2oo3 scheme transitions to a 1oo2 configuration, allowing pressure control to continue using the remaining two transmitters. Median select logic is implemented for temperature transmitters TT-105, TT-106, and TT-107 to determine the de-propanizer column temperature (TVT-402), ensuring robust temperature control at a setpoint of 65 °C.
+
+### 5.2) Interlocks and Permissives
+
+The pressure control interlock I-401 prevents PV-102 from opening unless PVT-401 is valid and within the operational range of 1.6–2.0 MPa. The interlock logic continuously evaluates the health of PT-401A, PT-401B, and PT-401C. If all three pressure transmitters fail or produce bad PV signals simultaneously, the interlock closes shut-off valve XV-104 to isolate the column and triggers a high-pressure shutdown. Similarly, temperature control interlock I-402 prevents the activation of flow control valve FV-107 unless TVT-402 is valid and within the range of 60–70 °C. Permissive logic ensures that maintenance bypass switches for PT-401 and TT-105/106/107 are engaged only during manual override mode, preventing automatic transitions to degraded operation during maintenance activities.
+
+### 5.3) Alarm and Fault Handling
+
+Deviation alarms DA-401A, DA-401B, and DA-401C are generated if the pressure readings from PT-401A, PT-401B, or PT-401C differ by more than ±5% from the median pressure value. If a single transmitter produces a bad PV signal (<3.8 mA or >20.5 mA), fault alarm FA-401 is activated, and the transmitter is automatically excluded from the voting calculation. In degraded mode, the system raises a degraded operation alarm DA-402 to notify operators that the 2oo3 voting scheme has transitioned to 1oo2. For temperature control, deviation alarms DA-402A, DA-402B, and DA-402C are triggered if TT-105, TT-106, or TT-107 readings differ by more than ±2 °C from the median temperature. Fault alarms FA-402A, FA-402B, and FA-402C are activated for bad PV signals from any temperature transmitter. All alarms are aggregated into a master alarm MA-401 for centralized operator notification, and diagnostic outputs are logged to the DCS for maintenance tracking.

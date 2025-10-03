@@ -1,0 +1,21 @@
+## 4 **Oil Tank Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-302 | Flow Controller | Regulates flow to maintain tank level based on LI-201 feedback |
+|FV-101 | Flow Valve | Air-actuated control valve for flow regulation with fail-closed functionality |
+|LI-201 | Level Transmitter | Measures oil tank level for feedback control loop |
+|T-200 | Tank | Oil storage tank monitored and controlled for level |
+|XV-010 | On-Off Valve | Ensures flow path is open for control loop operation |
+|XV-011 | On-Off Valve | Ensures flow path is open for control loop operation |
+
+### 4.1) Control Strategy Description
+
+The oil tank T200 level is maintained via feedback control implemented on FIC302, which regulates the flow through FV-101 based on the level measurement provided by LI201. The process variable (PV) is the tank level from LI201, scaled from 0% to 100% corresponding to 0-5 meters. The setpoint (SP) for LI201 is configured at 70% (3.5 meters). FIC302 operates in reverse-acting mode to decrease flow through FV-101 as the level approaches the setpoint. The PID tuning parameters for FIC302 are defined as follows: proportional gain (Kp) = 1.8, integral time (Ki) = 2.0 minutes, and derivative time (Kd) = 0.3 minutes. The output (MV) of FIC302 is constrained between 0% and 100%, corresponding to the 4-20mA signal range sent to FV-101. FV-101 is an air-actuated control valve with fail-closed functionality to ensure isolation during fault conditions. Bumpless transfer logic is implemented to allow smooth transitions between manual and automatic modes without process disruption.
+
+### 4.2) Interlocks and Permissives
+
+The control loop for FIC302 is interlocked with the status of V10 and V11. Both valves must be fully open to enable flow control; their positions are verified using discrete feedback signals. If either valve is closed, FIC302 output is forced to 0%, closing FV-101. Additionally, the loop is permissive on the operational status of LI201; if LI201 fails or provides an invalid signal (e.g., out of range or loss of communication), FIC302 transitions to manual mode with a fixed output of 25% to maintain minimal flow. A high-level interlock is configured on LI201 at 90% (4.5 meters), which overrides FIC302 and closes FV-101 to prevent overflow.
+
+### 4.3) Alarm and Fault Handling
+
+Level alarms are configured for LI201 as follows: a low-level alarm at 20% (1.0 meter) and a high-level alarm at 80% (4.0 meters). These alarms trigger visual and audible notifications in the control system. If LI201 fails, an instrument fault alarm is activated, and the control system forces FIC302 into manual mode. FV-101 position feedback is monitored; any deviation greater than 5% between the commanded position and actual position triggers a valve fault alarm. In case of a high-level interlock activation at 90%, an emergency shutdown signal is sent to FV-101 and logged in the system. Settling time for the control loop is targeted at less than 60 seconds under normal operating conditions, ensuring rapid response to process disturbances.

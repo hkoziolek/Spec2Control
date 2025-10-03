@@ -1,0 +1,78 @@
+* Function Blocks *
+ANALOG_IN FT-301
+ANALOG_IN PT-301
+ANALOG_IN TT-301
+ANALOG_IN FT-302
+RATIO_CONTROL FFIC-303
+PID_BASIC FIC-302
+VALVE_ELECTRIC FV-302
+
+* Variables *
+REAL FT_301_CoalFlow_PV
+REAL FT_302_AirFlow_PV
+REAL PT_301_Pressure_PV
+REAL TT_301_Temperature_PV
+REAL FIC_302_HotBlastAir_SP_FromRatio
+REAL Ratio_Bias
+
+* Functions *
+OR FT301_Range_OR
+OR Shutdown_OR
+OR CombinedDisable_OR
+OR RatioInhibit_OR
+NOT RatioAuto_NOT
+SEL AirSP_Fallback_SEL
+SEL AirSP_Shutdown_SEL
+
+* Data Connections * 
+FT-301.PV, FFIC-303.PrimaryPV
+FT-302.PV, FFIC-303.SecondaryPV
+FT-302.PV, FIC-302.PV
+FFIC-303.SlaveSP, AirSP_Fallback_SEL.IN0
+FT301_Range_OR.OUT, AirSP_Fallback_SEL.G
+AirSP_Fallback_SEL.OUT, AirSP_Shutdown_SEL.IN0
+Shutdown_OR.OUT, AirSP_Shutdown_SEL.G
+AirSP_Shutdown_SEL.OUT, FIC-302.SP
+FIC-302.XOUT, FV-302.Control_Signal
+FT-301.High_Alarm, FT301_Range_OR.IN1
+FT-301.Low_Alarm, FT301_Range_OR.IN2
+TT-301.Low_Alarm, Shutdown_OR.IN1
+PT-301.High_Alarm, Shutdown_OR.IN2
+FT301_Range_OR.OUT, CombinedDisable_OR.IN1
+Shutdown_OR.OUT, CombinedDisable_OR.IN2
+CombinedDisable_OR.OUT, RatioAuto_NOT.IN
+RatioAuto_NOT.OUT, FFIC-303.Auto
+PT-301.High_Alarm, RatioInhibit_OR.IN1
+TT-301.Low_Alarm, RatioInhibit_OR.IN2
+FT-301.General_Fault, RatioInhibit_OR.IN3
+PT-301.Low_Alarm, RatioInhibit_OR.IN4
+RatioInhibit_OR.OUT, FFIC-303.Inhibit
+Shutdown_OR.OUT, FIC-302.Inhibit
+Shutdown_OR.OUT, FV-302.Inhibit
+FT-301.PV, FT_301_CoalFlow_PV
+FT-302.PV, FT_302_AirFlow_PV
+PT-301.PV, PT_301_Pressure_PV
+TT-301.PV, TT_301_Temperature_PV
+FFIC-303.SlaveSP, FIC_302_HotBlastAir_SP_FromRatio
+Ratio_Bias, FFIC-303.Bias
+
+* Parameter Data Connections *
+5000.0, FT-301.PV_High
+100.0, FT-301.PV_Low
+TRUE, FT-301.Alarm_Enable
+TRUE, PT-301.Alarm_Enable
+TRUE, TT-301.Alarm_Enable
+1.8, FFIC-303.RatioSP
+200.0, FFIC-303.MV_MIN
+9000.0, FFIC-303.MV_MAX
+0.0, FFIC-303.TrimKp
+T#0s, FFIC-303.TrimTi
+9000.0, FIC-302.PV_High
+200.0, FIC-302.PV_Low
+TRUE, FIC-302.AUTO
+0.0, FIC-302.X0
+0.0, FIC-302.MV_MIN
+100.0, FIC-302.MV_MAX
+500.0, AirSP_Fallback_SEL.IN1
+0.0, AirSP_Shutdown_SEL.IN1
+

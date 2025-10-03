@@ -1,0 +1,110 @@
+Evaluation Results for ammonium-nitrates - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_2\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(3), RATIO_CONTROL(1), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(4), PID_BASIC(3), RATIO_CONTROL(1), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN LT-104
+ANALOG_IN PH-105
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+PID_BASIC TIC-103
+RATIO_CONTROL FFIC-102
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+BOOL_IN VS-107
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN LT-104
+ANALOG_IN PH-105
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+PID_BASIC TIC-103
+RATIO_CONTROL FFIC-102
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+
+ALL DATA CONNECTIONS:
+FT-101.PV, FFIC-102.PrimaryPV
+FT-102.PV, FFIC-102.SecondaryPV
+FT-102.PV, FIC-102.PV
+FFIC-102.SlaveSP, FIC-102.SP
+FIC-102.XOUT, FV-102.Control_Signal
+FT-101.PV, FIC-101.PV
+FIC-101.XOUT, FV-101.Control_Signal
+LT-104.High_Alarm, AcidShutdown.IN1
+LT-104.Low_Alarm, AcidShutdown.IN2
+FT-101.Low_Alarm, AcidShutdown.IN3
+FIC-102.PV_Low_Alarm, AcidShutdown.IN4
+TIC-103.PV_High_Alarm, AcidShutdown.IN5
+AcidShutdown.OUT, FFIC-102.Inhibit
+AcidShutdown.OUT, FV-102.Inhibit
+VS-107.Bool_Out, ScrubberNotReady.IN
+TIC-103.PV_High_Alarm, AmmoniaShutdown.IN1
+ScrubberNotReady.OUT, AmmoniaShutdown.IN2
+FT-101.Low_Alarm, AmmoniaShutdown.IN3
+AmmoniaShutdown.OUT, FV-101.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1=FT-101, RATIO_CONTROL=FFIC-102
+- Actual Connection: FT-101.PV, FFIC-102.PrimaryPV
+- Notes: Primary flow transmitter is correctly wired into the ratio controller’s PrimaryPV.
+
+ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2=FT-102, RATIO_CONTROL=FFIC-102
+- Actual Connection: FT-102.PV, FFIC-102.SecondaryPV
+- Notes: Secondary flow transmitter is correctly wired into the ratio controller’s SecondaryPV.
+
+RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: FOUND DIRECT
+- Mapping: RATIO_CONTROL=FFIC-102, PID_BASIC=FIC-102
+- Actual Connection: FFIC-102.SlaveSP, FIC-102.SP
+- Notes: Ratio controller’s slave setpoint is cascaded directly to the slave flow PID’s setpoint as intended.
+
+PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC=FIC-102, VALVE_ELECTRIC=FV-102
+- Actual Connection: FIC-102.XOUT, FV-102.Control_Signal
+- Notes: Slave PID output drives the corresponding control valve directly. An additional independent loop (FIC-101 -> FV-101) exists but does not affect this intended connection.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with clear, consistent instance mapping. The cascade from ratio controller to slave PID to final control element is correctly realized.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

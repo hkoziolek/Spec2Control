@@ -1,0 +1,100 @@
+Evaluation Results for lng-production - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_4\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(5), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AI-302
+ANALOG_IN AI-303
+ANALOG_IN AI-304
+DIGITAL_IN DI-301
+ANALOG_IN DP-301
+PID_BASIC FIC-302
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-302
+RATIO_CONTROL FFIC-303
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AI-302
+ANALOG_IN AI-303
+ANALOG_IN AI-304
+ANALOG_IN DP-301
+PID_BASIC FIC-302
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-302
+RATIO_CONTROL FFIC-303
+
+ALL DATA CONNECTIONS:
+FT-301.PV, FFIC-303.PrimaryPV
+FFIC-303.SlaveSP, FIC-302.SP
+FIC-302.XOUT, FV-302.Control_Signal
+AI-302.High_Alarm, TotalRegInhibit_OR.IN1
+AI-303.High_Alarm, TotalRegInhibit_OR.IN2
+AI-302.General_Fault, TotalRegInhibit_OR.IN3
+AI-303.General_Fault, TotalRegInhibit_OR.IN4
+FT-301.Low_Alarm, TotalRegInhibit_OR.IN5
+DP-301.High_Alarm, TotalRegInhibit_OR.IN6
+DI-301.DI_Out, TotalRegInhibit_OR.IN7
+TotalRegInhibit_OR.OUT, FFIC-303.Inhibit
+TotalRegInhibit_OR.OUT, FIC-302.Inhibit
+TotalRegInhibit_OR.OUT, FV-302.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 -> FT-301; RATIO_CONTROL -> FFIC-303
+   Actual Connection: FT-301.PV -> FFIC-303.PrimaryPV
+   Notes: Primary PV is sourced from the flow transmitter; mapping is consistent with typical ratio control design.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: MISSING
+   Mapping: ANALOG_IN2 -> [no connected instance identified]; RATIO_CONTROL -> FFIC-303
+   Actual Connection: None found to FFIC-303.SecondaryPV
+   Notes: Potential candidates (AI-302, AI-303, AI-304, DP-301) appear only in alarm/inhibit logic; no PV connection to FFIC-303.SecondaryPV is present.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL -> FFIC-303; PID_BASIC -> FIC-302
+   Actual Connection: FFIC-303.SlaveSP -> FIC-302.SP
+   Notes: Proper handoff of Slave SP to the downstream PID. Both FFIC-303 and FIC-302 also receive a common inhibit, which is coherent with safe operation.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC -> FIC-302; VALVE_ELECTRIC -> FV-302
+   Actual Connection: FIC-302.XOUT -> FV-302.Control_Signal
+   Notes: Direct actuation path is implemented. Alternate acceptable path to a MOTOR_VSD is not needed here.
+
+OVERALL ASSESSMENT:
+Coverage: 3/4
+Quality: Core control chain (Primary PV -> Ratio -> PID -> Valve) is correctly implemented with consistent inhibit interlocks. Missing SecondaryPV to the ratio block limits the intended ratio functionality and may prevent proper cascade/ratio operation.
+Missing Connections: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+==================================================
+
+EVAL-3 Coverage: 75.00%

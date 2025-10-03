@@ -1,0 +1,85 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN LT-101
+PID_BASIC FIC-101
+MOTOR_VSD VFD-101A
+MOTOR_VSD VFD-101B
+MOTOR_VSD VFD-101C
+MOTOR_VSD VFD-101D
+MOTOR_ON_OFF SPUMP-201A
+MOTOR_ON_OFF SPUMP-201B
+DIGITAL_IN M103A
+DIGITAL_IN M103B
+DIGITAL_IN M103C
+DIGITAL_IN M103D
+TON FlowDeviationHold
+
+* Variables *
+REAL FT_101_Flow_PV_m3ph
+REAL LT_101_SumpLevel_m
+REAL FIC_101_MV_Percent
+REAL FIC_101_SP_m3ph
+BOOL Flow_Deviation_Alarm
+
+* Functions *
+OR SumpLevelOutOfRange
+OR Inhibit_101A
+OR Inhibit_101B
+OR Inhibit_101C
+OR Inhibit_101D
+
+* Data Connections * 
+FT-101.PV, FIC-101.PV
+FIC_101_SP_m3ph, FIC-101.SP
+FIC-101.XOUT, VFD-101A.Speed_SP
+
+LT-101.Low_Alarm, SumpLevelOutOfRange.IN1
+LT-101.High_Alarm, SumpLevelOutOfRange.IN2
+SumpLevelOutOfRange.OUT, FIC-101.Inhibit
+
+SumpLevelOutOfRange.OUT, Inhibit_101A.IN1
+M103A.DI_Out, Inhibit_101A.IN2
+VFD-101A.FB_Fault, Inhibit_101A.IN3
+Inhibit_101A.OUT, VFD-101A.Inhibit
+
+SumpLevelOutOfRange.OUT, Inhibit_101B.IN1
+M103B.DI_Out, Inhibit_101B.IN2
+VFD-101B.FB_Fault, Inhibit_101B.IN3
+Inhibit_101B.OUT, VFD-101B.Inhibit
+
+SumpLevelOutOfRange.OUT, Inhibit_101C.IN1
+M103C.DI_Out, Inhibit_101C.IN2
+VFD-101C.FB_Fault, Inhibit_101C.IN3
+Inhibit_101C.OUT, VFD-101C.Inhibit
+
+SumpLevelOutOfRange.OUT, Inhibit_101D.IN1
+M103D.DI_Out, Inhibit_101D.IN2
+VFD-101D.FB_Fault, Inhibit_101D.IN3
+Inhibit_101D.OUT, VFD-101D.Inhibit
+
+FIC-101.Deviation_Alarm, FlowDeviationHold.IN
+FlowDeviationHold.Q, Flow_Deviation_Alarm
+
+FT-101.PV, FT_101_Flow_PV_m3ph
+LT-101.PV, LT_101_SumpLevel_m
+FIC-101.XOUT, FIC_101_MV_Percent
+
+* Parameter Data Connections *
+31.25, FT-101.Scaling_Slope
+-125.0, FT-101.Scaling_Offset
+TRUE, FT-101.Alarm_Enable
+0.625, LT-101.Scaling_Slope
+-2.5, LT-101.Scaling_Offset
+1.5, LT-101.PV_Low
+9.0, LT-101.PV_High
+TRUE, LT-101.Alarm_Enable
+0.0, FIC-101.MV_MIN
+100.0, FIC-101.MV_MAX
+2.5, FIC-101.KP
+0.8, FIC-101.TR
+0.2, FIC-101.TD
+10.0, FIC-101.Deviation_Limit
+TRUE, FIC-101.AUTO
+0.0, FIC-101.X0
+T#30s, FlowDeviationHold.PT
+

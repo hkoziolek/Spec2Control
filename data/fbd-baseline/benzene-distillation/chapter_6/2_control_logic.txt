@@ -1,0 +1,66 @@
+* Function Blocks *
+ANALOG_IN FT-105
+ANALOG_IN FT-106
+VALVE_ELECTRIC FV-101
+RATIO_CONTROL IIC-104
+PID_BASIC FIC-106
+PID_BASIC LIC-002
+BOOL_IN LIC-002-LOW_LEVEL_ILK
+DIGITAL_IN FEED_PUMP_RUN
+DIGITAL_IN BOTTOMS_PUMP_RUN
+
+* Variables *
+REAL FT105_FeedFlowRate
+REAL FT106_BottomsFlowRate
+REAL FT106_SP_From_IIC104
+REAL LIC002_LevelPV
+
+* Functions *
+GT FeedAboveCutoff_GT
+AND PumpsRunning_AND
+NOT PumpsNotRunning_NOT
+OR RatioInhibit_OR
+
+* Data Connections *
+FT-105.PV, IIC-104.PrimaryPV
+FT-106.PV, IIC-104.SecondaryPV
+IIC-104.SlaveSP, FIC-106.SP
+FT-106.PV, FIC-106.PV
+FIC-106.XOUT, FV-101.Control_Signal
+FT-105.PV, FeedAboveCutoff_GT.IN1
+FeedAboveCutoff_GT.OUT, IIC-104.Auto
+FeedAboveCutoff_GT.OUT, FIC-106.AUTO
+LIC-002.PV_Low_Alarm, LIC-002-LOW_LEVEL_ILK.Bool_In
+FEED_PUMP_RUN.DI_Out, PumpsRunning_AND.IN1
+BOTTOMS_PUMP_RUN.DI_Out, PumpsRunning_AND.IN2
+PumpsRunning_AND.OUT, PumpsNotRunning_NOT.IN
+LIC-002-LOW_LEVEL_ILK.Bool_Out, RatioInhibit_OR.IN1
+PumpsNotRunning_NOT.OUT, RatioInhibit_OR.IN2
+FT-105.General_Fault, RatioInhibit_OR.IN3
+FT-106.General_Fault, RatioInhibit_OR.IN4
+FEED_PUMP_RUN.Fault_State, RatioInhibit_OR.IN5
+BOTTOMS_PUMP_RUN.Fault_State, RatioInhibit_OR.IN6
+RatioInhibit_OR.OUT, IIC-104.Inhibit
+RatioInhibit_OR.OUT, FIC-106.Inhibit
+RatioInhibit_OR.OUT, FV-101.Inhibit
+FT-105.PV, FT105_FeedFlowRate
+FT-106.PV, FT106_BottomsFlowRate
+IIC-104.SlaveSP, FT106_SP_From_IIC104
+LIC002_LevelPV, LIC-002.PV
+
+* Parameter Data Connections *
+62.5, FT-105.Scaling_Slope
+-250.0, FT-105.Scaling_Offset
+50.0, FT-105.PV_Low
+TRUE, FT-105.Alarm_Enable
+62.5, FT-106.Scaling_Slope
+-250.0, FT-106.Scaling_Offset
+TRUE, FT-106.Alarm_Enable
+1.5, IIC-104.RatioSP
+0.0, IIC-104.MV_MIN
+1000.0, IIC-104.MV_MAX
+50.0, FeedAboveCutoff_GT.IN2
+TRUE, LIC-002-LOW_LEVEL_ILK.Alarm_OnTrue
+0.0, FIC-106.MV_MIN
+100.0, FIC-106.MV_MAX
+

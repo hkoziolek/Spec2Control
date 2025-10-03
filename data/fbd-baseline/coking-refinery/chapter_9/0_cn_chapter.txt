@@ -1,0 +1,29 @@
+## 9 **Flare and Relief Systems**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FV-102 | Flow Valve | Regulates flow to maintain pressure in the knockout drum. |
+|LC-801 | Level Controller | Maintains liquid level within the specified range. |
+|PIC-101 | Pressure Controller | Controls knockout drum pressure to prevent overpressure. |
+|PT-106 | Pressure Transmitter | Measures knockout drum pressure and sends signal to controller. |
+
+### 9.1) Control Strategy Description
+
+The flare system is regulated by PIC-101, which maintains the pressure within the knockout drum at a target setpoint of 1.5 barg. The controller operates in reverse-acting mode, ensuring that an increase in process variable (PV) results in a decrease in manipulated variable (MV) to prevent overpressure. The PID tuning parameters are configured as follows: proportional gain (Kp) = 3.2, integral time (Ki) = 0.5 min, and derivative time (Kd) = 0.1 min. The controller output range is limited to 0-100% to match the control valve FV-102's operational range.
+
+The process pressure is measured by PT-106, a pressure transmitter with a calibrated range of 0-5 barg, transmitting a 4-20mA signal to PIC-101. Signal scaling ensures the transmitter output is normalized to the controller input range of 0-100%. FV-102, the final control element, is a pneumatically actuated valve with a fail-open position to ensure safety during controller or power failure scenarios. A 3% deadband is implemented in PIC-101 to minimize valve wear during steady-state operation.
+
+The controller is equipped with bumpless transfer logic to facilitate smooth transitions between manual and automatic modes. Setpoint clamping is applied to restrict operator-entered values within the range of 1.0-2.0 barg to prevent unsafe operating conditions. Anti-windup provisions are included to limit integral action during saturation events, ensuring stable control performance.
+
+### 9.2) Interlocks and Permissives
+
+PIC-101 is interlocked with the flare stack ignition system to ensure proper combustion of vented gases. The controller is disabled if the ignition system fails, preventing uncontrolled gas discharge. FV-102 is equipped with a position feedback transmitter, ensuring the valve responds correctly to controller output. If the valve position deviates by more than 5% from the commanded position, the controller enters fault mode and halts further adjustments.
+
+Permissive logic requires PT-106 to provide a valid signal within its calibrated range before PIC-101 can initiate control. If PT-106 fails or outputs an invalid signal, PIC-101 transitions to manual mode, alerting the operator to take corrective action. Additionally, FV-102 cannot open unless the knockout drum level, monitored by LC-801, is below 80% to avoid liquid carryover into the flare stack.
+
+### 9.3) Alarm and Fault Handling
+
+PIC-101 generates high-pressure and low-pressure alarms when the process pressure exceeds 1.8 barg or drops below 1.2 barg, respectively. These alarms are displayed on the operator interface and logged for historical analysis. If the pressure deviates beyond these thresholds for more than 30 seconds, the controller initiates an emergency shutdown sequence, closing FV-102 to isolate the system.
+
+Fault conditions in PT-106 or FV-102 trigger a system-wide alarm, notifying operators of equipment failure. In the event of a PT-106 signal loss, PIC-101 switches to manual mode and clamps the controller output at its last known value to prevent abrupt process changes. FV-102 is designed to fail open, ensuring continuous gas venting to the flare stack during fault scenarios.
+
+PIC-101 includes diagnostic routines to monitor controller health and performance. If the controller fails to achieve the setpoint within a 60-second settling time, an alarm is raised, and the operator is prompted to investigate potential tuning or equipment issues.

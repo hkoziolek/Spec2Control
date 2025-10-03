@@ -1,0 +1,38 @@
+## 5 **Shock Chlorination System**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|ANK-301 | Interlock | Ensures system safety by preventing unauthorized operation. |
+|FAH-301 | Flow Alarm High | High flow rate alarm for process protection. |
+|FAL-301 | Flow Alarm Low | Low flow rate alarm for process protection. |
+|FIC-301 | Flow Controller | Regulates flow rate to maintain setpoint in shock chlorination system. |
+|FT-301 | Flow Transmitter | Measures flow rate for sodium hypochlorite dosing control. |
+|FV-301 | Flow Valve | Modulates flow rate in the chlorination process. |
+|LAL-301 | Level Alarm Low | Low level alarm for tank monitoring. |
+|LT-301 | Level Transmitter | Measures liquid level in the storage tank. |
+|PAH-103 | Pressure Alarm High | High pressure alarm for system protection. |
+|PFA-301 | Pump Flow Alarm | Monitors pump flow for abnormal conditions. |
+|TAH-101 | Temperature Alarm High | High temperature alarm for process safety. |
+|UMP-301A | Pump | Metering pump for sodium hypochlorite dosing. |
+|XV-107 | On-Off Valve | Isolation valve for emergency shutdown. |
+
+### 5.1) Control Strategy Description
+
+The shock chlorination system regulates sodium hypochlorite dosing by controlling the flow rate through the metering pump CHLOR-PUMP-301A/B. The process variable (PV) is the measured flow rate from flow transmitter FT-301, which has a calibrated range of 0-50 L/min and outputs a 4-20 mA signal. The setpoint (SP) for the flow rate is operator-adjustable between 10 and 45 L/min, with a default setpoint of 30 L/min.
+
+The PID controller, designated as FIC-301, is configured for reverse-acting control, where an increase in PV results in a decrease in the manipulated variable (MV) to maintain SP. The tuning parameters for the controller are set as follows: proportional gain (Kp) = 1.8, integral time (Ki) = 0.5 minutes, and derivative time (Kd) = 0.05 minutes. The controller output (MV) modulates the stroke of CHLOR-PUMP-301A/B, with a control range of 0-100% corresponding to a flow rate of 0-50 L/min. Output limits are clamped between 5% and 95% to prevent pump underperformance or overdriving.
+
+The final control element is the pump stroke actuator, which responds linearly to the controller output. Bumpless transfer logic ensures seamless transitions between manual and automatic modes by initializing the controller output to the current manual position upon switching to automatic mode. Anti-windup protection is implemented to freeze integral action when the output reaches its limits.
+
+A signal scaling function normalizes the 4-20 mA input from FT-301 to a 0-100% range for the controller input. The control loop includes a 1% hysteresis band around the setpoint to prevent hunting and a 23-second delay timer to filter transient flow disturbances.
+
+### 5.2) Interlocks and Permissives
+
+The shock chlorination system operates only when the following permissives are satisfied: CHLOR-TANK-301 level, as measured by LT-301, must be above 20% to ensure sufficient chemical availability; CHLOR-PUMP-301A/B must be in the AVAILABLE state, verified by the pump status signal from UMP-301A. The system is interlocked with the dechlorination process to prevent simultaneous operation if downstream chlorine levels, measured by ANK-301, exceed 0.5 ppm.
+
+The flow control valve FV-301 is interlocked to fail-closed upon detection of a high-pressure condition (PAH-103) exceeding 6 bar or a high-temperature condition (TAH-101) exceeding 50°C. Additionally, the system will not start if the shut-off valve XV-107 is not in the fully open position, as confirmed by its limit switch.
+
+### 5.3) Alarm and Fault Handling
+
+The system generates a high-flow alarm (FAH-301) if the flow rate exceeds 48 L/min and a low-flow alarm (FAL-301) if the flow rate falls below 8 L/min for more than 10 seconds. Both alarms are latched and require operator acknowledgment to reset. A pump fault alarm (PFA-301) is triggered if CHLOR-PUMP-301A/B fails to start within 5 seconds of a run command or if the pump trips during operation.
+
+In the event of a tank low-level condition (LAL-301) below 10%, the system shuts down the pump and closes FV-301 to prevent air ingress. If the dechlorination interlock is active due to high chlorine levels downstream, an alarm (DCLH-301) is raised, and the chlorination system is disabled until the chlorine concentration drops below 0.3 ppm for 60 seconds.

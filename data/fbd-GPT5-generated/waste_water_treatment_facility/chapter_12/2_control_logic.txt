@@ -1,0 +1,55 @@
+* Function Blocks *
+ANALOG_IN IIC-101
+PID_BASIC IIC-103
+ANALOG_IN LV-104
+VALVE_ELECTRIC PV-102
+VALVE_ON_OFF OC-1101
+BOOL_IN DG-1101
+BOOL_IN DW-1101
+BOOL_IN IIC-105
+
+* Variables *
+REAL IIC101_Solids_PV
+REAL PV102_MV_Command
+REAL LV104_Level_PV
+
+* Functions *
+NOT IIC105_NotActive_NOT
+OR PV102_Inhibit_OR
+
+* Data Connections * 
+IIC-101.PV, IIC-103.PV
+IIC-103.XOUT, PV-102.Control_Signal
+LV-104.High_Alarm, IIC-103.Inhibit
+OC-1101.FB_Opened, IIC-105.Bool_In
+IIC-105.Bool_Out, IIC105_NotActive_NOT.IN
+IIC105_NotActive_NOT.OUT, PV102_Inhibit_OR.IN1
+PV-102.Position_Error, PV102_Inhibit_OR.IN2
+PV102_Inhibit_OR.OUT, PV-102.Inhibit
+IIC-101.PV, IIC101_Solids_PV
+IIC-103.XOUT, PV102_MV_Command
+LV-104.PV, LV104_Level_PV
+
+* Parameter Data Connections *
+6.5, IIC-103.SP
+3.0, IIC-103.KP
+1.2, IIC-103.TR
+0.3, IIC-103.TD
+10.0, IIC-103.MV_MIN
+90.0, IIC-103.MV_MAX
+8.0, IIC-103.PV_High
+4.0, IIC-103.PV_Low
+TRUE, IIC-103.AUTO
+8.0, IIC-101.PV_High
+4.0, IIC-101.PV_Low
+0.625, IIC-101.Scaling_Slope
+-2.5, IIC-101.Scaling_Offset
+TRUE, IIC-101.Alarm_Enable
+6.25, LV-104.Scaling_Slope
+-25.0, LV-104.Scaling_Offset
+85.0, LV-104.PV_High
+0.0, LV-104.PV_Low
+TRUE, LV-104.Alarm_Enable
+100.0, PV-102.Open_Limit
+0.0, PV-102.Close_Limit
+

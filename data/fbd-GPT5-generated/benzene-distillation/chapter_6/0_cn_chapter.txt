@@ -1,0 +1,30 @@
+## 6 **Bottoms Product Handling**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FT-105 | Flow Transmitter | Measures column feed flow rate for ratio control loop |
+|FT-106 | Flow Transmitter | Measures bottoms product flow rate for ratio control loop |
+|FV-101 | Flow Valve | Modulates to control bottoms product flow rate |
+|IIC-104 | Ratio Controller | Calculates setpoint for bottoms flow based on feed flow and ratio setpoint |
+|LIC-002 | Level Controller | Maintains column bottoms level and interlocks with ratio control loop |
+
+### 6.1) Control Strategy Description
+
+The bottoms product handling section employs ratio control to maintain a precise proportional relationship between the toluene-rich bottoms flow rate and the column feed flow rate. Flow transmitter FT-106 measures the bottoms product flow rate, while flow transmitter FT-105 measures the column feed flow rate, which serves as the wild flow for the ratio control loop. The ratio controller IIC-104 calculates the setpoint for the controlled flow (FT-106) based on the measured feed flow (FT-105) and a configurable ratio setpoint.
+
+The ratio setpoint is maintained at 1.5:1, ensuring that the bottoms flow rate is 1.5 times the feed flow rate. The ratio controller output is used as the setpoint for flow controller FV-101, which modulates the control valve to maintain the desired bottoms flow rate. The ratio control equation is defined as:
+
+\[ SP_{FT-106} = FT-105 \times 1.5 \]
+
+The ratio controller IIC-104 includes a manual adjustment feature, allowing operators to modify the ratio setpoint within a range of 1.2:1 to 1.8:1. Low flow cutoff logic is implemented to disable the ratio control loop when FT-105 measures a flow below 50 kg/hr, preventing instability during low feed conditions. The flow measurement ranges for FT-105 and FT-106 are 0-1000 kg/hr.
+
+### 6.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with the column level controller (LIC-002) to ensure safe operation. If the column bottoms level, as measured by LIC-002, falls below 10%, the ratio control loop is disabled, and FV-101 is set to a fail-safe position to prevent damage to downstream equipment. Additionally, the ratio control loop is only active when both FT-105 and FT-106 are operational and providing valid signals.
+
+A permissive is included to ensure that the ratio control loop cannot be activated unless the column feed pump and bottoms pump are running. The status of the pumps is monitored via discrete inputs, and the ratio control loop is inhibited if either pump is offline.
+
+### 6.3) Alarm and Fault Handling
+
+An alarm is triggered if the ratio setpoint deviates beyond the configured limits of 1.2:1 to 1.8:1. The alarm is displayed on the operator interface with the tagname IIC-104-ALM. Additionally, a low flow alarm (FT-105-LAL) is activated if the column feed flow rate falls below 50 kg/hr, indicating that the ratio control loop is no longer in operation.
+
+In the event of a fault in FT-105 or FT-106, the ratio controller IIC-104 switches to manual mode, and FV-101 is set to maintain a fixed position based on the last valid flow measurement. Fault conditions are indicated by diagnostic alarms FT-105-FAH and FT-106-FAH, which alert operators to investigate and resolve the issue promptly.

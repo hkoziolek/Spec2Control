@@ -1,0 +1,33 @@
+## 10 **Product Flow Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FAH-102 | Flow Alarm High | High flow alarm for process stream protection |
+|FAL-102 | Flow Alarm Low | Low flow alarm to prevent insufficient process flow |
+|FIF-102 | Flow Interlock | Interlock to prevent operation under unsafe flow conditions |
+|FIT-102 | Flow Transmitter | Measures flow rate for PID control loop |
+|IIC-103 | Flow Controller | PID controller for maintaining flow rate setpoint |
+|LC-002 | Level Controller | Regulates tank level within safe operating limits |
+|LIH-201 | Level Alarm High | High level alarm for storage tank overflow prevention |
+|LT-201 | Level Transmitter | Measures storage tank level for monitoring and control |
+|LV-101 | Level Valve | Pneumatically actuated valve for controlling tank level |
+|VAF-101 | Valve Alarm Failure | Alarm indicating valve failure condition |
+
+### 10.1) Control Strategy Description
+
+The flow control strategy for the product stream utilizes a PID feedback loop to maintain the flow rate at the desired setpoint. The process variable (PV) is the flow rate measured by FIT-102, which has a calibrated range of 0-200 m³/h and outputs a 4-20 mA signal. The manipulated variable (MV) is the position of the control valve LV-101, which is pneumatically actuated and configured to fail-closed on loss of signal.
+
+The PID controller, IIC-103, operates in reverse-acting mode to decrease the valve opening as the flow rate increases above the setpoint. The controller is tuned with the following parameters: proportional gain (Kp) of 1.8, integral time (Ki) of 0.5 minutes, and derivative time (Kd) of 0.1 minutes. The controller output (CO) is clamped between 0% and 100% to ensure the valve operates within its physical limits. The operator-defined setpoint (SP) is limited between 40 m³/h and 180 m³/h to maintain safe operating conditions and prevent overloading downstream processes.
+
+The raw 4-20 mA signal from FIT-102 is linearly scaled to engineering units (m³/h) within IIC-103 for control calculations. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes, preventing process disturbances.
+
+### 10.2) Interlocks and Permissives
+
+The control loop is interlocked with the downstream storage tank level to prevent overflow. If the level in the storage tank, as measured by LT-201, exceeds 90% of its maximum capacity, a high-level interlock (LIH-201) forces LV-101 to fully close, overriding the PID control. Additionally, the system requires a permissive signal from the upstream decanter (LC-002) to ensure sufficient product availability. If the level in the decanter drops below 10%, the permissive is removed, and the control valve LV-101 is forced to the closed position.
+
+The control loop also includes a startup permissive that ensures the flow rate is within 10% of the setpoint before enabling automatic control. This prevents abrupt changes in valve position during process initialization.
+
+### 10.3) Alarm and Fault Handling
+
+The system generates a high-flow alarm (FAH-102) if the flow rate measured by FIT-102 exceeds 190 m³/h, indicating potential process instability or valve malfunction. A low-flow alarm (FAL-102) is triggered if the flow rate falls below 30 m³/h, signaling potential upstream supply issues. Both alarms are displayed on the operator interface and logged for diagnostic purposes.
+
+In the event of a fault in FIT-102, such as signal loss or transmitter failure, the PID controller IIC-103 enters manual mode, and the control valve LV-101 is driven to a fail-safe position (fully closed). An alarm (FIF-102) is generated to notify the operator of the transmitter fault. The system also includes diagnostics for the control valve actuator. If LV-101 fails to respond to control signals, a valve fault alarm (VAF-101) is activated, and the loop is locked out until manual intervention resolves the issue.

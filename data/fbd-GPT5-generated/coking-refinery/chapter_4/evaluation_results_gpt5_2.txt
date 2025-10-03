@@ -1,0 +1,104 @@
+Evaluation Results for coking-refinery - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_4\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), MOTOR_ON_OFF(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(4), MOTOR_ON_OFF(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 0.88%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PT-301
+ANALOG_IN PT-302
+ANALOG_IN PT-303
+ANALOG_IN TT-301
+PID_BASIC PC-301
+VALVE_ELECTRIC PV-105
+VALVE_ON_OFF PV-106
+VALVE_ON_OFF XV-108
+MOTOR_ON_OFF P-301A
+DIGITAL_IN PAH-301
+DIGITAL_IN PAL-301
+DIGITAL_IN PTF-301
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PT-301
+ANALOG_IN PT-302
+ANALOG_IN PT-303
+ANALOG_IN TT-301
+PID_BASIC PC-301
+VALVE_ELECTRIC PV-105
+
+ALL DATA CONNECTIONS:
+PT-301.PV, PV_Minus_SP_SUB.IN1
+SP_LowClamp_MAX.OUT, SP_HighClamp_MIN.IN1
+SP_HighClamp_MIN.OUT, PV_Minus_SP_SUB.IN2
+PV_Minus_SP_SUB.OUT, ErrorAbs_ABS.IN
+ErrorAbs_ABS.OUT, DeadbandExceeded_GT.IN1
+DeadbandExceeded_GT.OUT, PV_Deadbanded_SEL.G
+SP_HighClamp_MIN.OUT, PV_Deadbanded_SEL.IN0
+PT-301.PV, PV_Deadbanded_SEL.IN1
+PV_Deadbanded_SEL.OUT, PC-301.PV
+SP_HighClamp_MIN.OUT, PC-301.SP
+PC-301.XOUT, PV-105.Control_Signal
+PV-105.Feedback_Pos, PC-301.X0
+TT-301.Low_Alarm, PV105_Inhibit_OR.IN1
+XV-108.FB_Closed, PV105_Inhibit_OR.IN2
+PT-301.High_Alarm, PV105_Inhibit_OR.IN3
+PT-302.Low_Alarm, PV105_Inhibit_OR.IN4
+PT-303.High_Alarm, PV105_Inhibit_OR.IN5
+P-301A.FB_Running, P301A_Running_NOT.IN
+P301A_Running_NOT.OUT, PV105_Inhibit_OR.IN6
+PV105_Inhibit_OR.OUT, PV-105.Inhibit
+PT-301.General_Fault, PTF-301.DI_Raw
+PTF-301.DI_Out, PC301_Inhibit_OR.IN1
+XV-108.FB_Closed, PC301_Inhibit_OR.IN2
+PC301_Inhibit_OR.OUT, PC-301.Inhibit
+PC-301.PV_High_Alarm, PAH-301.DI_Raw
+PC-301.PV_Low_Alarm, PAL-301.DI_Raw
+PT-301.High_Alarm, XV-108.Inhibit
+PT-301.High_Alarm, XV-108.Close_Cmd
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV → PID_BASIC.PV
+- Status: FOUND INDIRECT
+- Mapping: ANALOG_IN PT-301 → PID_BASIC PC-301
+- Actual Connection:
+  - PT-301.PV, PV_Deadbanded_SEL.IN1
+  - PV_Deadbanded_SEL.OUT, PC-301.PV
+- Notes: PT-301.PV is conditioned via a deadbanded selector before feeding the PID PV. The selector is gated by DeadbandExceeded_GT.OUT, and the alternative input is a clamped SP (SP_HighClamp_MIN.OUT). This is a valid indirect implementation of the intended PV routing.
+
+Intended: PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC PC-301 → VALVE_ELECTRIC PV-105
+- Actual Connection: PC-301.XOUT, PV-105.Control_Signal
+- Notes: The PID output directly drives the valve. Additional robustness is present: PV-105.Feedback_Pos → PC-301.X0 for feedback tracking, and comprehensive inhibit logic (PV105_Inhibit_OR → PV-105.Inhibit; PC301_Inhibit_OR → PC-301.Inhibit). The alternative valid indirect path to MOTOR_VSD.Speed_SP is not applicable here and not needed.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Clean implementation with appropriate signal conditioning (deadband and SP clamping) upstream of the PID, and direct, well-interlocked actuation downstream. The mapping aligns correctly with intended blocks and shows good engineering practice.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

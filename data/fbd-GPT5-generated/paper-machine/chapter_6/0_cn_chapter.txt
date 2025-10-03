@@ -1,0 +1,37 @@
+## 6 **Refining and Machine Chest**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CT-501 | Consistency Transmitter | Measures pulp consistency at machine chest outlet |
+|FC-502 | Flow Controller | Controls dilution water flow to achieve target consistency |
+|FV-502 | Flow Valve | Modulates water flow for consistency control |
+|LT-501 | Level Transmitter | Measures level in the refining or machine chest section |
+|M-501 | Motor | Drives the primary refiner for pulp processing |
+|PT-502 | Pressure Transmitter | Measures pressure in the refining or dilution system |
+
+### 6.1) Control Strategy Description
+
+The control system for the **Refining and Machine Chest** section ensures precise regulation of pulp consistency and specific-edge-load (SEL) during refining, followed by dilution to a target consistency of 3% in the machine chest. The primary control loop regulates the SEL of the double-disc refiners using motor load feedback, while a secondary loop controls the dilution water flow to achieve the desired pulp consistency.
+
+The SEL control loop uses the motor load signal from the primary refiner motor (M-501) as the process variable (PV) and compares it to the operator-defined SEL setpoint (SEL_SP). The SEL controller (SELC-501) is configured as a reverse-acting PID controller with tuning parameters Kp=1.8, Ki=0.5 min, and Kd=0.1 min. The SEL_SP is clamped between 0.4 and 1.0 W·s/mm² to ensure safe operation. The SEL measurement, derived from the motor load (M-501) and plate gap, is normalized to a 4-20 mA signal corresponding to 0.2 to 1.2 W·s/mm². The controller output (MV) modulates the refiner plate gap actuator, with a control output range of 0-100%.
+
+The dilution consistency control loop uses the consistency transmitter (CT-501) to measure the pulp consistency at the machine chest outlet. The transmitter signal is scaled to 4-20 mA, corresponding to a consistency range of 2.0% to 5.0%. The consistency controller (FC-502) is configured as a direct-acting PID controller with tuning parameters Kp=2.2, Ki=0.7 min, and Kd=0.0 min. The operator-defined consistency setpoint (CONS_SP) is limited to a range of 2.5% to 3.5%. The controller output modulates the dilution water flow control valve (FV-502), which is a fail-closed valve with a linear flow characteristic. The control output range for FV-502 is 0-100%, corresponding to a flow rate of 0-50 m³/h.
+
+Both control loops include bumpless transfer logic to ensure smooth transitions between Auto and Manual modes. In Manual mode, the operator directly adjusts the control output (MV) within the permissible range. Anti-windup protection is implemented to prevent integral windup during saturation of the control output.
+
+### 6.2) Interlocks and Permissives
+
+The SEL control loop (SELC-501) is interlocked with the refiner motor (M-501) status. The SEL controller is enabled only when M-501 is running and the plate gap is within the operating range of 0.5 to 5.0 mm, as indicated by the plate gap position transmitter. If M-501 trips or the plate gap exceeds the permissible range, SELC-501 output is forced to 0%, and the refiner is stopped.
+
+The dilution consistency control loop (FC-502) is interlocked with the machine chest level transmitter (LT-501). The controller is enabled only when the machine chest level is above 20% to prevent dilution water flow when the chest is empty. If the level drops below 20%, the FC-502 output is forced to 0%, closing FV-502.
+
+A permissive ensures that the dilution water supply pressure, monitored by PT-502, is within the range of 300 to 600 kPa before enabling the FC-502 loop. If the pressure falls outside this range, the controller output is held at its last value, and an alarm is triggered.
+
+### 6.3) Alarm and Fault Handling
+
+The SEL control loop generates a high-specific-edge-load alarm (ALM-SEL-HI) if the measured SEL exceeds 1.1 W·s/mm² for more than 5 seconds. A low-specific-edge-load alarm (ALM-SEL-LO) is triggered if the SEL drops below 0.3 W·s/mm² for more than 5 seconds. Both alarms require operator acknowledgment and automatically reset when the SEL returns to the normal operating range.
+
+The dilution consistency control loop generates a high-consistency alarm (ALM-CONS-HI) if the measured consistency exceeds 4.0% and a low-consistency alarm (ALM-CONS-LO) if the consistency drops below 2.0%. These alarms are latched and require manual acknowledgment after the process variable returns to the normal range.
+
+A fault in the consistency transmitter (CT-501), such as a signal below 3.6 mA or above 21.0 mA, triggers a transmitter fault alarm (ALM-CT-501-FAULT). In this case, the FC-502 controller output is forced to 0%, closing FV-502 to prevent over-dilution.
+
+For both loops, a watchdog timer monitors the controller scan rate. If the scan rate exceeds 500 ms, a controller fault alarm (ALM-CTRL-FAULT) is triggered, and the respective loop is placed in Manual mode.

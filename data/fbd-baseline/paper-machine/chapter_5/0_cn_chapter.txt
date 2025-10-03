@@ -1,0 +1,36 @@
+## 5 **Bleaching Towers**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AT-102 | pH Transmitter | Measures pH of pulp slurry in bleaching tower |
+|AT-107 | pH Transmitter | Monitors pH at secondary process location |
+|FV-101 | Flow Control Valve | Regulates acid dosing flow rate to control pH |
+|FV-103 | Flow Control Valve | Adjusts steam flow for temperature control |
+|LIC-102 | Level Controller | Controls acid dosing based on pH feedback |
+|LIC-104 | Level Controller | Manages level in auxiliary process tank |
+|TIC-106 | Temperature Controller | Maintains setpoint temperature at 65°C |
+|TIT-106 | Temperature Transmitter | Measures process temperature for control loop |
+|XV-104 | On-Off Valve | Provides isolation for maintenance or emergency shutdown |
+
+### 5.1) Control Strategy Description
+
+The bleaching tower control system employs a PID feedback loop to maintain the pH of the pulp slurry within a target setpoint range of 9.0 to 9.5, as measured by pH transmitter AT-102. The controller, identified as LIC-102, is configured for reverse-acting operation to ensure that an increase in pH results in a decrease in the manipulated variable (MV), which is the flow rate of acid dosing through flow control valve FV-101. The PID parameters are tuned with proportional gain (Kp) set to 1.8, integral time (Ki) set to 0.5 minutes, and derivative time (Kd) set to 0.1 minutes to achieve a settling time of less than 30 seconds.
+
+The process variable (PV) from AT-102 is transmitted as a 4–20 mA signal corresponding to a pH range of 0 to 14. The output of LIC-102 is scaled to operate FV-101 within a control range of 10% to 90% open. The valve is configured to fail-closed upon loss of signal to prevent over-dosing of acid. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes, with the last MV value held as the bias during mode switching.
+
+Temperature control is managed by a separate PID loop with TIT-106 providing the PV signal for temperature measurement. The controller TIC-106 adjusts the steam flow through FV-103 to maintain a setpoint temperature of 65°C. The PID parameters for TIC-106 are Kp = 2.0, Ki = 0.4 minutes, and Kd = 0.05 minutes, ensuring rapid response without overshoot. TIT-106 transmits temperature data as a 4–20 mA signal over a range of 0–100°C.
+
+Retention time in the bleaching tower is indirectly controlled by regulating the pulp flow rate via LIC-104, which adjusts the position of shut-off valve XV-104. The retention time setpoint is maintained at 120 minutes, with a proportional gain of 1.5, integral time of 1.0 minutes, and derivative time of 0.2 minutes. Flow measurement is derived from a differential pressure transmitter, scaled to 0–200 m³/h.
+
+### 5.2) Interlocks and Permissives
+
+The acid dosing system interlock ensures that FV-101 cannot open unless the upstream flow rate, as measured by a flow transmitter, is greater than 10 m³/h. Additionally, the pH control loop (LIC-102) is inhibited if AT-102 detects a pH below 2.0 or above 12.0 to prevent unsafe operating conditions. For temperature control, TIC-106 is disabled if the temperature exceeds 80°C, as indicated by TIT-106, to prevent thermal degradation of the pulp.
+
+The retention time control loop (LIC-104) is interlocked with the pulp flow system to ensure XV-104 remains in a fail-closed position if the flow rate drops below 5 m³/h or if the downstream pressure exceeds 5 bar. Permissives require that the bleaching tower level is within 20–80% of its capacity before any control loop is enabled.
+
+### 5.3) Alarm and Fault Handling
+
+High-priority alarms are generated for pH deviations beyond the setpoint range of ±1.0, with LIC-102 triggering a "HIGH pH" alarm at 10.5 and a "LOW pH" alarm at 8.5. Similarly, TIC-106 generates a "HIGH TEMP" alarm at 75°C and a "LOW TEMP" alarm at 55°C. These alarms initiate a gradual ramp-down of the respective control valves to prevent abrupt process changes.
+
+Sensor faults, such as signal loss from AT-102 or TIT-106, result in the respective control loops defaulting to manual mode with the last known MV held constant. A fault in AT-107 triggers a "pH SENSOR FAULT" alarm, and the acid dosing system is automatically isolated by closing FV-101. Redundant transmitters are not implemented; therefore, operators must manually verify measurements during sensor faults.
+
+For retention time control, LIC-104 triggers a "RETENTION TIME DEVIATION" alarm if the calculated retention time deviates by more than 10 minutes from the setpoint. XV-104 is forced closed if this deviation persists for more than 60 seconds.

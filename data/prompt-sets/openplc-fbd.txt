@@ -1,0 +1,218 @@
+{
+  "steps": [
+    {
+      "id": "step_1753100000001",
+      "promptName": "openplc-function-blocks-v2",
+      "prompt": "Analyze the provided specification, interlocks and alarms to identify all required function blocks.\n\nProvide output in the following format, no explanations, no markdown:\n\n* Function Blocks *\nMyFBType MyFB1\nMyOtherFBType MyOtherFB1\n\nRules:\n- Only include function blocks that are explicitly required by the specification\n- Instantiate any alarm switches explicitly listed in taglists as function blocks of type DIGITAL_IN\n- Do not create DIGITAL_IN blocks for alarms that are not in the taglist, these are not separate devices but are handled with parameters of other blocks.\n- Instantiate interlocks explicitly listed in taglists as function blocks of type BOOL_IN\n- Use instance names based on tagnames\n- Do not include basic logic functions (OR, AND, NOT, XOR) - these will be handled separately\n- Focus on main control elements like sensors, transmitters, actuators, controllers, etc.\n\n{{specification}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Function Blocks *\nANALOG_IN FT-101\nANALOG_IN FT-102\nANALOG_IN PIT-106\nANALOG_IN TIT-104\nANALOG_IN TIT-105\nANALOG_IN TIT-107\nRATIO_CONTROL FFIC-103\nPID_BASIC FIC-104\nPID_BASIC PIC-102\nVALVE_ELECTRIC FV-104"
+    },
+    {
+      "id": "step_1753100000011",
+      "promptName": "openplc-function-blocks-validation",
+      "prompt": "Based on the provided control narrative, function block specifications specifications, and the already generated function block list from a previous step, update the list to make sure that all required function blocks are in the list. \n\nRules\n- check tagname references in the specification and make sure all sensors (e.g., LIT-101), transmitters, actuators (e.g., LV-101), and controllers (e.g., LIC-101) are covered, add missing ones.\n- check that alarm switches from taglists are mapped to DIGITAL_IN function blocks\n- check that interlocks from taglists are mapped to BOOL_IN function blocks\n- remove any function blocks created for alarms, which are not mentioned in the taglist.\n\n\nProvide output in the same format as before, no explanations, no markdown.\n\n* Control Narrative and Function Block Types * \n{{specification}}\n\n* Function Block List * \n{{function-blocks}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_0"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Function Block List * \n* Function Blocks *\nANALOG_IN FT-101\nANALOG_IN FT-102\nANALOG_IN PIT-106\nANALOG_IN TIT-104\nANALOG_IN TIT-105\nANALOG_IN TIT-107\nRATIO_CONTROL FFIC-103\nPID_BASIC FIC-104\nPID_BASIC PIC-102\nVALVE_ELECTRIC FV-104"
+    },
+    {
+      "id": "step_1753100000002",
+      "promptName": "openplc-block-connections-and-logic",
+      "prompt": "Create connections between function blocks and add necessary logic functions exclusively for the main control strategy identified in the specification. Disregard any connections required for interlocks or alarms.\n\nRules for Functions:\n- Only use IEC 61131-3 functions: OR, TON, NOT, etc.\n- When creating functions with two input parameter (e.g., OR, ADD, GT, EQ, TON, etc.), always create also two data connections or parameter data connection, so that no input is left unbound.\n- For IEC 61131-3 function with an variable number of input parameters (OR, XOR, AND, ADD, etc.) it is ok to use more than two, also to limit the number of necessary functions.\n- Only include functions prescribed by the control strategy\n- Give each function a descriptive instance name, ending with suffix _TypeName (examples: _OR, _TON).\n- If no functions are needed for the control strategy, leave the section * Functions * empty\n\nRules for Block-to-Block Connections:\n- Connect outputs of one function block directly to inputs of another\n- Use the exact function block instance names from the previous step\n- For each created logic function, create appropriate connections both for inputs and outputs\n\nProvide output in the following format, no explanations, no markdown:\n\n* Functions *\nGT Comparator1_GT\nTON Timer1_TON\n\n* Block-to-Block Connections *\nFB1.OUT, FB2.IN1\nFB2.Signal, FB3.Control\n\n\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Functions *\n\n* Block-to-Block Connections *\nFT-101.PV, FFIC-103.PrimaryPV\nFT-102.PV, FFIC-103.SecondaryPV\nFFIC-103.SlaveSP, FIC-104.SP\nFT-102.PV, FIC-104.PV\nFIC-104.XOUT, FV-104.Control_Signal"
+    },
+    {
+      "id": "step_1753100000003",
+      "promptName": "openplc-block-connections-interlocks",
+      "prompt": "Create functions, data connections, and parameter data connections that implement interlock and alarm logic, as needed per the specification. Assume IEC 61131-3 naming and types.\n\nRules for Functions:\n- Only use IEC 61131-3 boolean functions (OR, XOR, AND, NOT) with IN1, IN2, IN, OUT if needed. If the boolean function only has one input (e.g NOT), make sure that there is no number behind the input parameter (IN in stead of IN1).\n- Single alarm output signals driving an inhibit can be directly connected without a function.\n- Only include functions required for an interlock, permissive, or alarm\n- Give each function a descriptive instance name ending with _OR, _AND, _NOT (e.g., HighTempTrip_OR).\n- If no functions are needed, leave the section * Functions * empty\n\nRules for Data Connections:\n- Only create connections that refer to interlocks and alarms, but make sure to cover all interlocks and alarms completely.\n- Connect alarm output signals (BOOL) to inhibit input parameters (no permissive parameter available), as prescribed by the specification, unless the alarm output is already connected to DIGITAL_IN or BOOL_IN. \n- Use only BOOL alarm/limit/trip outputs (e.g., *.High_Alarm, *.Low_Alarm, *.DI_Out) for interlocks/permissives/inhibits; do not route REAL signals into boolean logic.\n- Do not modify previously created data connections for process values and the main control strategies.\n- Ensure for functions that at minimum IN1 and IN2 are connected with distinct sources, but more inputs (IN3, IN4, ...) are ok if needed.\n- Do not create any numeric comparison or arithmetic functions.\n- Use the exact function block instance names from the previous step.\n- Do not connect boolean output signals to real type input parameters.\n- Ensure that function blocks DIGITIAL_IN and BOOL_IN receiving alarms or interlock signals as input also connects its output (*DI_Out or *.Bool_Out)  to the related inhibit input. \n\nRules for Parameter Data Connections:\n- Parameter data connections consist of comma-separated pair <source>, <target>.\n- <source> is always a literal value (e.g., an alarm range literal), never a function block or function\n- <target> must be an existing input parameter of a function or function block\n- Map from specification all allowed ranges to configured alarm high and low levels (example PV_High, PV_Low)\n- Make sure to cover alarm high and low parameters if information available, do not have highs without lows\n- Connect literals for alarm limits to PV_High, PV_Low\n- Never connect literals to DI_Raw input parameters\n- Never connect literal TRUE directly to inhibit inputs; only map alarms/trips to such inputs.\n\nIf a section has no items, keep the header and leave it empty (no placeholder text).\nProvide output in the following format, no explanations, no markdown, no XML tags:\n\n* Functions * \nOR InterlockTank1_OR\nAND Alarm23_AND\n\n* Data Connections *\nFB1.OUT, FB2.IN1\nFB2.Alarm, FB3.Inhibit\nInterlockTank1_OR.OUT, Valve.Inhibit\n\n* Parameter Data Connections *\n42, FB1.AlarmHigh\n500, FB2.MV_Min\n\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}\n\nData Connections:\n{{data-connections}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        },
+        {
+          "variable": "{{data-connections}}",
+          "source": "step_2"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Functions * \nOR PressureOutOfRange_OR\nOR Temp104OutOfRange_OR\nOR Temp105OutOfRange_OR\nOR Temp107OutOfRange_OR\nOR AnyTempOutOfRange_OR\nNOT FT101Below500_NOT\nOR ValveInhibit_OR\nOR RatioInhibit_OR\nOR FICInhibit_OR\n\n* Data Connections *\nPIT-106.High_Alarm, PressureOutOfRange_OR.IN1\nPIT-106.Low_Alarm, PressureOutOfRange_OR.IN2\nTIT-104.High_Alarm, Temp104OutOfRange_OR.IN1\nTIT-104.Low_Alarm, Temp104OutOfRange_OR.IN2\nTIT-105.High_Alarm, Temp105OutOfRange_OR.IN1\nTIT-105.Low_Alarm, Temp105OutOfRange_OR.IN2\nTIT-107.High_Alarm, Temp107OutOfRange_OR.IN1\nTIT-107.Low_Alarm, Temp107OutOfRange_OR.IN2\nTemp104OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN1\nTemp105OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN2\nTemp107OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN3\nFT-101.High_Alarm, FT101Below500_NOT.IN\nFT101Below500_NOT.OUT, ValveInhibit_OR.IN1\nAnyTempOutOfRange_OR.OUT, ValveInhibit_OR.IN2\nValveInhibit_OR.OUT, FV-104.Inhibit\nPressureOutOfRange_OR.OUT, RatioInhibit_OR.IN1\nFT-101.Low_Alarm, RatioInhibit_OR.IN2\nFT-101.General_Fault, RatioInhibit_OR.IN3\nFT-102.General_Fault, RatioInhibit_OR.IN4\nAnyTempOutOfRange_OR.OUT, RatioInhibit_OR.IN5\nFV-104.Position_Error, RatioInhibit_OR.IN6\nRatioInhibit_OR.OUT, FFIC-103.Inhibit\nAnyTempOutOfRange_OR.OUT, FICInhibit_OR.IN1\nFT-102.General_Fault, FICInhibit_OR.IN2\nFICInhibit_OR.OUT, FIC-104.Inhibit\n\n* Parameter Data Connections *\n100, FT-101.PV_Low\n500, FT-101.PV_High\nTRUE, FT-101.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, PIT-106.Alarm_Enable\n120, TIT-104.PV_Low\n350, TIT-104.PV_High\nTRUE, TIT-104.Alarm_Enable\n120, TIT-105.PV_Low\n350, TIT-105.PV_High\nTRUE, TIT-105.Alarm_Enable\n120, TIT-107.PV_Low\n350, TIT-107.PV_High\nTRUE, TIT-107.Alarm_Enable"
+    },
+    {
+      "id": "step_1753100000004",
+      "promptName": "openplc-parameter-data-connections",
+      "prompt": "Identify specific values in the specification for input parameters of already instantiated function blocks and functions.\n\n\nRules for Parameter Data Connections:\n- Consist of comma-separate pair <source>, <target>\n- <source> is always a literal, never another function block or function\n- The <source> literal always complies to a 61131 data type ((BOOL, REAL, INT, TIME, ...)\n- <target> is always an input parameter of a function or function block\n- For input parameters of functions, use data type real for any GT, GE, EQ, LT, LE, NE inputs, make sure that the input parameters are IN1, IN2, OUT.\n- If no parameter connections with specific values are mentioned, leave section empty\n- Focus on configuration parameters, setpoints, and enable/disable flags\n- Do not use Parameter Data Connections for DIGITAL_IN function blocks.\n- For ranges in the specification, try to map their start and end to low and high input parameter of respective function blocks.\n- Connect literals for alarm limits to the respective alarm limit input parameters of function blocks\n- Never connect literals to DI_Raw input parameters\n- Never connect literal TRUE directly to an inhibit\n\nProvide output in the following format, no explanations, no markdown:\n\n* Parameter Data Connections *\nsome_value, FB1.Param1\nanother_value, FB2.SetPoint\nTRUE, FB1.Enable\nmy_value, Function1.IN1\nmy_value2, Function2.IN2\n\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}\n\nFunctions and Connections:\n{{functions-connections}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        },
+        {
+          "variable": "{{functions-connections}}",
+          "source": "step_2"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Parameter Data Connections *\n0.5, FFIC-103.RatioSP\n0.0, FFIC-103.MV_MIN\n2500.0, FFIC-103.MV_MAX\nTRUE, FT-101.Alarm_Enable\n100.0, FT-101.PV_Low\nTRUE, PIT-106.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, TIT-104.Alarm_Enable\n120.0, TIT-104.PV_Low\n350.0, TIT-104.PV_High\nTRUE, TIT-105.Alarm_Enable\n120.0, TIT-105.PV_Low\n350.0, TIT-105.PV_High\nTRUE, TIT-107.Alarm_Enable\n120.0, TIT-107.PV_Low\n350.0, TIT-107.PV_High"
+    },
+    {
+      "id": "step_1753100000005",
+      "promptName": "openplc-input-variables-and-connections",
+      "prompt": "Update the previously created Parameter Data Connections by identifying specific values in the specification for input parameters of already instantiated function blocks and functions.\n\nRules for Parameter Data Connections:\n- If the specification is already fully covered by the previously generated Parameter Data Connections, output them as before.\n- For input parameters of functions, use data type real for any GT, GE, EQ, LT, LE, NE inputs, make sure that the input parameters are IN1, IN2, OUT.\n- Do not use Parameter Data Connections for DIGITAL_IN function blocks.\n- For ranges (alarms, ratios, operating range, etc.) in the specification, map the range start and end to low and high input parameters of respective function blocks (e.g., PV_High, PV_Low, MV_MIN, MV_MAX, etc.)\n- Make sure to cover range high and low parameters if information or defaults available, do not have highs without lows or vice versa\n- Connect literals for alarm limits to the respective alarm limit input parameters of function blocks\n- Never connect literals to DI_Raw input parameters\n- Never connect literal TRUE directly to an inhibit\n\nUpdate the previous output for Parameter Data Connection and provide it in the following format, no explanations, no markdown:\n\n* Parameter Data Connections *\nsome_value, FB1.Param1\nanother_value, FB2.SetPoint\nTRUE, FB1.Enable\nmy_value, Function1.IN1\nmy_value2, Function2.IN2\n\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}\n\nBlock Connections and Logic:\n{{block-connections-and-logic}}\n{{interlocks-alarms}}\n\nParameter Data Connections:\n{{parameter-data-connections}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        },
+        {
+          "variable": "{{block-connections-and-logic}}",
+          "source": "step_2"
+        },
+        {
+          "variable": "{{parameter-data-connections}}",
+          "source": "step_4"
+        },
+        {
+          "variable": "{{interlocks-alarms}}",
+          "source": "step_3"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Parameter Data Connections *\n0.5, FFIC-103.RatioSP\n0.0, FFIC-103.MV_MIN\n2500.0, FFIC-103.MV_MAX\n312.5, FT-101.Scaling_Slope\n-1250.0, FT-101.Scaling_Offset\n156.25, FT-102.Scaling_Slope\n-625.0, FT-102.Scaling_Offset\nTRUE, FT-101.Alarm_Enable\n100.0, FT-101.PV_Low\n500.0, FT-101.PV_High\nTRUE, PIT-106.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, TIT-104.Alarm_Enable\n120.0, TIT-104.PV_Low\n350.0, TIT-104.PV_High\nTRUE, TIT-105.Alarm_Enable\n120.0, TIT-105.PV_Low\n350.0, TIT-105.PV_High\nTRUE, TIT-107.Alarm_Enable\n120.0, TIT-107.PV_Low\n350.0, TIT-107.PV_High"
+    },
+    {
+      "id": "step_1753100000006",
+      "promptName": "openplc-output-variables-and-connections",
+      "prompt": "Create output variables and their connections to function blocks.\n\nProvide output in the following format, no explanations, no markdown:\n\n* Variables *\nVarType MyOutputVar\nOtherVarType MyOutputVar2\n\n* Data Connections *\nFB1.OutputParam, MyOutputVar\nFB2.Status, MyOutputVar2\n\nRules for Output Variables:\n- Only create variables that receive outputs from function blocks\n- Use appropriate IEC 61131-3 data types (BOOL, INT, REAL, etc.)\n- Do not create boolean output variables in case there are already corresponding DIGITAL_IN function blocks.\n- Variable names must refer to the related tag name and the variable's purpose in the control strategy.\n- Only create variables explicitly mentioned in the specification\n- Do not create output variables for alarms.\n\nRules for Data Connections concerning output variables:\n- Connect function block outputs to output variables\n- Make sure that each created output variable has a data connection\n- Use exact instance names from previous steps\n- If no output variables are needed, leave sections empty\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Variables *\nREAL FT101_FeedFlow_PV\nREAL FT102_RefluxFlow_PV\nREAL PIT106_ColumnPressure_PV\nREAL TIT104_Temperature_PV\nREAL TIT105_Temperature_PV\nREAL TIT107_Temperature_PV\nREAL FFIC103_RefluxFlow_SP\n\n* Data Connections *\nFT-101.PV, FT101_FeedFlow_PV\nFT-102.PV, FT102_RefluxFlow_PV\nPIT-106.PV, PIT106_ColumnPressure_PV\nTIT-104.PV, TIT104_Temperature_PV\nTIT-105.PV, TIT105_Temperature_PV\nTIT-107.PV, TIT107_Temperature_PV\nFFIC-103.SlaveSP, FFIC103_RefluxFlow_SP"
+    },
+    {
+      "id": "step_1753100000007",
+      "promptName": "openplc-rule-checks",
+      "prompt": "Perform rule checks and validation on the complete OpenPLC Function Block Diagram.\n\nValidation Rules:\n- Check that all function block instance names are consistent across all sections, refer only to tags, and include no reference to any types (e.g., AI, AnalogIn, PID, etc.)\n- Verify all connections reference valid function block instances and parameters\n- Ensure all variables have appropriate IEC 61131-3 data types\n- Confirm no orphaned connections (connections to non-existent blocks/variables)\n- Ensure that all AND, OR, XOR, IN, NOT, ADD, SUB, MULT, DIV blocks have valid data connections on all inputs and outputs\n- Ensure that all TON, TOF, TP blocks have timing values via parameter data connections or data connections\n- Validate that required connections from specification are present\n- Check for logical consistency in the control flow\n- Merge all connections in a section * Data Connections *, do not have a separate section * Block-to-Block Connections *\n- Ensure that each function has a descriptive name.\n- Ensure that no Parameter Data Connection refers to a DIGITAL_IN\n\n\nProvide the output as text (no markdown) in following format, no explanations: \n\n* Function Blocks *\nMyFBType MyFB1\nMyOtherFBType MyOtherFB1\n\n* Variables *\nVarType MyVar\nOtherVarType MyVar2\n\n* Functions *\nADD SetpointSUM_ADD\nMyOtherFuncType MyOtherFunc2_MyOtherFuncType\nGT Comparator1_GT\nTON Timer1_TON\n\n* Data Connections * \nMyFB1.ParC, MyOtherFB.B\nMyVar, MyFB1.ParB\nMyCM1.C, MyVar2\n\n* Parameter Data Connections *\nsome_value, MyFB1.Param1\n\n\n\nSpecification:\n{{specification}}\n\nFunction Blocks:\n{{function-blocks}}\n\nBlock Connections and Logic:\n{{block-connections-and-logic}}\n{{connections2}}\n{{connections3}}\n\nParameter Data Connections:\n{{parameter-data-connections}}\n\nOutput Variables and Connections:\n{{output-variables-and-connections}}",
+      "inputMappings": [
+        {
+          "variable": "{{specification}}",
+          "source": "autoContent"
+        },
+        {
+          "variable": "{{function-blocks}}",
+          "source": "step_1"
+        },
+        {
+          "variable": "{{block-connections-and-logic}}",
+          "source": "step_2"
+        },
+        {
+          "variable": "{{connections2}}",
+          "source": "step_3"
+        },
+        {
+          "variable": "{{parameter-data-connections}}",
+          "source": "step_5"
+        },
+        {
+          "variable": "{{output-variables-and-connections}}",
+          "source": "step_6"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Function Blocks *\nANALOG_IN FT-101\nANALOG_IN FT-102\nANALOG_IN PIT-106\nANALOG_IN TIT-104\nANALOG_IN TIT-105\nANALOG_IN TIT-107\nRATIO_CONTROL FFIC-103\nPID_BASIC FIC-104\nPID_BASIC PIC-102\nVALVE_ELECTRIC FV-104\n\n* Variables *\nREAL FT101_FeedFlow_PV\nREAL FT102_RefluxFlow_PV\nREAL PIT106_ColumnPressure_PV\nREAL TIT104_Temperature_PV\nREAL TIT105_Temperature_PV\nREAL TIT107_Temperature_PV\nREAL FFIC103_RefluxFlow_SP\n\n* Functions *\nOR PressureOutOfRange_OR\nOR Temp104OutOfRange_OR\nOR Temp105OutOfRange_OR\nOR Temp107OutOfRange_OR\nOR AnyTempOutOfRange_OR\nNOT FT101Below500_NOT\nOR ValveInhibit_OR\nOR RatioInhibit_OR\nOR FICInhibit_OR\n\n* Data Connections *\nFT-101.PV, FFIC-103.PrimaryPV\nFT-102.PV, FFIC-103.SecondaryPV\nFFIC-103.SlaveSP, FIC-104.SP\nFT-102.PV, FIC-104.PV\nFIC-104.XOUT, FV-104.Control_Signal\nPIT-106.High_Alarm, PressureOutOfRange_OR.IN1\nPIT-106.Low_Alarm, PressureOutOfRange_OR.IN2\nTIT-104.High_Alarm, Temp104OutOfRange_OR.IN1\nTIT-104.Low_Alarm, Temp104OutOfRange_OR.IN2\nTIT-105.High_Alarm, Temp105OutOfRange_OR.IN1\nTIT-105.Low_Alarm, Temp105OutOfRange_OR.IN2\nTIT-107.High_Alarm, Temp107OutOfRange_OR.IN1\nTIT-107.Low_Alarm, Temp107OutOfRange_OR.IN2\nTemp104OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN1\nTemp105OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN2\nTemp107OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN3\nFT-101.High_Alarm, FT101Below500_NOT.IN\nFT101Below500_NOT.OUT, ValveInhibit_OR.IN1\nAnyTempOutOfRange_OR.OUT, ValveInhibit_OR.IN2\nValveInhibit_OR.OUT, FV-104.Inhibit\nPressureOutOfRange_OR.OUT, RatioInhibit_OR.IN1\nFT-101.Low_Alarm, RatioInhibit_OR.IN2\nFT-101.General_Fault, RatioInhibit_OR.IN3\nFT-102.General_Fault, RatioInhibit_OR.IN4\nAnyTempOutOfRange_OR.OUT, RatioInhibit_OR.IN5\nFV-104.Position_Error, RatioInhibit_OR.IN6\nRatioInhibit_OR.OUT, FFIC-103.Inhibit\nAnyTempOutOfRange_OR.OUT, FICInhibit_OR.IN1\nFT-102.General_Fault, FICInhibit_OR.IN2\nFICInhibit_OR.OUT, FIC-104.Inhibit\nFT-101.PV, FT101_FeedFlow_PV\nFT-102.PV, FT102_RefluxFlow_PV\nPIT-106.PV, PIT106_ColumnPressure_PV\nTIT-104.PV, TIT104_Temperature_PV\nTIT-105.PV, TIT105_Temperature_PV\nTIT-107.PV, TIT107_Temperature_PV\nFFIC-103.SlaveSP, FFIC103_RefluxFlow_SP\n\n* Parameter Data Connections *\n0.5, FFIC-103.RatioSP\n0.0, FFIC-103.MV_MIN\n2500.0, FFIC-103.MV_MAX\n312.5, FT-101.Scaling_Slope\n-1250.0, FT-101.Scaling_Offset\n156.25, FT-102.Scaling_Slope\n-625.0, FT-102.Scaling_Offset\nTRUE, FT-101.Alarm_Enable\n100.0, FT-101.PV_Low\n500.0, FT-101.PV_High\nTRUE, PIT-106.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, TIT-104.Alarm_Enable\n120.0, TIT-104.PV_Low\n350.0, TIT-104.PV_High\nTRUE, TIT-105.Alarm_Enable\n120.0, TIT-105.PV_Low\n350.0, TIT-105.PV_High\nTRUE, TIT-107.Alarm_Enable\n120.0, TIT-107.PV_Low\n350.0, TIT-107.PV_High"
+    },
+    {
+      "id": "step_1753100000009",
+      "promptName": "openplc-rule-checks2",
+      "prompt": "Update the following function block diagram specification. For output, keep the same format as before and output also all unmodified entries as before, no explanations, no markdown.\n\nCheck the following rules:\n- FunctionCategorization: make sure that 61131 standard functions (NOT, AND, OR, XOR, SEL, ADD, SUB, etc.) appear under section *Functions* but not under section *Function Blocks*, move wrongly-assigned entries to *Functions*.\n\n- NoProse: make sure that the specification does not contain prose text, remove entries with prose text.\n\n- NoDI_RawParameterDataConnections: remove any entries in * Parameter Data Connections * that refer to DI_Raw parameters.\n\n\n{{function-block-diagram-specification}}",
+      "inputMappings": [
+        {
+          "variable": "{{function-block-diagram-specification}}",
+          "source": "step_7"
+        }
+      ],
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": false,
+      "output": "* Function Blocks *\nANALOG_IN FT-101\nANALOG_IN FT-102\nANALOG_IN PIT-106\nANALOG_IN TIT-104\nANALOG_IN TIT-105\nANALOG_IN TIT-107\nRATIO_CONTROL FFIC-103\nPID_BASIC FIC-104\nPID_BASIC PIC-102\nVALVE_ELECTRIC FV-104\n\n* Variables *\nREAL FT101_FeedFlow_PV\nREAL FT102_RefluxFlow_PV\nREAL PIT106_ColumnPressure_PV\nREAL TIT104_Temperature_PV\nREAL TIT105_Temperature_PV\nREAL TIT107_Temperature_PV\nREAL FFIC103_RefluxFlow_SP\n\n* Functions *\nOR PressureOutOfRange_OR\nOR Temp104OutOfRange_OR\nOR Temp105OutOfRange_OR\nOR Temp107OutOfRange_OR\nOR AnyTempOutOfRange_OR\nNOT FT101Below500_NOT\nOR ValveInhibit_OR\nOR RatioInhibit_OR\nOR FICInhibit_OR\n\n* Data Connections *\nFT-101.PV, FFIC-103.PrimaryPV\nFT-102.PV, FFIC-103.SecondaryPV\nFFIC-103.SlaveSP, FIC-104.SP\nFT-102.PV, FIC-104.PV\nFIC-104.XOUT, FV-104.Control_Signal\nPIT-106.High_Alarm, PressureOutOfRange_OR.IN1\nPIT-106.Low_Alarm, PressureOutOfRange_OR.IN2\nTIT-104.High_Alarm, Temp104OutOfRange_OR.IN1\nTIT-104.Low_Alarm, Temp104OutOfRange_OR.IN2\nTIT-105.High_Alarm, Temp105OutOfRange_OR.IN1\nTIT-105.Low_Alarm, Temp105OutOfRange_OR.IN2\nTIT-107.High_Alarm, Temp107OutOfRange_OR.IN1\nTIT-107.Low_Alarm, Temp107OutOfRange_OR.IN2\nTemp104OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN1\nTemp105OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN2\nTemp107OutOfRange_OR.OUT, AnyTempOutOfRange_OR.IN3\nFT-101.High_Alarm, FT101Below500_NOT.IN\nFT101Below500_NOT.OUT, ValveInhibit_OR.IN1\nAnyTempOutOfRange_OR.OUT, ValveInhibit_OR.IN2\nValveInhibit_OR.OUT, FV-104.Inhibit\nPressureOutOfRange_OR.OUT, RatioInhibit_OR.IN1\nFT-101.Low_Alarm, RatioInhibit_OR.IN2\nFT-101.General_Fault, RatioInhibit_OR.IN3\nFT-102.General_Fault, RatioInhibit_OR.IN4\nAnyTempOutOfRange_OR.OUT, RatioInhibit_OR.IN5\nFV-104.Position_Error, RatioInhibit_OR.IN6\nRatioInhibit_OR.OUT, FFIC-103.Inhibit\nAnyTempOutOfRange_OR.OUT, FICInhibit_OR.IN1\nFT-102.General_Fault, FICInhibit_OR.IN2\nFICInhibit_OR.OUT, FIC-104.Inhibit\nFT-101.PV, FT101_FeedFlow_PV\nFT-102.PV, FT102_RefluxFlow_PV\nPIT-106.PV, PIT106_ColumnPressure_PV\nTIT-104.PV, TIT104_Temperature_PV\nTIT-105.PV, TIT105_Temperature_PV\nTIT-107.PV, TIT107_Temperature_PV\nFFIC-103.SlaveSP, FFIC103_RefluxFlow_SP\n\n* Parameter Data Connections *\n0.5, FFIC-103.RatioSP\n0.0, FFIC-103.MV_MIN\n2500.0, FFIC-103.MV_MAX\n312.5, FT-101.Scaling_Slope\n-1250.0, FT-101.Scaling_Offset\n156.25, FT-102.Scaling_Slope\n-625.0, FT-102.Scaling_Offset\nTRUE, FT-101.Alarm_Enable\n100.0, FT-101.PV_Low\n500.0, FT-101.PV_High\nTRUE, PIT-106.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, TIT-104.Alarm_Enable\n120.0, TIT-104.PV_Low\n350.0, TIT-104.PV_High\nTRUE, TIT-105.Alarm_Enable\n120.0, TIT-105.PV_Low\n350.0, TIT-105.PV_High\nTRUE, TIT-107.Alarm_Enable\n120.0, TIT-107.PV_Low\n350.0, TIT-107.PV_High"
+    },
+    {
+      "id": "step_1757140378506",
+      "promptName": "append_two_inputs",
+      "prompt": "Update the following function block diagram specification. For output, keep the same format as before and output also all unmodified entries as before, no explanations, no markdown.\n\nCheck the following rules:\n- LiteralToParameterDataConnection: move any entries in * Data Connections * where the first item before the comma is a literal to * Parameter Data Connections *\n\n- MinimizeBooleanExpressions: analyze the boolean functions and data connections and minimize the number of functions as much as possible without altering the functionality, rewire accordingly. For example, combine different OR functions or AND functions or XOR functions.\n\n- MultipleInputsOR: check if there are any two entries in * Data Connections * with identical boolean targets (parameters named inhibit, enable, auto). For each of these cases add a new function of type OR with appropriate instance name in * Functions *, replace the targets in the previous data connection entries with OR.IN1 and OR.IN2, and add a new data connection OR.OUT,<common target>\n\n\n{{function-block-diagram-specification}}",
+      "inputMappings": [
+        {
+          "variable": "{{function-block-diagram-specification}}",
+          "source": "step_8"
+        }
+      ],
+      "output": "* Function Blocks *\nANALOG_IN FT-101\nANALOG_IN FT-102\nANALOG_IN PIT-106\nANALOG_IN TIT-104\nANALOG_IN TIT-105\nANALOG_IN TIT-107\nRATIO_CONTROL FFIC-103\nPID_BASIC FIC-104\nPID_BASIC PIC-102\nVALVE_ELECTRIC FV-104\n\n* Variables *\nREAL FT101_FeedFlow_PV\nREAL FT102_RefluxFlow_PV\nREAL PIT106_ColumnPressure_PV\nREAL TIT104_Temperature_PV\nREAL TIT105_Temperature_PV\nREAL TIT107_Temperature_PV\nREAL FFIC103_RefluxFlow_SP\n\n* Functions *\nOR AnyTempOutOfRange_OR\nNOT FT101Below500_NOT\nOR ValveInhibit_OR\nOR RatioInhibit_OR\nOR FICInhibit_OR\n\n* Data Connections *\nFT-101.PV, FFIC-103.PrimaryPV\nFT-102.PV, FFIC-103.SecondaryPV\nFFIC-103.SlaveSP, FIC-104.SP\nFT-102.PV, FIC-104.PV\nFIC-104.XOUT, FV-104.Control_Signal\nTIT-104.High_Alarm, AnyTempOutOfRange_OR.IN1\nTIT-104.Low_Alarm, AnyTempOutOfRange_OR.IN2\nTIT-105.High_Alarm, AnyTempOutOfRange_OR.IN3\nTIT-105.Low_Alarm, AnyTempOutOfRange_OR.IN4\nTIT-107.High_Alarm, AnyTempOutOfRange_OR.IN5\nTIT-107.Low_Alarm, AnyTempOutOfRange_OR.IN6\nFT-101.High_Alarm, FT101Below500_NOT.IN\nFT101Below500_NOT.OUT, ValveInhibit_OR.IN1\nAnyTempOutOfRange_OR.OUT, ValveInhibit_OR.IN2\nValveInhibit_OR.OUT, FV-104.Inhibit\nPIT-106.High_Alarm, RatioInhibit_OR.IN1\nPIT-106.Low_Alarm, RatioInhibit_OR.IN2\nFT-101.Low_Alarm, RatioInhibit_OR.IN3\nFT-101.General_Fault, RatioInhibit_OR.IN4\nFT-102.General_Fault, RatioInhibit_OR.IN5\nAnyTempOutOfRange_OR.OUT, RatioInhibit_OR.IN6\nFV-104.Position_Error, RatioInhibit_OR.IN7\nRatioInhibit_OR.OUT, FFIC-103.Inhibit\nAnyTempOutOfRange_OR.OUT, FICInhibit_OR.IN1\nFT-102.General_Fault, FICInhibit_OR.IN2\nFICInhibit_OR.OUT, FIC-104.Inhibit\nFT-101.PV, FT101_FeedFlow_PV\nFT-102.PV, FT102_RefluxFlow_PV\nPIT-106.PV, PIT106_ColumnPressure_PV\nTIT-104.PV, TIT104_Temperature_PV\nTIT-105.PV, TIT105_Temperature_PV\nTIT-107.PV, TIT107_Temperature_PV\nFFIC-103.SlaveSP, FFIC103_RefluxFlow_SP\n\n* Parameter Data Connections *\n0.5, FFIC-103.RatioSP\n0.0, FFIC-103.MV_MIN\n2500.0, FFIC-103.MV_MAX\n312.5, FT-101.Scaling_Slope\n-1250.0, FT-101.Scaling_Offset\n156.25, FT-102.Scaling_Slope\n-625.0, FT-102.Scaling_Offset\nTRUE, FT-101.Alarm_Enable\n100.0, FT-101.PV_Low\n500.0, FT-101.PV_High\nTRUE, PIT-106.Alarm_Enable\n0.5, PIT-106.PV_Low\n1.5, PIT-106.PV_High\nTRUE, TIT-104.Alarm_Enable\n120.0, TIT-104.PV_Low\n350.0, TIT-104.PV_High\nTRUE, TIT-105.Alarm_Enable\n120.0, TIT-105.PV_Low\n350.0, TIT-105.PV_High\nTRUE, TIT-107.Alarm_Enable\n120.0, TIT-107.PV_Low\n350.0, TIT-107.PV_High",
+      "isRunning": false,
+      "hasError": false,
+      "includeInOutput": true
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+Evaluation Results for paper-machine - chapter_8
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_8\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_8\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_8\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_8\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN MM-701
+ANALOG_IN PT-701
+ANALOG_IN TT-102
+BOOL_IN CS-701
+BOOL_IN HS-701
+BOOL_IN SB-701
+PID_BASIC LIC-701
+VALVE_ELECTRIC PV-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN MM-701
+ANALOG_IN PT-701
+ANALOG_IN TT-102
+PID_BASIC LIC-701
+VALVE_ELECTRIC PV-101
+
+ALL DATA CONNECTIONS:
+MM-701.PV, LIC-701.PV
+LIC-701.XOUT, PV-101.Control_Signal
+SB-701.Bool_Out, SheetBreak_NOT.IN
+SheetBreak_NOT.OUT, PressRunPermissive_AND.IN3
+CS-701.Bool_Out, PressRunPermissive_AND.IN1
+HS-701.Bool_Out, PressRunPermissive_AND.IN2
+PressRunPermissive_AND.OUT, LIC-701.AUTO
+MM-701.PV, MoistureInterlock_GT.IN1
+TT-102.High_Alarm, ValveInterlock_OR.IN1
+MoistureInterlock_GT.OUT, ValveInterlock_OR.IN2
+PV-101.Position_Error, ValveInterlock_OR.IN3
+ValveInterlock_OR.OUT, PV-101.Inhibit
+ValveInterlock_OR.OUT, PV-101.Manual_Mode
+PT-701.High_Alarm, PIDInhibit_OR.IN1
+MM-701.General_Fault, PIDInhibit_OR.IN2
+PIDInhibit_OR.OUT, LIC-701.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN -> MM-701; PID_BASIC -> LIC-701
+- Actual Connection: MM-701.PV, LIC-701.PV
+- Notes: Multiple ANALOG_IN blocks exist (PT-701, TT-102), but MM-701 is the one providing PV to the PID. Others are used for alarms/interlocks, not for LIC-701.PV.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC -> LIC-701; VALVE_ELECTRIC -> PV-101
+- Actual Connection: LIC-701.XOUT, PV-101.Control_Signal
+- Notes: Interlocks/permissives present (e.g., ValveInterlock_OR to PV-101.Inhibit and Manual_Mode; PIDInhibit_OR to LIC-701.Inhibit; PressRunPermissive_AND to LIC-701.AUTO). No MOTOR_VSD.Speed_SP path observed; direct valve control signal is correctly implemented.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct mappings are correct and augmented by sensible permissives and interlocks for safe operation. Be aware that valve Manual_Mode/Inhibit may override the PID output when interlocks are active.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

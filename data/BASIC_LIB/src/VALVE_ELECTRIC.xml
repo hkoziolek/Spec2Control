@@ -1,0 +1,83 @@
+      <pou name="VALVE_ELECTRIC" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Control_Signal">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Manual_Mode">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Manual_Position">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Open_Limit">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Close_Limit">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Timeout">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Valve_Position">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Feedback_Pos">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Valve_Moving">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Position_Error">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

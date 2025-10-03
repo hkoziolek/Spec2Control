@@ -1,0 +1,15 @@
+Direction,Pin Name,Type,Description 
+Input,Name,STRING,Descriptive name of the electric control valve. 
+Input,Description,STRING,Longer description of the valve's role. 
+Input,Control_Signal,REAL,Valve position command input (0-100 percent). 
+Input,Manual_Mode,BOOL,TRUE for manual control, FALSE for automatic control. 
+Input,Manual_Position,REAL,Valve position used when Manual_Mode is TRUE (0-100%). 
+Input,Open_Limit,REAL,Valve fully open position limit. 
+Input,Close_Limit,REAL,Valve fully closed position limit. 
+Input,Timeout,TIME,Maximum time allowed for valve to reach position. 
+Input,Inhibit,BOOL,Inhibits operating the valve and can receive alarm signals
+Output,Valve_Position,REAL,Current valve position output to the actuator. 
+Output,Feedback_Pos,REAL,Actual valve position feedback (0-100%). 
+Output,Valve_Moving,BOOL,TRUE if valve actuator is moving. 
+Output,Position_Error,BOOL,TRUE if valve fails to reach commanded position within Timeout. 
+Output,Alarm,BOOL,General alarm flag for valve faults or interlocks.

@@ -1,0 +1,156 @@
+* Function Blocks *
+ANALOG_IN FT-401
+ANALOG_IN PT-401A
+ANALOG_IN PT-401B
+ANALOG_IN PT-401C
+ANALOG_IN TT-401A
+ANALOG_IN TT-401B
+ANALOG_IN TT-401C
+VOTING_ANALOG TT-401-V
+VALVE_ELECTRIC BOF-402
+BOOL_IN I-401
+BOOL_IN DA-401
+BOOL_IN FA-401
+
+* Variables *
+REAL TT_401_V_Voted_Temp
+
+* Functions *
+AND TT401_1450_A_B_AND
+AND TT401_1450_A_C_AND
+AND TT401_1450_B_C_AND
+OR TT401_1450_2oo3_OR
+OR TT401_1450_2oo3_stage2_OR
+NOT TT401_1450_2oo3_NOT
+OR PTA_OutOfRange_OR
+NOT PTA_InRange_NOT
+OR PTB_OutOfRange_OR
+NOT PTB_InRange_NOT
+OR PTC_OutOfRange_OR
+NOT PTC_InRange_NOT
+AND PT_InRange_AB_AND
+AND PT_InRange_AC_AND
+AND PT_InRange_BC_AND
+OR PT_2oo3_InRange_OR
+OR PT_2oo3_InRange_stage2_OR
+NOT PT_2oo3_InRange_NOT
+OR Faults_TT_AB_OR
+OR Faults_TT_ABC_OR
+OR Faults_PT_AB_OR
+OR Faults_PT_ABC_OR
+OR Faults_All_TT_PT_OR
+OR Faults_All_OR
+NOT TT401A_Healthy_NOT
+NOT TT401B_Healthy_NOT
+NOT TT401C_Healthy_NOT
+AND TT_Healthy_AB_AND
+AND TT_AllHealthy_AND
+NOT TT_Startup_NotOk_NOT
+OR Inhibit_TempPress_OR
+OR Inhibit_AddFlow_OR
+OR Inhibit_AddDA_OR
+OR Inhibit_AddFA_OR
+OR Inhibit_AddStartup_OR
+
+* Data Connections * 
+TT-401A.PV, TT-401-V.Input1
+TT-401B.PV, TT-401-V.Input2
+TT-401C.PV, TT-401-V.Input3
+TT-401-V.Voted_Output, BOF-402.Control_Signal
+
+TT-401A.High_Alarm, TT401_1450_A_B_AND.IN1
+TT-401B.High_Alarm, TT401_1450_A_B_AND.IN2
+TT-401A.High_Alarm, TT401_1450_A_C_AND.IN1
+TT-401C.High_Alarm, TT401_1450_A_C_AND.IN2
+TT-401B.High_Alarm, TT401_1450_B_C_AND.IN1
+TT-401C.High_Alarm, TT401_1450_B_C_AND.IN2
+TT401_1450_A_B_AND.OUT, TT401_1450_2oo3_OR.IN1
+TT401_1450_A_C_AND.OUT, TT401_1450_2oo3_OR.IN2
+TT401_1450_2oo3_OR.OUT, TT401_1450_2oo3_stage2_OR.IN1
+TT401_1450_B_C_AND.OUT, TT401_1450_2oo3_stage2_OR.IN2
+TT401_1450_2oo3_stage2_OR.OUT, TT401_1450_2oo3_NOT.IN
+
+PT-401A.High_Alarm, PTA_OutOfRange_OR.IN1
+PT-401A.Low_Alarm, PTA_OutOfRange_OR.IN2
+PTA_OutOfRange_OR.OUT, PTA_InRange_NOT.IN
+PT-401B.High_Alarm, PTB_OutOfRange_OR.IN1
+PT-401B.Low_Alarm, PTB_OutOfRange_OR.IN2
+PTB_OutOfRange_OR.OUT, PTB_InRange_NOT.IN
+PT-401C.High_Alarm, PTC_OutOfRange_OR.IN1
+PT-401C.Low_Alarm, PTC_OutOfRange_OR.IN2
+PTC_OutOfRange_OR.OUT, PTC_InRange_NOT.IN
+PTA_InRange_NOT.OUT, PT_InRange_AB_AND.IN1
+PTB_InRange_NOT.OUT, PT_InRange_AB_AND.IN2
+PTA_InRange_NOT.OUT, PT_InRange_AC_AND.IN1
+PTC_InRange_NOT.OUT, PT_InRange_AC_AND.IN2
+PTB_InRange_NOT.OUT, PT_InRange_BC_AND.IN1
+PTC_InRange_NOT.OUT, PT_InRange_BC_AND.IN2
+PT_InRange_AB_AND.OUT, PT_2oo3_InRange_OR.IN1
+PT_InRange_AC_AND.OUT, PT_2oo3_InRange_OR.IN2
+PT_2oo3_InRange_OR.OUT, PT_2oo3_InRange_stage2_OR.IN1
+PT_InRange_BC_AND.OUT, PT_2oo3_InRange_stage2_OR.IN2
+PT_2oo3_InRange_stage2_OR.OUT, PT_2oo3_InRange_NOT.IN
+
+TT-401A.General_Fault, Faults_TT_AB_OR.IN1
+TT-401B.General_Fault, Faults_TT_AB_OR.IN2
+Faults_TT_AB_OR.OUT, Faults_TT_ABC_OR.IN1
+TT-401C.General_Fault, Faults_TT_ABC_OR.IN2
+PT-401A.General_Fault, Faults_PT_AB_OR.IN1
+PT-401B.General_Fault, Faults_PT_AB_OR.IN2
+Faults_PT_AB_OR.OUT, Faults_PT_ABC_OR.IN1
+PT-401C.General_Fault, Faults_PT_ABC_OR.IN2
+Faults_TT_ABC_OR.OUT, Faults_All_TT_PT_OR.IN1
+Faults_PT_ABC_OR.OUT, Faults_All_TT_PT_OR.IN2
+Faults_All_TT_PT_OR.OUT, Faults_All_OR.IN1
+FT-401.General_Fault, Faults_All_OR.IN2
+Faults_All_OR.OUT, FA-401.Bool_In
+
+TT-401-V.Alarm_Voting_Error, DA-401.Bool_In
+
+TT-401A.General_Fault, TT401A_Healthy_NOT.IN
+TT401A_Healthy_NOT.OUT, TT_Healthy_AB_AND.IN1
+TT-401B.General_Fault, TT401B_Healthy_NOT.IN
+TT401B_Healthy_NOT.OUT, TT_Healthy_AB_AND.IN2
+TT_Healthy_AB_AND.OUT, TT_AllHealthy_AND.IN1
+TT-401C.General_Fault, TT401C_Healthy_NOT.IN
+TT401C_Healthy_NOT.OUT, TT_AllHealthy_AND.IN2
+TT_AllHealthy_AND.OUT, TT_Startup_NotOk_NOT.IN
+
+TT401_1450_2oo3_NOT.OUT, Inhibit_TempPress_OR.IN1
+PT_2oo3_InRange_NOT.OUT, Inhibit_TempPress_OR.IN2
+Inhibit_TempPress_OR.OUT, Inhibit_AddFlow_OR.IN1
+FT-401.Low_Alarm, Inhibit_AddFlow_OR.IN2
+Inhibit_AddFlow_OR.OUT, Inhibit_AddDA_OR.IN1
+DA-401.Bool_Out, Inhibit_AddDA_OR.IN2
+Inhibit_AddDA_OR.OUT, Inhibit_AddFA_OR.IN1
+FA-401.Bool_Out, Inhibit_AddFA_OR.IN2
+Inhibit_AddFA_OR.OUT, Inhibit_AddStartup_OR.IN1
+TT_Startup_NotOk_NOT.OUT, Inhibit_AddStartup_OR.IN2
+Inhibit_AddStartup_OR.OUT, I-401.Bool_In
+
+I-401.Bool_Out, BOF-402.Inhibit
+
+TT-401-V.Voted_Output, TT_401_V_Voted_Temp
+
+* Parameter Data Connections *
+0.05, TT-401-V.Deviation_Limit
+2oo3, TT-401-V.Voting_Scheme
+TRUE, TT-401-V.EnableAlarm
+1450.0, TT-401A.PV_High
+1450.0, TT-401B.PV_High
+1450.0, TT-401C.PV_High
+90.0, PT-401A.PV_Low
+120.0, PT-401A.PV_High
+90.0, PT-401B.PV_Low
+120.0, PT-401B.PV_High
+90.0, PT-401C.PV_Low
+120.0, PT-401C.PV_High
+500.0, FT-401.PV_Low
+TRUE, TT-401A.Alarm_Enable
+TRUE, TT-401B.Alarm_Enable
+TRUE, TT-401C.Alarm_Enable
+TRUE, PT-401A.Alarm_Enable
+TRUE, PT-401B.Alarm_Enable
+TRUE, PT-401C.Alarm_Enable
+TRUE, FT-401.Alarm_Enable
+

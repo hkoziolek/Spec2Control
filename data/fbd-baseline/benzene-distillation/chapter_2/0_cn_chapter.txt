@@ -1,0 +1,24 @@
+## 2 **Distillation Column (T-101)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|LAH-101 | Level Alarm High | High level alarm for tank overflow protection |
+|LAL-101 | Level Alarm Low | Low level alarm for tank level monitoring |
+|LIT-101 | Level Transmitter | Measures liquid level in the tank |
+|PIT-102 | Pressure Transmitter | Monitors column pressure for safe operation |
+|PV-103 | Pressure Valve | Modulates heat input to the reboiler |
+|T-101 | Distillation Column | Separates benzene and toluene |
+|TE-101 | Temperature Transmitter | Measures temperature at the base of the column |
+|TIC-104 | Temperature Controller | Regulates reboiler temperature for optimal separation |
+|XV-105 | On-Off Valve | Isolation valve for process safety |
+
+### 2.1) Control Strategy Description
+
+The primary control objective for the distillation column (T-101) is to regulate the reboiler temperature using TIC-104 to maintain a stable separation of benzene and toluene. TIC-104 operates in a single-loop feedback configuration, controlling the temperature at the base of T-101 via TE-101 and modulating the heat input through PV-103. The process variable (PV) is the temperature measured by TE-101, which has a calibrated range of 50°C to 200°C and outputs a 4-20mA signal. The setpoint (SP) for TIC-104 is configured at 150°C to optimize the separation process. TIC-104 is configured as a reverse-acting controller with tuning parameters set to Kp=3.0, Ki=0.5 min, and Kd=0.1 min to ensure precise control and minimize overshoot. The manipulated variable (MV) is the position of PV-103, which is a fail-closed control valve with an actuator signal range of 0-100%. Bumpless transfer logic is implemented to allow seamless switching between manual and automatic modes without disrupting process stability. Signal scaling ensures TE-101 output is normalized to match the controller input range, while the control output from TIC-104 is clamped between 10% and 90% to prevent excessive heating.
+
+### 2.2) Interlocks and Permissives
+
+The operation of TIC-104 is interlocked with the column pressure control system to ensure safe operation. PIT-102 monitors the column pressure, and if the pressure exceeds 150 psig or falls below 90 psig, TIC-104 is forced into manual mode with the output held constant to prevent unsafe temperature excursions. XV-105, a shut-off valve downstream of PV-103, is interlocked to close automatically if the column level, as measured by LIT-101, falls below 20% or exceeds 80%, as indicated by LAL-101 and LAH-101 respectively. The permissive logic ensures TIC-104 can only operate in automatic mode if LIT-101 is within the safe operating range and XV-105 is confirmed open. Additionally, TE-101 signal integrity is continuously monitored, and any deviation beyond the calibrated range triggers a permissive block to inhibit TIC-104 operation.
+
+### 2.3) Alarm and Fault Handling
+
+TIC-104 generates a high-temperature alarm if TE-101 detects a temperature above 180°C, and a low-temperature alarm if the temperature falls below 130°C. These alarms are displayed to the operator with priority levels to prompt immediate corrective action. In the event of TE-101 signal failure (4-20mA signal loss or out-of-range values), TIC-104 enters a fault state where the output is frozen at the last known value, and an alarm is triggered. If PV-103 fails to respond to control signals, TIC-104 generates a control valve fault alarm and switches to manual mode. A deadband of ±2°C is implemented in the control logic to prevent hunting around the setpoint. Settling time for the temperature control loop is designed to be within 5 minutes under normal operating conditions, ensuring rapid stabilization after disturbances.

@@ -1,0 +1,24 @@
+## 6 **Water Coalescer Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FT-105 | Flow Transmitter | Measures flow rate downstream of water coalescer (0-50 gpm range) |
+|LI-503 | Level Transmitter | Measures liquid level in the water coalescer (0-100% range) |
+|LIC-502 | Level Controller | Controls flow rate downstream of water coalescer via LVC-502 |
+|LIC-503 | Level Controller | Maintains liquid level in the water coalescer via LVC-507 |
+|LVC-502 | Level Valve | Regulates flow rate downstream of water coalescer (fail-open) |
+|LVC-507 | Level Valve | Regulates liquid level in the water coalescer (fail-closed) |
+|P-001 | Pump | Circulates process fluid in the system |
+
+### 6.1) Control Strategy Description
+
+The water coalescer level is controlled using LIC-503, which maintains the liquid level within the coalescer to ensure optimal impurity removal. The process variable (PV) is the liquid level measured by LI-503, with a calibrated range of 0-100% corresponding to a 4-20mA signal. The setpoint (SP) for LIC-503 is configured at 65% to maintain stable operation. LIC-503 employs a reverse-acting PID controller to regulate the output to LVC-507, which is a fail-closed control valve. The PID tuning parameters for LIC-503 are configured as follows: proportional gain (Kp) = 2.0, integral time (Ki) = 1.5 minutes, and derivative time (Kd) = 0.1 minutes. The output range of LIC-503 is clamped between 0% and 100% to prevent actuator saturation. Bumpless transfer is implemented to ensure smooth transitions between manual and automatic modes.
+
+Flow control downstream of the water coalescer is managed by LIC-502, which adjusts LVC-502 to maintain the flow rate measured by FT-105. FT-105 provides a 4-20mA signal corresponding to a flow range of 0-50 gpm. The setpoint for LIC-502 is set at 35 gpm, and the PID tuning parameters are configured as follows: Kp = 1.8, Ki = 2.0 minutes, and Kd = 0.0 minutes. LIC-502 is direct-acting, and LVC-502 is fail-open to ensure flow continuity in the event of a controller or valve failure.
+
+### 6.2) Interlocks and Permissives
+
+The operation of LIC-503 is interlocked with LI-503 to prevent overfilling or emptying of the water coalescer. If LI-503 detects a level above 90% or below 10%, LIC-503 output is overridden to close LVC-507, and an alarm is triggered. Additionally, LIC-502 is interlocked with FT-105 to ensure flow rate stability; if FT-105 detects a flow rate below 5 gpm, LIC-502 output is overridden to fully open LVC-502 to restore flow. Both LIC-503 and LIC-502 are permissive-controlled by the status of P01, the pump feeding the water coalescer. If P01 is not running, both control loops are disabled, and LVC-502 and LVC-507 are forced to their fail positions.
+
+### 6.3) Alarm and Fault Handling
+
+High and low-level alarms are configured for LI-503 at 90% and 10%, respectively. If either alarm is triggered, LIC-503 enters fault mode, closing LVC-507 and disabling automatic control. Similarly, FT-105 has high and low flow alarms set at 45 gpm and 5 gpm, respectively. Upon alarm activation, LIC-502 output is overridden to fully open LVC-502. A fault in the signal from LI-503 or FT-105 (e.g., signal loss or out-of-range values) results in the respective controller entering manual mode, with the operator required to adjust valve positions manually. Hysteresis of 5% is applied to all alarm thresholds to prevent oscillation between alarm states.

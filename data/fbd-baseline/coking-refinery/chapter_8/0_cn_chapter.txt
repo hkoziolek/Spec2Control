@@ -1,0 +1,39 @@
+## 8 **Utilities and Offsites**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|B-701 | Boiler | Provides steam generation for process heating. |
+|FD-701 | Forced Draft Fan | Supplies combustion air to the boiler. |
+|FIC-702 | Flow Controller | Controls combustion air flow to maintain ratio. |
+|FT-701 | Flow Transmitter | Measures fuel gas flow to the boiler. |
+|FT-702 | Flow Transmitter | Measures combustion air flow to the boiler. |
+|FV-701 | Flow Valve | Regulates fuel gas flow to the boiler. |
+|FV-702 | Flow Valve | Modulates combustion air flow based on control. |
+|LIC-101 | Level Controller | Maintains liquid level in a specified vessel. |
+|PT-701 | Pressure Transmitter | Measures pressure in the fuel gas line. |
+
+### 8.1) Control Strategy Description
+
+In the **Utilities and Offsites** section, ratio control is implemented to maintain a precise proportional relationship between the fuel gas flow to the boiler (B-701) and the combustion air flow. The wild flow, measured by FT-701 (fuel gas flow transmitter), is used as the primary input for ratio calculations. The controlled flow, measured by FT-702 (combustion air flow transmitter), is adjusted to maintain a 10:1 air-to-fuel ratio, ensuring optimal combustion efficiency.
+
+The ratio controller FFIC-701 calculates the combustion air flow setpoint (SP) based on the fuel gas flow measurement. The relationship is defined as:
+\[ \text{FT-702 SP} = \text{FT-701 PV} \times 10 \]
+
+Here, FT-701 provides a process variable (PV) range of 0–500 kg/hr, while FT-702 adjusts the air flow SP within a range of 0–5000 kg/hr. The flow control valve FV-702 modulates the combustion air flow based on the output of FIC-702 (air flow controller). FFIC-701 includes manual bias adjustment capability, allowing operators to fine-tune the ratio within a range of 9.5:1 to 10.5:1 for specific combustion conditions.
+
+Signal scaling ensures accurate ratio calculation, with FT-701 and FT-702 outputs linearly scaled to engineering units (kg/hr). A low-flow cutoff is implemented such that if FT-701 PV falls below 50 kg/hr, FFIC-701 forces FIC-702 to maintain a minimum air flow of 500 kg/hr to prevent flame instability in B-701.
+
+### 8.2) Interlocks and Permissives
+
+The ratio control logic is interlocked with boiler safety systems to ensure safe operation. FT-701 and FT-702 are continuously monitored for signal validity. If either transmitter fails or provides a signal outside its calibrated range, FFIC-701 automatically disables ratio control and switches FIC-702 to manual mode, maintaining a default air flow of 2500 kg/hr.
+
+A permissive condition requires the boiler flame detector FD-701 to confirm active combustion before FFIC-701 enables ratio control. Additionally, LIC-101 (boiler drum level controller) ensures that the drum level remains within 40–60% before allowing fuel gas flow through FV-701. If LIC-101 detects a level outside this range, FFIC-701 halts fuel gas flow and combustion air flow to B-701.
+
+Boolean interlocks prevent operation if the cooling water supply to B-701 is unavailable, as confirmed by PT-701 (pressure transmitter) indicating cooling water pressure below 2 bar. The system also prevents FV-702 from opening unless the fuel gas flow rate exceeds 50 kg/hr, ensuring air flow does not exceed safe limits during startup.
+
+### 8.3) Alarm and Fault Handling
+
+Alarms are configured to notify operators of deviations from the air-to-fuel ratio or equipment faults. FFIC-701 generates a high-priority alarm if the calculated air-to-fuel ratio exceeds 10.5:1 or falls below 9.5:1 for more than 5 seconds, indicating potential combustion inefficiency. FT-701 and FT-702 are equipped with signal fault alarms to detect transmitter failures or calibration errors.
+
+Low-flow alarms are triggered if FT-701 PV drops below 50 kg/hr, prompting operators to verify fuel gas supply. Similarly, a high-flow alarm is activated if FT-701 PV exceeds 450 kg/hr, indicating potential overloading of the boiler. FIC-702 generates a control deviation alarm if the actual air flow deviates from FFIC-701 SP by more than 10% for 10 seconds.
+
+In the event of a fault, FFIC-701 transitions to manual mode, maintaining a default air flow of 2500 kg/hr through FV-702. Operators are required to investigate and clear the fault condition before re-enabling automatic ratio control.

@@ -1,0 +1,35 @@
+## 4 **Overhead Condenser and Accumulator (E-104 and V-104)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|E-104 | Heat Exchanger | Condenses overhead vapor stream |
+|FIC-107 | Flow Controller | Regulates condensate flow rate |
+|FT-107 | Flow Transmitter | Measures condensate flow rate |
+|LAH-104 | Level Alarm High | High level alarm for accumulator |
+|LAL-104 | Level Alarm Low | Low level alarm for accumulator |
+|LIC-104 | Level Controller | Controls liquid level in accumulator |
+|LT-105 | Level Transmitter | Measures liquid level in accumulator |
+|LV-107 | Level Valve | Modulates condensate flow rate |
+|PIC-104 | Pressure Controller| Controls pressure in accumulator |
+|PT-104 | Pressure Transmitter| Measures pressure in accumulator |
+|V-104 | Vessel | Accumulator for condensed liquid |
+|XV-103 | On-Off Valve | Isolation valve for process line |
+
+### 4.1) Control Strategy Description
+
+The cascade control system for the overhead condenser and accumulator (E-104 and V-104) utilizes a primary loop to regulate the liquid level in the accumulator (V-104) and a secondary loop to control the flow rate of condensate through the level control valve LV-107. The primary controller, LIC-104, receives input from level transmitter LT-105, which measures the liquid level in V-104. LIC-104 maintains the accumulator level at a setpoint of 65% and outputs a remote setpoint (RSP) to the secondary controller FIC-107.
+
+The secondary controller, FIC-107, regulates the flow rate of condensate by modulating LV-107. FIC-107 receives its process variable from flow transmitter FT-107, which measures the condensate flow rate. The secondary loop is tuned to respond 5 times faster than the primary loop, ensuring rapid disturbance rejection. Tuning parameters are set as follows: LIC-104 (Kp=1.5, Ki=2.5 min) and FIC-107 (Kp=4.0, Ki=0.5 min). The cascade configuration ensures that the primary controller output dynamically adjusts the secondary controller setpoint, maintaining stable operation under varying process conditions.
+
+Signal scaling is implemented between LIC-104 and FIC-107 to ensure compatibility between the primary output range (0-100%) and the secondary setpoint range (0-50 GPM). The system operates in cascade mode by default, with provisions for local and manual modes. Manual setpoints for FIC-107 are clamped between 12 and 79 GPM to prevent saturation of LV-107 and ensure operational safety.
+
+### 4.2) Interlocks and Permissives
+
+The cascade control system is permitted to operate only when the following conditions are satisfied: PT-104 indicates accumulator pressure is within the range of 15-30 psig, and LT-105 confirms the liquid level is above the low alarm threshold set by LAL-104 (10%). Additionally, XV-103, the upstream shut-off valve, must be fully open to allow vapor flow to E-104. If any of these conditions are violated, the cascade control system transitions to manual mode, and the operator is alerted to take corrective action.
+
+During startup, a timer delay of 30 seconds ensures that the secondary loop (FIC-107) stabilizes before the primary loop (LIC-104) begins operation. This prevents interaction-induced hunting and ensures smooth cascade mode transitions.
+
+### 4.3) Alarm and Fault Handling
+
+Alarm handling for the cascade control system includes high and low level alarms from LAH-104 and LAL-104, respectively. If LT-105 detects a level above 90% or below 10%, LIC-104 enters an alarm state and outputs a fixed setpoint to FIC-107 to maintain minimum flow through LV-107. Similarly, if PT-104 detects accumulator pressure exceeding 30 psig, PIC-104 overrides LIC-104 and closes LV-107 to prevent overpressure conditions.
+
+In the event of secondary loop failure, such as FT-107 signal loss or LV-107 actuator malfunction, the system automatically switches to manual mode. LIC-104 outputs a fixed setpoint of 40% to maintain safe operation, and the operator is notified via the control system interface. Deadband logic is applied to LIC-104 to prevent oscillations during recovery from fault conditions.

@@ -1,0 +1,88 @@
+Evaluation Results for multi-phase-flow-facility - chapter_6
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_6\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_6\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_6\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(2), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_6\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-105
+ANALOG_IN LI-503
+PID_BASIC LIC-502
+PID_BASIC LIC-503
+VALVE_ELECTRIC LVC-502
+VALVE_ELECTRIC LVC-507
+MOTOR_ON_OFF P-001
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-105
+ANALOG_IN LI-503
+PID_BASIC LIC-502
+PID_BASIC LIC-503
+VALVE_ELECTRIC LVC-502
+VALVE_ELECTRIC LVC-507
+
+ALL DATA CONNECTIONS:
+FT-105.PV, LIC-502.PV
+LI-503.PV, LIC-503.PV
+LIC-502.XOUT, LVC-502.Control_Signal
+LIC-503.XOUT, LVC-507.Control_Signal
+LI-503.High_Alarm, LIC503_Inhibit_OR.IN1
+LI-503.Low_Alarm, LIC503_Inhibit_OR.IN4
+FT-105.High_Alarm, LIC502_Inhibit_OR.IN1
+FT-105.Low_Alarm, LIC502_Inhibit_OR.IN4
+P-001.FB_Running, PumpNotRunning_NOT.IN
+PumpNotRunning_NOT.OUT, LIC503_Inhibit_OR.IN2
+PumpNotRunning_NOT.OUT, LIC502_Inhibit_OR.IN2
+LI-503.General_Fault, LIC503_Inhibit_OR.IN3
+FT-105.General_Fault, LIC502_Inhibit_OR.IN3
+LIC503_Inhibit_OR.OUT, LIC-503.Inhibit
+LIC503_Inhibit_OR.OUT, LVC-507.Inhibit
+LIC503_Inhibit_OR.OUT, LVC-507.Manual_Mode
+LIC502_Inhibit_OR.OUT, LIC-502.Inhibit
+LIC502_Inhibit_OR.OUT, LVC-502.Inhibit
+LIC502_Inhibit_OR.OUT, LVC-502.Manual_Mode
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1=FT-105, PID_BASIC1=LIC-502; ANALOG_IN2=LI-503, PID_BASIC2=LIC-503
+- Actual Connection: FT-105.PV, LIC-502.PV; LI-503.PV, LIC-503.PV
+- Notes: Both PV connections are direct. Alarm/fault/inhibit logic exists around these loops but does not alter the PV wiring.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1=LIC-502, VALVE_ELECTRIC1=LVC-502; PID_BASIC2=LIC-503, VALVE_ELECTRIC2=LVC-507
+- Actual Connection: LIC-502.XOUT, LVC-502.Control_Signal; LIC-503.XOUT, LVC-507.Control_Signal
+- Notes: Direct output-to-actuator connections found for both loops. The allowed indirect alternative to MOTOR_VSD.Speed_SP is not used here. Inhibit and Manual_Mode signals are present for both PID and valve, indicating coordinated interlock behavior.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct, consistent implementation across both loops with appropriate inhibit/manual interlocking; signal routing matches intended patterns.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

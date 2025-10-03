@@ -1,0 +1,13 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the AI block for HMI and alarms.
+Input,Description,STRING,Longer description of the measurement purpose.
+Input,Raw_Signal,REAL,Raw 4-20mA input signal from field transmitter (mA).
+Input,PV_High,REAL,High alarm limit for PV. 
+Input,PV_Low,REAL,Low alarm limit for PV.
+Input,Scaling_Slope,REAL,Slope for linear scaling of raw signal to engineering units.
+Input,Scaling_Offset,REAL,Offset for scaling raw input to engineering units.
+Input,Alarm_Enable,BOOL,Enables or disables alarm monitoring.
+Output,PV,REAL,Process Variable, scaled engineering value (e.g. flow rate).
+Output,High_Alarm,BOOL,TRUE if PV exceeds PV_High limit.
+Output,Low_Alarm,BOOL,TRUE if PV falls below PV_Low limit.
+Output,General_Fault,BOOL,TRUE if sensor fault.

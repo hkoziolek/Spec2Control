@@ -1,0 +1,114 @@
+* Function Blocks *
+ANALOG_IN FT-901
+ANALOG_IN LS-901
+MOTOR_ON_OFF P-901A
+MOTOR_ON_OFF P-901B
+VALVE_ON_OFF XV-102
+DUTY_STANDBY P-901_DS
+
+* Variables *
+REAL FT-901_Flow_PV
+REAL LS-901_Level_PV
+BOOL P-901A_MotorStartOut
+BOOL P-901B_MotorStartOut
+BOOL XV-102_CloseOut
+
+* Functions *
+GT LevelAbove60_GT
+LT LevelBelow40_LT
+GT LevelAbove85_GT
+RS StartRequest_RS
+AND SelectedA_AND
+NOT ActiveIsA_NOT
+AND SelectedB_AND
+OR SelectedRun_OR
+TON DutyPeriod_TON
+TON MinRun_TON
+AND PumpA_Fail_AND
+TON PumpA_Fail_TON
+AND PumpB_Fail_AND
+TON PumpB_Fail_TON
+OR FailAny_OR
+TON SwitchoverDelay_TON
+OR StartA_OR
+NOT StartA_NOT
+OR StartB_OR
+NOT StartB_NOT
+OR PumpA_Inhibit_OR
+OR PumpB_Inhibit_OR
+
+* Data Connections * 
+LS-901.PV, LevelAbove60_GT.IN1
+LS-901.PV, LevelBelow40_LT.IN1
+LS-901.PV, LevelAbove85_GT.IN1
+LevelAbove60_GT.OUT, StartRequest_RS.S
+LevelBelow40_LT.OUT, StartRequest_RS.R
+P-901_DS.ActiveIsA, SelectedA_AND.IN1
+P-901A.FB_Running, SelectedA_AND.IN2
+P-901_DS.ActiveIsA, ActiveIsA_NOT.IN
+ActiveIsA_NOT.OUT, SelectedB_AND.IN1
+P-901B.FB_Running, SelectedB_AND.IN2
+SelectedA_AND.OUT, SelectedRun_OR.IN1
+SelectedB_AND.OUT, SelectedRun_OR.IN2
+SelectedRun_OR.OUT, DutyPeriod_TON.IN
+DutyPeriod_TON.Q, P-901_DS.DutyElapsed
+SelectedRun_OR.OUT, MinRun_TON.IN
+MinRun_TON.Q, P-901_DS.MinRunElapsed
+P-901A.FB_Running, PumpA_Fail_AND.IN1
+FT-901.Low_Alarm, PumpA_Fail_AND.IN2
+PumpA_Fail_AND.OUT, PumpA_Fail_TON.IN
+PumpA_Fail_TON.Q, P-901_DS.PumpA_Fault
+P-901B.FB_Running, PumpB_Fail_AND.IN1
+FT-901.Low_Alarm, PumpB_Fail_AND.IN2
+PumpB_Fail_AND.OUT, PumpB_Fail_TON.IN
+PumpB_Fail_TON.Q, P-901_DS.PumpB_Fault
+PumpA_Fail_TON.Q, FailAny_OR.IN1
+PumpB_Fail_TON.Q, FailAny_OR.IN2
+FailAny_OR.OUT, SwitchoverDelay_TON.IN
+SwitchoverDelay_TON.Q, P-901_DS.SwitchoverDelayElapsed
+StartRequest_RS.Q, P-901_DS.StartRequest
+P-901_DS.CmdPumpA, StartA_OR.IN1
+LevelAbove85_GT.OUT, StartA_OR.IN2
+StartA_OR.OUT, StartA_NOT.IN
+StartA_OR.OUT, P-901A.Start_Cmd
+StartA_NOT.OUT, P-901A.Stop_Cmd
+P-901_DS.CmdPumpB, StartB_OR.IN1
+LevelAbove85_GT.OUT, StartB_OR.IN2
+StartB_OR.OUT, StartB_NOT.IN
+StartB_OR.OUT, P-901B.Start_Cmd
+StartB_NOT.OUT, P-901B.Stop_Cmd
+P-901A.FB_Running, P-901_DS.PumpA_RunFB
+P-901B.FB_Running, P-901_DS.PumpB_RunFB
+LS-901.Low_Alarm, PumpA_Inhibit_OR.IN1
+PumpA_Fail_AND.OUT, PumpA_Inhibit_OR.IN2
+PumpA_Inhibit_OR.OUT, P-901A.Inhibit
+LS-901.Low_Alarm, PumpB_Inhibit_OR.IN1
+PumpB_Fail_AND.OUT, PumpB_Inhibit_OR.IN2
+PumpB_Inhibit_OR.OUT, P-901B.Inhibit
+P-901_DS.Alarm_NoAvailablePump, XV-102.Inhibit
+P-901_DS.Alarm_NoAvailablePump, XV-102.Close_Cmd
+FT-901.PV, FT-901_Flow_PV
+LS-901.PV, LS-901_Level_PV
+P-901A.Motor_Start_Out, P-901A_MotorStartOut
+P-901B.Motor_Start_Out, P-901B_MotorStartOut
+XV-102.Valve_Close_Out, XV-102_CloseOut
+
+* Parameter Data Connections *
+60.0, LevelAbove60_GT.IN2
+40.0, LevelBelow40_LT.IN2
+85.0, LevelAbove85_GT.IN2
+T#48h, DutyPeriod_TON.PT
+T#30m, MinRun_TON.PT
+T#10s, PumpA_Fail_TON.PT
+T#10s, PumpB_Fail_TON.PT
+T#5s, SwitchoverDelay_TON.PT
+40.0, LS-901.PV_Low
+90.0, LS-901.PV_High
+TRUE, LS-901.Alarm_Enable
+15.0, FT-901.PV_Low
+TRUE, FT-901.Alarm_Enable
+T#30m, P-901A.MinRunTime
+T#30m, P-901B.MinRunTime
+TRUE, P-901_DS.Enable
+TRUE, P-901_DS.AlternateEnable
+

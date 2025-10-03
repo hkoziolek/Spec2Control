@@ -1,0 +1,82 @@
+* Function Blocks *
+ANALOG_IN DT-301
+ANALOG_IN PIT-103
+ANALOG_IN PT-101
+PID_BASIC PIC-104
+VALVE_ELECTRIC FV-106
+VALVE_ON_OFF XV-102
+VALVE_ON_OFF XV-107
+DIGITAL_IN XV-102-OPEN-FB
+DIGITAL_IN XV-107-OPEN-FB
+BOOL_IN PERM-XV102-OPEN
+BOOL_IN PERM-XV107-OPEN
+
+* Variables *
+REAL PIT103_Pressure_kPa
+REAL PT101_UpstreamPressure_kPa
+REAL DT301_PulpDensity_Pct
+REAL PIC104_ControlOutput_to_FV106_Pct
+REAL FV106_ValvePositionFeedback_Pct
+
+* Functions *
+OR PIC104Inhibit_OR
+OR FV106Inhibit_OR
+OR SystemFault_OR
+NOT XV102NotOpen_NOT
+NOT XV107NotOpen_NOT
+NOT SystemEnable_NOT
+NOT PIC104Auto_NOT
+
+* Data Connections *
+PIT-103.PV, PIC-104.PV
+PIC-104.XOUT, FV-106.Control_Signal
+XV-102-OPEN-FB.DI_Out, PERM-XV102-OPEN.Bool_In
+XV-107-OPEN-FB.DI_Out, PERM-XV107-OPEN.Bool_In
+PERM-XV102-OPEN.Bool_Out, XV102NotOpen_NOT.IN
+PERM-XV107-OPEN.Bool_Out, XV107NotOpen_NOT.IN
+PT-101.General_Fault, SystemFault_OR.IN1
+DT-301.General_Fault, SystemFault_OR.IN2
+SystemFault_OR.OUT, XV-102.Inhibit
+SystemFault_OR.OUT, XV-107.Inhibit
+SystemFault_OR.OUT, SystemEnable_NOT.IN
+SystemEnable_NOT.OUT, XV-102.Open_Cmd
+SystemFault_OR.OUT, XV-102.Close_Cmd
+SystemEnable_NOT.OUT, XV-107.Open_Cmd
+SystemFault_OR.OUT, XV-107.Close_Cmd
+PT-101.Low_Alarm, PIC104Inhibit_OR.IN1
+PT-101.High_Alarm, PIC104Inhibit_OR.IN2
+DT-301.High_Alarm, PIC104Inhibit_OR.IN3
+PIT-103.General_Fault, PIC104Inhibit_OR.IN4
+PIC104Inhibit_OR.OUT, PIC-104.Inhibit
+PIC104Inhibit_OR.OUT, PIC104Auto_NOT.IN
+PIC104Auto_NOT.OUT, PIC-104.AUTO
+XV102NotOpen_NOT.OUT, FV106Inhibit_OR.IN1
+XV107NotOpen_NOT.OUT, FV106Inhibit_OR.IN2
+PT-101.High_Alarm, FV106Inhibit_OR.IN3
+PIT-103.General_Fault, FV106Inhibit_OR.IN4
+FV106Inhibit_OR.OUT, FV-106.Inhibit
+PIT-103.PV, PIT103_Pressure_kPa
+PT-101.PV, PT101_UpstreamPressure_kPa
+DT-301.PV, DT301_PulpDensity_Pct
+PIC-104.XOUT, PIC104_ControlOutput_to_FV106_Pct
+FV-106.Feedback_Pos, FV106_ValvePositionFeedback_Pct
+
+* Parameter Data Connections *
+31.25, PIT-103.Scaling_Slope
+-125.0, PIT-103.Scaling_Offset
+250.0, PIC-104.SP
+-3.0, PIC-104.KP
+1.2, PIC-104.TR
+0.1, PIC-104.TD
+0.0, PIC-104.MV_MIN
+100.0, PIC-104.MV_MAX
+0.0, PIC-104.X0
+275.0, PIC-104.PV_High
+200.0, PIC-104.PV_Low
+12.5, PIC-104.Deviation_Limit
+100.0, FV-106.Open_Limit
+0.0, FV-106.Close_Limit
+T#2S, FV-106.Timeout
+FALSE, FV-106.Manual_Mode
+0.0, FV-106.Manual_Position
+

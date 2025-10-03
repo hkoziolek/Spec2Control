@@ -1,0 +1,64 @@
+* Function Blocks *
+ANALOG_IN LT-501
+ANALOG_IN WB-505
+RATIO_CONTROL RIC-506
+PID_BASIC FIC-507
+MOTOR_VSD SC-504
+BOOL_IN AP-503
+BOOL_IN PRV-502
+
+* Variables *
+REAL WB505_FlowRate_PV
+REAL LT501_SiloLevel_PV
+REAL SC504_FlowSP_Calc
+REAL SC504_SpeedCmd
+REAL SC504_Flow_PV
+BOOL AP503_AerationActive_Status
+BOOL PRV502_Closed_Status
+
+* Functions *
+NOT AerationPadInactive
+NOT PressureReliefNotClosed
+OR SC504_Inhibit
+MULT SC504SpeedToFlow
+
+* Data Connections * 
+WB-505.PV, RIC-506.PrimaryPV
+SC504SpeedToFlow.OUT, RIC-506.SecondaryPV
+RIC-506.SlaveSP, FIC-507.SP
+SC504SpeedToFlow.OUT, FIC-507.PV
+FIC-507.XOUT, SC-504.Speed_SP
+AP-503.Bool_Out, AerationPadInactive.IN
+AerationPadInactive.OUT, SC504_Inhibit.IN3
+PRV-502.Bool_Out, PressureReliefNotClosed.IN
+PressureReliefNotClosed.OUT, SC504_Inhibit.IN4
+LT-501.Low_Alarm, SC504_Inhibit.IN1
+WB-505.Low_Alarm, SC504_Inhibit.IN2
+SC504_Inhibit.OUT, SC-504.Inhibit
+SC504_Inhibit.OUT, RIC-506.Inhibit
+SC-504.FB_ActualSpeed, SC504SpeedToFlow.IN1
+WB-505.PV, WB505_FlowRate_PV
+LT-501.PV, LT501_SiloLevel_PV
+RIC-506.SlaveSP, SC504_FlowSP_Calc
+FIC-507.XOUT, SC504_SpeedCmd
+AP-503.Bool_Out, AP503_AerationActive_Status
+PRV-502.Bool_Out, PRV502_Closed_Status
+SC504SpeedToFlow.OUT, SC504_Flow_PV
+
+* Parameter Data Connections *
+1.5, RIC-506.RatioSP
+TRUE, RIC-506.Auto
+0.0, RIC-506.MV_MIN
+2000.0, RIC-506.MV_MAX
+TRUE, FIC-507.AUTO
+0.0, FIC-507.MV_MIN
+100.0, FIC-507.MV_MAX
+90.0, LT-501.PV_High
+10.0, LT-501.PV_Low
+TRUE, LT-501.Alarm_Enable
+100.0, WB-505.PV_Low
+TRUE, WB-505.Alarm_Enable
+TRUE, AP-503.Alarm_OnFalse
+TRUE, PRV-502.Alarm_OnFalse
+20.0, SC504SpeedToFlow.IN2
+

@@ -1,0 +1,108 @@
+Evaluation Results for steel-plant - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_4\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 0.86%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-301
+ANALOG_IN PT-301
+ANALOG_IN TT-301
+RATIO_CONTROL FFIC-303
+PID_BASIC FIC-302
+VALVE_ELECTRIC FV-302
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-301
+ANALOG_IN PT-301
+ANALOG_IN TT-301
+RATIO_CONTROL FFIC-303
+PID_BASIC FIC-302
+VALVE_ELECTRIC FV-302
+
+ALL DATA CONNECTIONS:
+FT-301.PV, FFIC-303.PrimaryPV
+RatioBias_Add_ADD.OUT, RatioUpperLimit_MIN.IN2
+RatioUpperLimit_MIN.OUT, RatioClamp_MAX.IN2
+RatioClamp_MAX.OUT, FFIC-303.RatioSP
+FT-301.PV, LowFlow_LT_LT.IN1
+LowFlow_LT_LT.OUT, LowFlowSel_SEL.G
+FFIC-303.SlaveSP, LowFlowSel_SEL.IN0
+LowFlowSel_SEL.OUT, RangeFailSel_SEL.IN0
+FT301_RangeFail_OR.OUT, RangeFailSel_SEL.G
+RangeFailSel_SEL.OUT, FIC-302.SP
+FIC-302.XOUT, FV-302.Control_Signal
+FT-301.Low_Alarm, FT301_RangeFail_OR.IN1
+FT-301.High_Alarm, FT301_RangeFail_OR.IN2
+PT-301.Low_Alarm, PT301_RangeFail_OR.IN1
+PT-301.High_Alarm, PT301_RangeFail_OR.IN2
+FT301_RangeFail_OR.OUT, RatioInhibit1_OR.IN1
+TT-301.Low_Alarm, RatioInhibit1_OR.IN2
+RatioInhibit1_OR.OUT, RatioInhibit2_OR.IN1
+PT301_RangeFail_OR.OUT, RatioInhibit2_OR.IN2
+RatioInhibit2_OR.OUT, RatioInhibit3_OR.IN1
+FT-301.General_Fault, RatioInhibit3_OR.IN2
+RatioInhibit3_OR.OUT, FFIC-303.Inhibit
+TT-301.Low_Alarm, ESD_Close_OR.IN1
+PT-301.High_Alarm, ESD_Close_OR.IN2
+ESD_Close_OR.OUT, FIC-302.Inhibit
+ESD_Close_OR.OUT, FV-302.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = FT-301; RATIO_CONTROL = FFIC-303
+- Actual Connection: FT-301.PV -> FFIC-303.PrimaryPV
+- Notes: Primary PV for the ratio controller is fed directly from the flow transmitter FT-301.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: MISSING
+- Mapping: ANALOG_IN2 = (not identified); RATIO_CONTROL = FFIC-303
+- Actual Connection: No connection to FFIC-303.SecondaryPV found
+- Notes: PT-301 and TT-301 exist but are only used for alarms/inhibit logic; neither is connected to FFIC-303.SecondaryPV.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: FOUND INDIRECT
+- Mapping: RATIO_CONTROL = FFIC-303; PID_BASIC = FIC-302
+- Actual Connection: FFIC-303.SlaveSP -> LowFlowSel_SEL.IN0 -> LowFlowSel_SEL.OUT -> RangeFailSel_SEL.IN0 -> RangeFailSel_SEL.OUT -> FIC-302.SP
+- Notes: SP is routed through low-flow selection and range-fail selection logic. LowFlowSel_SEL.G is driven by LowFlow_LT_LT (from FT-301.PV), and RangeFailSel_SEL.G is driven by FT301_RangeFail_OR.OUT. This provides protective selection before reaching FIC-302.SP.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC = FIC-302; VALVE_ELECTRIC = FV-302
+- Actual Connection: FIC-302.XOUT -> FV-302.Control_Signal
+- Notes: ESD_Close_OR inhibits both FIC-302 and FV-302, which is appropriate. The alternative allowed path to a MOTOR_VSD.Speed_SP is not used here.
+
+OVERALL ASSESSMENT:
+Coverage: 3/4
+Quality: Generally strong: primary PV and final control element connections are correct; SlaveSP is properly conditioned via selection/interlock logic. However, the SecondaryPV for ratio control is not connected, which limits full ratio functionality.
+Missing Connections: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+==================================================
+
+EVAL-3 Coverage: 75.00%

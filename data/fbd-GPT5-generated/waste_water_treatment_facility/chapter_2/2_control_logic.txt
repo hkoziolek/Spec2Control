@@ -1,0 +1,96 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN LS-101
+ANALOG_IN VG-101
+PID_BASIC PIC-101
+MOTOR_VSD P-101A
+MOTOR_VSD P-101B
+VALVE_ON_OFF XV-101
+BOOL_IN BS-101
+
+* Variables *
+REAL LS101_WetWellLevel_m
+REAL FT101_InfluentFlow_m3ph
+REAL VG101_VacuumPressure
+REAL PIC101_PumpSpeed_MV_Pct
+REAL P101A_VFD_SpeedCommand_Pct
+REAL P101B_VFD_SpeedCommand_Pct
+
+* Functions *
+OR HighLevelTrip_OR
+OR PumpInhibit_OR
+OR FlowOrLow_OR
+OR AI_Fault_OR
+OR PumpStop_OR
+AND PumpStart_AND
+AND PumpBStart_AND
+NOT HighLevelTrip_NOT
+NOT LevelOK_NOT
+OR PID_Manual_OR
+NOT PID_AUTO_NOT
+GT LevelAboveMin_GT
+
+* Data Connections * 
+LS-101.PV, PIC-101.PV
+PIC-101.XOUT, P-101A.Speed_SP
+PIC-101.XOUT, P-101B.Speed_SP
+LS-101.High_Alarm, HighLevelTrip_OR.IN1
+PIC-101.PV_High_Alarm, HighLevelTrip_OR.IN2
+HighLevelTrip_OR.OUT, XV-101.Close_Cmd
+HighLevelTrip_OR.OUT, PumpInhibit_OR.IN1
+HighLevelTrip_OR.OUT, PumpStop_OR.IN1
+PIC-101.PV_Low_Alarm, FlowOrLow_OR.IN1
+FT-101.High_Alarm, FlowOrLow_OR.IN2
+FlowOrLow_OR.OUT, PumpInhibit_OR.IN2
+PumpInhibit_OR.OUT, P-101A.Inhibit
+PumpInhibit_OR.OUT, P-101B.Inhibit
+PumpInhibit_OR.OUT, XV-101.Inhibit
+PumpInhibit_OR.OUT, PIC-101.Inhibit
+HighLevelTrip_OR.OUT, HighLevelTrip_NOT.IN
+HighLevelTrip_NOT.OUT, XV-101.Open_Cmd
+LS-101.PV, LevelAboveMin_GT.IN1
+LevelAboveMin_GT.OUT, PumpStart_AND.IN1
+HighLevelTrip_NOT.OUT, PumpStart_AND.IN2
+LevelAboveMin_GT.OUT, LevelOK_NOT.IN
+LevelOK_NOT.OUT, PumpStop_OR.IN2
+PumpStart_AND.OUT, P-101A.Start_Cmd
+PumpStop_OR.OUT, P-101A.Stop_Cmd
+PumpStart_AND.OUT, PumpBStart_AND.IN1
+P-101A.FB_Fault, PumpBStart_AND.IN2
+PumpBStart_AND.OUT, P-101B.Start_Cmd
+PumpStop_OR.OUT, P-101B.Stop_Cmd
+LS-101.General_Fault, AI_Fault_OR.IN1
+FT-101.General_Fault, AI_Fault_OR.IN2
+LevelOK_NOT.OUT, PID_Manual_OR.IN1
+AI_Fault_OR.OUT, PID_Manual_OR.IN2
+PID_Manual_OR.OUT, PID_AUTO_NOT.IN
+PID_AUTO_NOT.OUT, PIC-101.AUTO
+LS-101.PV, LS101_WetWellLevel_m
+FT-101.PV, FT101_InfluentFlow_m3ph
+VG-101.PV, VG101_VacuumPressure
+PIC-101.XOUT, PIC101_PumpSpeed_MV_Pct
+P-101A.Speed_Out, P101A_VFD_SpeedCommand_Pct
+P-101B.Speed_Out, P101B_VFD_SpeedCommand_Pct
+
+* Parameter Data Connections *
+5.5, PIC-101.SP
+2.0, PIC-101.KP
+1.5, PIC-101.TR
+0.3, PIC-101.TD
+30.0, PIC-101.MV_MIN
+90.0, PIC-101.MV_MAX
+0.1, PIC-101.Deviation_Limit
+9.0, PIC-101.PV_High
+2.0, PIC-101.PV_Low
+0.0, PIC-101.X0
+8.5, LS-101.PV_High
+1.5, LS-101.PV_Low
+TRUE, LS-101.Alarm_Enable
+0.625, LS-101.Scaling_Slope
+-2.5, LS-101.Scaling_Offset
+31.25, FT-101.Scaling_Slope
+-125.0, FT-101.Scaling_Offset
+450.0, FT-101.PV_High
+50.0, FT-101.PV_Low
+2.0, LevelAboveMin_GT.IN2
+

@@ -1,0 +1,124 @@
+Evaluation Results for waste_water_treatment_facility - chapter_9
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_9\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_9\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: Ratio Control
+EVAL-1 Result: PASS
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_9\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), MOTOR_ON_OFF(1), MOTOR_VSD(2), RATIO_CONTROL(2), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), MOTOR_ON_OFF(1), MOTOR_VSD(2), RATIO_CONTROL(2), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_9\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-801
+ANALOG_IN FT-CL-801
+ANALOG_IN FT-DC-801
+RATIO_CONTROL FIC-101
+RATIO_CONTROL FIC-102
+VALVE_ELECTRIC LV-105
+VALVE_ON_OFF XV-106
+DIGITAL_IN XV-106-OPEN-LS
+DIGITAL_IN XV-106-CLOSED-LS
+MOTOR_VSD CL-801
+MOTOR_VSD DC-801
+MOTOR_ON_OFF UV-801
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-801
+ANALOG_IN FT-CL-801
+ANALOG_IN FT-DC-801
+RATIO_CONTROL FIC-101
+RATIO_CONTROL FIC-102
+VALVE_ELECTRIC LV-105
+
+ALL DATA CONNECTIONS:
+FT-801.PV, FIC-101.PrimaryPV
+FT-CL-801.PV, FIC-101.SecondaryPV
+Chl_MinBound_MULT.OUT, FIC-101.MV_MIN
+Chl_MaxBound_MULT.OUT, FIC-101.MV_MAX
+FIC-101.SlaveSP, CL-801.Speed_SP
+FT-801.PV, FIC-102.PrimaryPV
+FT-DC-801.PV, FIC-102.SecondaryPV
+DChl_MinBound_MULT.OUT, FIC-102.MV_MIN
+DChl_MaxBound_MULT.OUT, FIC-102.MV_MAX
+FIC-102.SlaveSP, DC-801.Speed_SP
+FT-801.PV, Chl_MinBound_MULT.IN1
+FT-801.PV, Chl_MaxBound_MULT.IN1
+FT-801.PV, DChl_MinBound_MULT.IN1
+FT-801.PV, DChl_MaxBound_MULT.IN1
+FT-801.Low_Alarm, FlowCutoff_OR.IN1
+FT-801.High_Alarm, FlowCutoff_OR.IN2
+FT-801.General_Fault, FlowCutoff_OR.IN3
+FlowCutoff_OR.OUT, FIC-101.Inhibit
+FlowCutoff_OR.OUT, FIC-102.Inhibit
+XV-106-OPEN-LS.DI_Out, XV106NotOpen_NOT.IN
+XV106NotOpen_NOT.OUT, CL801_Inhibit_OR.IN2
+XV-106.Alarm_Position_Error, CL801_Inhibit_OR.IN3
+XV-106.Alarm_General, CL801_Inhibit_OR.IN5
+FlowCutoff_OR.OUT, CL801_Inhibit_OR.IN1
+LV-105.Alarm, CL801_Inhibit_OR.IN4
+CL801_Inhibit_OR.OUT, CL-801.Inhibit
+CL-801.FB_Running, CL801NotRunning_NOT.IN
+CL801NotRunning_NOT.OUT, DC_Inhibit_OR.IN2
+FlowCutoff_OR.OUT, DC_Inhibit_OR.IN1
+LV-105.Alarm, DC_Inhibit_OR.IN3
+DC_Inhibit_OR.OUT, DC-801.Inhibit
+CL-801.FB_Running, UV_ChemActive_OR.IN1
+DC-801.FB_Running, UV_ChemActive_OR.IN2
+UV_ChemActive_OR.OUT, UV-801.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = FT-801; RATIO_CONTROL = FIC-101
+- Actual Connection: FT-801.PV -> FIC-101.PrimaryPV
+- Notes: This same primary PV linkage is also present for FIC-102 (FT-801.PV -> FIC-102.PrimaryPV).
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 = FT-CL-801; RATIO_CONTROL = FIC-101
+- Actual Connection: FT-CL-801.PV -> FIC-101.SecondaryPV
+- Notes: A parallel implementation exists for the second ratio controller: FT-DC-801.PV -> FIC-102.SecondaryPV.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: MISSING
+- Mapping: RATIO_CONTROL = FIC-101; PID_BASIC = (no PID_BASIC instance present in filtered set)
+- Actual Connection: None found to any PID_BASIC.SP
+- Notes: Observed connections route FIC-101.SlaveSP -> CL-801.Speed_SP and FIC-102.SlaveSP -> DC-801.Speed_SP (i.e., to MOTOR_VSD setpoints), not to a PID_BASIC.SP. No PID_BASIC blocks are referenced in the available data.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: MISSING
+- Mapping: PID_BASIC = (no PID_BASIC instance present); VALVE_ELECTRIC = LV-105
+- Actual Connection: None found to LV-105.Control_Signal
+- Notes: No PID_BASIC.XOUT signals are present. LV-105 appears only in alarm/inhibit logic (e.g., LV-105.Alarm to various OR blocks), not as a commanded valve. The allowed indirect alternative (PID_BASIC.XOUT -> MOTOR_VSD.Speed_SP) is also not present.
+
+OVERALL ASSESSMENT:
+Coverage: 2/4
+Quality: Primary and secondary PV feed-throughs to ratio controllers are correctly implemented and duplicated across two ratio loops. Setpoint/output integrations to downstream PID/valve actuation are not implemented; the ratio controllers drive VSD Speed_SP rather than a PID, and there is no control signal to the electric valve.
+Missing Connections: 
+- RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+==================================================
+
+EVAL-3 Coverage: 50.00%

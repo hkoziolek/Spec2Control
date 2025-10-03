@@ -1,0 +1,65 @@
+* Function Blocks *
+ANALOG_IN AI-302
+ANALOG_IN AI-303
+ANALOG_IN AI-304
+DIGITAL_IN DI-301
+ANALOG_IN DP-301
+PID_BASIC FIC-302
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-302
+RATIO_CONTROL FFIC-303
+
+* Variables *
+REAL AI302_H2O_Outlet_PV
+REAL AI303_Hg_Permissive_PV
+REAL AI304_H2O_RatioOpt_PV
+REAL FT301_FeedGasFlow_PV
+REAL DP301_MolSieveBed_DP_PV
+REAL FFIC303_RegenFlow_SP_to_FIC302
+
+* Functions *
+OR Inhibit_OR
+
+* Data Connections * 
+FT-301.PV, FFIC-303.PrimaryPV
+FFIC-303.SlaveSP, FIC-302.SP
+FIC-302.XOUT, FV-302.Control_Signal
+AI-302.High_Alarm, Inhibit_OR.IN1
+AI-303.High_Alarm, Inhibit_OR.IN2
+AI-302.General_Fault, Inhibit_OR.IN3
+AI-303.General_Fault, Inhibit_OR.IN4
+DI-301.DI_Out, Inhibit_OR.IN5
+FT-301.Low_Alarm, Inhibit_OR.IN6
+DP-301.High_Alarm, Inhibit_OR.IN7
+Inhibit_OR.OUT, FFIC-303.Inhibit
+Inhibit_OR.OUT, FIC-302.Inhibit
+Inhibit_OR.OUT, FV-302.Inhibit
+AI-302.PV, AI302_H2O_Outlet_PV
+AI-303.PV, AI303_Hg_Permissive_PV
+AI-304.PV, AI304_H2O_RatioOpt_PV
+FT-301.PV, FT301_FeedGasFlow_PV
+DP-301.PV, DP301_MolSieveBed_DP_PV
+FFIC-303.SlaveSP, FFIC303_RegenFlow_SP_to_FIC302
+
+* Parameter Data Connections *
+0.25, FFIC-303.RatioSP
+0, FFIC-303.MV_MIN
+100, FFIC-303.MV_MAX
+TRUE, FFIC-303.Auto
+0, FFIC-303.Bias
+6.25, FT-301.Scaling_Slope
+-25, FT-301.Scaling_Offset
+TRUE, FT-301.Alarm_Enable
+500, FT-301.PV_Low
+TRUE, DP-301.Alarm_Enable
+20, DP-301.PV_High
+TRUE, AI-302.Alarm_Enable
+TRUE, AI-303.Alarm_Enable
+TRUE, AI-304.Alarm_Enable
+10, AI-304.PV_High
+0, FIC-302.MV_MIN
+100, FIC-302.MV_MAX
+TRUE, FIC-302.AUTO
+100, FV-302.Open_Limit
+0, FV-302.Close_Limit
+

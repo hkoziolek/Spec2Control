@@ -1,0 +1,25 @@
+## 3 **Acid Gas Removal (Amine Absorber System)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AI-201 | Analyzer | Monitors and analyzes process variables for acid gas removal system efficiency |
+|FV-101 | Flow Valve | Regulates steam flow to the reboiler for temperature control |
+|LT-201 | Level Transmitter | Measures liquid level in the amine absorber |
+|PT-201 | Pressure Transmitter | Monitors flash tank pressure for permissive interlock conditions |
+|TIC-201 | Temperature Controller | PID controller for maintaining absorber temperature setpoint |
+|TT-201 | Temperature Transmitter | Measures absorber temperature for feedback to TIC-201 |
+
+### 3.1) Control Strategy Description
+
+The Acid Gas Removal system utilizes PID control to regulate lean-amine circulation temperature within the amine absorber (TIC-201). The controlled variable (PV) is the absorber temperature measured by TT-201, with a target setpoint (SP) of 45°C. The PID controller TIC-201 is configured as reverse-acting to maintain temperature stability by manipulating the steam flow through the reboiler control valve (FV-101).
+
+The transmitter TT-201 has a calibrated range of 0–100°C, outputting a 4–20mA signal to TIC-201. The controller tuning parameters are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.5 minutes, and derivative time (Kd) = 0.0 minutes. The controller output (MV) is scaled to operate FV-101 within a range of 0–100% valve position. FV-101 is a fail-closed valve to ensure safe operation during system faults. Bumpless transfer logic is implemented to allow smooth transitions between manual and automatic modes, with anti-windup protection to prevent integral term saturation during manual operation. A 4% deadband is applied to the controller output to reduce valve wear during stable operation.
+
+### 3.2) Interlocks and Permissives
+
+The PID control loop for TIC-201 is interlocked with low-pressure and high-temperature permissives to protect equipment and ensure safe operation. Steam flow to FV-101 is permitted only when the flash tank pressure (PT-201) is above 0.5 MPa and the absorber temperature (TT-201) is below 50°C. If TT-201 exceeds 50°C, TIC-201 output is clamped to 0% to close FV-101, preventing further heating. Additionally, FV-101 is interlocked with the flash tank level transmitter (LT-201) to ensure sufficient lean-amine inventory; if LT-201 indicates a level below 20%, the valve is forced closed.
+
+### 3.3) Alarm and Fault Handling
+
+High-priority alarms are generated if TT-201 measures a temperature exceeding 50°C or if PT-201 drops below 0.5 MPa. These alarms trigger immediate closure of FV-101 and disengage the PID control loop to prevent equipment damage. A secondary alarm is activated if TIC-201 detects a deviation between SP and PV exceeding 5°C for more than 30 seconds, indicating potential control instability.
+
+In the event of TT-201 signal failure (4 mA or less), TIC-201 enters manual mode with its output frozen at the last known value, while FV-101 defaults to fail-closed position. Operators are notified via DCS with a "Sensor Fault" alarm. The CO₂ analyzer AI-201 continuously monitors absorber outlet gas composition; if CO₂ exceeds 1% by volume, TIC-201 triggers a system-wide shutdown sequence to prevent off-spec product.

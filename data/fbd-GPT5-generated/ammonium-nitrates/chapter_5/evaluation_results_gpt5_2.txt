@@ -1,0 +1,104 @@
+Evaluation Results for ammonium-nitrates - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_5\1_categorization.txt
+Ground truth strategy: Cascade Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(2), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, PID_BASIC1.PV
+PID_BASIC1.XOUT, PID_BASIC2.SP
+ANALOG_IN2.PV, PID_BASIC2.PV
+PID_BASIC2.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+PID_BASIC TIC-401
+PID_BASIC FIC-402
+ANALOG_IN TT-401
+ANALOG_IN FT-402
+VALVE_ELECTRIC FV-402
+MOTOR_ON_OFF MP-405
+BOOL_IN PS-403
+DIGITAL_IN PSA-404
+
+FILTERED FUNCTION BLOCKS (only types from template):
+PID_BASIC TIC-401
+PID_BASIC FIC-402
+ANALOG_IN TT-401
+ANALOG_IN FT-402
+VALVE_ELECTRIC FV-402
+
+ALL DATA CONNECTIONS:
+TT-401.PV, TIC-401.PV
+TIC-401.XOUT, TICtoFIC_SP_SCALE_MULT.IN1
+TICtoFIC_SP_SCALE_MULT.OUT, FIC-402.SP
+FT-402.PV, FIC-402.PV
+FIC-402.XOUT, FV-402.Control_Signal
+TT-401.General_Fault, CascadeInhibit_OR.IN1
+TT-401.High_Alarm, CascadeInhibit_OR.IN2
+TT-401.Low_Alarm, CascadeInhibit_OR.IN3
+FT-402.General_Fault, CascadeInhibit_OR.IN4
+FT-402.High_Alarm, CascadeInhibit_OR.IN5
+FT-402.Low_Alarm, CascadeInhibit_OR.IN6
+PS-403.Bool_Out, CascadeInhibit_OR.IN7
+PSA-404.DI_Out, CascadeInhibit_OR.IN8
+CascadeInhibit_OR.OUT, TIC-401.Inhibit
+CascadeInhibit_OR.OUT, FIC-402.Inhibit
+PS-403.Bool_Out, SafetyTrip_OR.IN1
+PSA-404.DI_Out, SafetyTrip_OR.IN2
+MP-405.FB_Trip, SafetyTrip_OR.IN3
+MP-405.Alarm_Start_Fail, SafetyTrip_OR.IN4
+SafetyTrip_OR.OUT, MP-405.Inhibit
+SafetyTrip_OR.OUT, FV-402.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> PID_BASIC1.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=TT-401, PID_BASIC1=TIC-401
+   Actual Connection: TT-401.PV, TIC-401.PV
+   Notes: Direct sensor-to-PV link is correctly implemented.
+
+Intended: PID_BASIC1.XOUT -> PID_BASIC2.SP
+   Status: FOUND INDIRECT
+   Mapping: PID_BASIC1=TIC-401, PID_BASIC2=FIC-402
+   Actual Connection: TIC-401.XOUT, TICtoFIC_SP_SCALE_MULT.IN1; TICtoFIC_SP_SCALE_MULT.OUT, FIC-402.SP
+   Notes: Cascade realized via a scaling block between TIC-401 output and FIC-402 SP. This is a valid indirect implementation and typical for unit/scale alignment. Both PIDs have coordinated inhibit inputs via CascadeInhibit_OR, which does not break the connection.
+
+Intended: ANALOG_IN2.PV -> PID_BASIC2.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=FT-402, PID_BASIC2=FIC-402
+   Actual Connection: FT-402.PV, FIC-402.PV
+   Notes: Direct feed to FIC-402 PV is correct.
+
+Intended: PID_BASIC2.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC2=FIC-402, VALVE_ELECTRIC=FV-402
+   Actual Connection: FIC-402.XOUT, FV-402.Control_Signal
+   Notes: Direct command to valve is correct. Valve and related equipment are protected by SafetyTrip_OR inhibit. Special-case allowance for PID_BASIC1.XOUT -> MOTOR_VSD.Speed_SP is not applicable here.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented correctly, with appropriate cascade scaling and coordinated inhibit/trip logic for safety and operability. Indirect scaling between TIC-401 and FIC-402 SP is a sound design choice for unit matching.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

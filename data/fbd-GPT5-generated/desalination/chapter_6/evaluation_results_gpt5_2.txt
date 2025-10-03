@@ -1,0 +1,90 @@
+Evaluation Results for desalination - chapter_6
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_6\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_6\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_6\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(1), RATIO_CONTROL(1), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 0.60%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_6\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FIT-101
+BOOL_IN AT-105
+RATIO_CONTROL FIC-104
+VALVE_ELECTRIC FV-102
+VALVE_ELECTRIC LV-103
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FIT-101
+RATIO_CONTROL FIC-104
+VALVE_ELECTRIC FV-102
+VALVE_ELECTRIC LV-103
+
+ALL DATA CONNECTIONS:
+FIT-101.PV, FIC-104.PrimaryPV
+FIC-104.SlaveSP, FV-102.Control_Signal
+FIT-101.Low_Alarm, SamplingInhibitA_OR.IN1
+FIT-101.General_Fault, SamplingInhibitA_OR.IN2
+AT-105.Alarm_Active, SamplingInhibitB_OR.IN1
+LV-103.Alarm, SamplingInhibitB_OR.IN2
+SamplingInhibitA_OR.OUT, SamplingInhibit_OR.IN1
+SamplingInhibitB_OR.OUT, SamplingInhibit_OR.IN2
+SamplingInhibit_OR.OUT, FIC-104.Inhibit
+SamplingInhibit_OR.OUT, FV-102.Inhibit
+SamplingInhibit_OR.OUT, FV-102.Manual_Mode
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 = FIT-101; RATIO_CONTROL = FIC-104
+   Actual Connection: FIT-101.PV, FIC-104.PrimaryPV
+   Notes: Direct match to intent.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: MISSING
+   Mapping: ANALOG_IN2 = [not available]; RATIO_CONTROL = FIC-104
+   Actual Connection: None
+   Notes: No second analog input instance is available; no connection found to FIC-104.SecondaryPV.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: MISSING
+   Mapping: RATIO_CONTROL = FIC-104; PID_BASIC = [not available]
+   Actual Connection: None
+   Notes: FIC-104.SlaveSP is actually wired to FV-102.Control_Signal, which deviates from the intended chain through a PID block.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: MISSING
+   Mapping: PID_BASIC = [not available]; VALVE_ELECTRIC = FV-102 (candidate), LV-103 also present
+   Actual Connection: None from PID_BASIC.XOUT; observed FIC-104.SlaveSP, FV-102.Control_Signal
+   Notes: No PID_BASIC instance present. Allowed indirect via MOTOR_VSD.Speed_SP not applicable (no MOTOR_VSD present). Existing FIC-104.SlaveSP -> FV-102.Control_Signal suggests PID stage is bypassed.
+
+OVERALL ASSESSMENT:
+Coverage: 1/4
+Quality: Only the primary PV path is correctly implemented. Key control loop elements (secondary PV, PID linkage, and final control connection via PID) are missing or bypassed. The connection of FIC-104.SlaveSP directly to a valve control signal is a significant deviation from the intended control architecture.
+Missing Connections: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV; RATIO_CONTROL.SlaveSP -> PID_BASIC.SP; PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+==================================================
+
+EVAL-3 Coverage: 25.00%

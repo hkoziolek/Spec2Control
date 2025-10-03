@@ -1,0 +1,31 @@
+## 5 **Cooling and Coating Circuit**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-402 | Flow Controller | Adjusts flow rate of anti-caking agent in secondary loop |
+|FT-402 | Flow Transmitter | Measures flow rate of anti-caking agent for feedback to FIC-402 |
+|FV-402 | Flow Valve | Modulates flow of anti-caking agent based on FIC-402 output |
+|MP-405 | Pump | Circulates cooling medium through the cooling circuit |
+|PS-403 | Pressure Switch | Monitors pressure in the cooling circuit for safety interlock |
+|PSA-404 | Pressure Alarm | Alerts high-pressure condition in the cooling circuit |
+|TIC-401 | Temperature Controller | Regulates cooler outlet temperature via cascade control |
+|TT-401 | Temperature Transmitter | Measures cooler outlet temperature for feedback to TIC-401 |
+
+### 5.1) Control Strategy Description
+
+The cooling and coating circuit employs a cascade control strategy to maintain product thermal stability and ensure uniform application of the anti-caking agent. The primary loop, controlled by TIC-401, regulates the cooler outlet temperature to a setpoint of 45 °C. TIC-401 receives temperature feedback from TT-401, which measures the cooler outlet temperature after linear scaling to compensate for sensor drift. TIC-401 outputs a remote setpoint (RSP) to the secondary loop, controlled by FIC-402, which adjusts the flow rate of the anti-caking agent. FIC-402 modulates control valve FV-402 to maintain the flow rate at the desired setpoint, ensuring precise application of the agent.
+
+The secondary loop operates with a faster response time, tuned to reject disturbances within 2 seconds, compared to the primary loop’s slower response of approximately 10 seconds. Secondary controller FIC-402 is tuned with Kp=3.5 and Ki=0.3 min, while TIC-401 is tuned with Kp=1.2 and Ki=2.0 min to ensure stable cascade operation. Signal scaling is applied between TIC-401’s output range of 0–100% and FIC-402’s input range of 0–10 L/min to maintain compatibility. Manual setpoint adjustments for TIC-401 are clamped between 22 °C and 80 °C to prevent unsafe operating conditions.
+
+In cascade mode, TIC-401 dynamically adjusts FIC-402’s setpoint to maintain the cooler outlet temperature. During secondary loop failure, TIC-401 enters local mode, maintaining the last known stable setpoint for FIC-402. Deadband logic is implemented in TIC-401 to prevent hunting between loops, with a ±0.5 °C tolerance band around the cooler temperature setpoint.
+
+### 5.2) Interlocks and Permissives
+
+Cascade control activation is permitted only when TT-401 and FT-402 are operational and within calibrated ranges. TT-401 must report a valid temperature signal between 0 °C and 100 °C, and FT-402 must measure flow rates between 0.5 L/min and 10 L/min. The dust extraction system, monitored by PS-403, must maintain a differential pressure of ≤200 Pa to ensure adequate ventilation during operation. PSA-404 must confirm particle size distribution within 2–4 mm before allowing cascade mode, ensuring proper coating conditions. MP-405 must report moisture levels below 0.3 wt % to prevent caking.
+
+If TT-401 fails or reports an invalid signal, TIC-401 automatically switches to manual mode, allowing operators to set a fixed flow rate for FIC-402. Similarly, if FT-402 fails, FIC-402 enters manual mode, holding the last known valve position. Cascade mode is disabled if PS-403 exceeds 200 Pa or PSA-404 detects particle size deviations beyond the acceptable range.
+
+### 5.3) Alarm and Fault Handling
+
+Alarm conditions for TIC-401 include deviations exceeding ±2 °C from the setpoint, triggering a high-temperature alarm at 50 °C and a low-temperature alarm at 40 °C. FIC-402 generates alarms for flow rates below 0.5 L/min or above 10 L/min, indicating potential valve or pump issues. TT-401 failure triggers a fault alarm, switching TIC-401 to manual mode and notifying operators.
+
+In the event of secondary loop failure, TIC-401 freezes its output to FIC-402 at the last stable setpoint, preventing erratic flow adjustments. FIC-402 enters manual mode, allowing operators to manually position FV-402. If PS-403 exceeds 200 Pa, the dust extraction system trips, halting the cooling and coating circuit to prevent unsafe conditions. All alarms are logged in the DCS, and operators are required to acknowledge faults before re-enabling cascade control.

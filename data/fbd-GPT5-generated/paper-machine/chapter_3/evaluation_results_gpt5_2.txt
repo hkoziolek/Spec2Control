@@ -1,0 +1,106 @@
+Evaluation Results for paper-machine - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_3\1_categorization.txt
+Ground truth strategy: Cascade Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(4), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(2), PID_BASIC(4), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, PID_BASIC1.PV
+PID_BASIC1.XOUT, PID_BASIC2.SP
+ANALOG_IN2.PV, PID_BASIC2.PV
+PID_BASIC2.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PT-101
+ANALOG_IN TT-103
+PID_BASIC PIC-101
+PID_BASIC TIC-104
+PID_BASIC FC-202
+PID_BASIC FC-203
+VALVE_ELECTRIC FV-202
+VALVE_ELECTRIC SV-203
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PT-101
+ANALOG_IN TT-103
+PID_BASIC PIC-101
+PID_BASIC TIC-104
+PID_BASIC FC-202
+PID_BASIC FC-203
+VALVE_ELECTRIC FV-202
+VALVE_ELECTRIC SV-203
+
+ALL DATA CONNECTIONS:
+TT-103.PV, TIC-104.PV
+TIC-104.XOUT, FC-203.SP
+SV-203.Feedback_Pos, FC-203.PV
+FC-203.XOUT, SV-203.Control_Signal
+PT-101.PV, PIC-101.PV
+PIC-101.XOUT, FC-202.SP
+FV-202.Feedback_Pos, FC-202.PV
+FC-202.XOUT, FV-202.Control_Signal
+PT-101.High_Alarm, SteamTrip.IN1
+TT-103.High_Alarm, SteamTrip.IN2
+SteamTrip.OUT, SV-203.Inhibit
+SteamTrip.OUT, FC-203.Inhibit
+PT-101.Low_Alarm, FV-202.Inhibit
+PT-101.Low_Alarm, FC-202.Inhibit
+TT-103.General_Fault, TICManualCondition.IN1
+SV-203.Position_Error, TICManualCondition.IN2
+TICManualCondition.OUT, TIC-104.Inhibit
+PT-101.General_Fault, PICManualCondition.IN1
+FV-202.Position_Error, PICManualCondition.IN2
+PICManualCondition.OUT, PIC-101.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) ANALOG_IN1.PV -> PID_BASIC1.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 = PT-101, PID_BASIC1 = PIC-101
+   Actual Connection: PT-101.PV -> PIC-101.PV
+   Notes: Direct mapping matches the template for the primary loop PV to primary PID PV.
+
+2) PID_BASIC1.XOUT -> PID_BASIC2.SP
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC1 = PIC-101, PID_BASIC2 = FC-202
+   Actual Connection: PIC-101.XOUT -> FC-202.SP
+   Notes: Classic cascade link from primary PID output to secondary PID setpoint.
+
+3) ANALOG_IN2.PV -> PID_BASIC2.PV
+   Status: MISSING
+   Mapping: ANALOG_IN2 = TT-103 (intended), PID_BASIC2 = FC-202
+   Actual Connection: None; actual FC-202.PV <- FV-202.Feedback_Pos
+   Notes: The secondary PID PV is sourced from valve position feedback rather than an analog input. No available ANALOG_IN instance is wired to FC-202.PV (or FC-203.PV). This is a design deviation from the template.
+
+4) PID_BASIC2.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC2 = FC-202, VALVE_ELECTRIC = FV-202
+   Actual Connection: FC-202.XOUT -> FV-202.Control_Signal
+   Notes: Direct final control element drive from the secondary PID output. The special allowance for PID_BASIC1.XOUT -> MOTOR_VSD.Speed_SP does not apply here.
+
+OVERALL ASSESSMENT:
+Coverage: 3/4
+Quality: The cascade structure is well implemented for primary PV-to-primary PID and primary-to-secondary setpoint links, and secondary PID outputs correctly drive the valves. However, the secondary PID PV is taken from valve position feedback rather than an analog transmitter as per the template, indicating a position-control inner loop instead of a measured-process inner loop.
+Missing Connections: ANALOG_IN2.PV -> PID_BASIC2.PV (intended TT-103.PV -> FC-202.PV; actual FC-202.PV is fed by FV-202.Feedback_Pos)
+==================================================
+
+EVAL-3 Coverage: 75.00%

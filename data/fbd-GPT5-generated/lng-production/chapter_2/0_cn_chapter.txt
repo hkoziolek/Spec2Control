@@ -1,0 +1,24 @@
+## 2 **Feed-Gas Reception and Pretreatment**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|DP-101 | Differential Pressure Transmitter | Measures differential pressure across a process component |
+|DP-102 | Differential Pressure Transmitter | Monitors pressure drop for system diagnostics |
+|FT-101 | Flow Transmitter | Measures feed-gas flow rate (0–5000 Nm³/hr) |
+|IIC-101 | Ratio Controller | Calculates liquid separation flow setpoint based on feed-gas flow and ratio |
+|IT-102 | Flow Transmitter | Monitors liquid separation flow rate (0–2000 Nm³/hr) |
+|LCV-101 | Level Control Valve | Modulates liquid flow to maintain separation ratio |
+|LT-101 | Level Transmitter | Measures liquid level in a vessel or separator |
+
+### 2.1) Control Strategy Description
+
+The feed-gas reception and pretreatment section employs ratio control to maintain a precise proportional relationship between the pipeline gas flow rate and the liquid separation rate. The wild flow measurement is provided by FT-101, which measures the feed-gas flow rate within a range of 0–5000 Nm³/hr. This value is used as the input to the ratio controller IIC-101, which calculates the controlled flow setpoint for the liquid separation stream based on a fixed ratio of 2.5:1. The controlled flow measurement is derived from IT-102, which monitors the liquid separation flow rate within a range of 0–2000 Nm³/hr. IIC-101 computes the liquid separation flow setpoint as the product of the feed-gas flow rate and the ratio setpoint, ensuring the liquid separation stream maintains the desired proportional relationship to the feed-gas flow.
+
+The output of IIC-101 modulates the liquid control valve LCV-101 to achieve the calculated setpoint. The ratio setpoint can be adjusted manually within the range of 2.0:1 to 3.0:1 via the operator interface, allowing flexibility for process optimization. Signal scaling is applied to both FT-101 and IT-102 measurements to ensure accurate ratio calculations. Lead-lag compensation is implemented within IIC-101 to account for delays in the liquid separation process, ensuring stable control. Low flow cutoff logic disables ratio control if FT-101 measures a feed-gas flow below 100 Nm³/hr to prevent erroneous operation during low-flow conditions.
+
+### 2.2) Interlocks and Permissives
+
+The ratio control loop is governed by interlocks and permissives to ensure safe operation. The liquid separation valve LCV-101 is permitted to modulate only when the feed-gas flow rate measured by FT-101 exceeds 100 Nm³/hr and the liquid separation flow rate measured by IT-102 is within its operational range of 0–2000 Nm³/hr. A Boolean interlock ensures that the ratio controller IIC-101 is active only when the slug catcher level transmitter LT-101 indicates a level below 80% to prevent overfilling. Additionally, a permissive signal from DP-101 and DP-102 ensures that the differential pressure across the inlet separators does not exceed 10 kPa, preventing filter damage or excessive pressure drop. Mode selection logic allows bumpless transfer between automatic ratio control and manual operation, ensuring smooth transitions without process disturbances.
+
+### 2.3) Alarm and Fault Handling
+
+The ratio control system includes comprehensive alarm and fault handling mechanisms to maintain operational integrity. If FT-101 fails or reports a feed-gas flow rate outside its calibrated range of 0–5000 Nm³/hr, an alarm is triggered in the DCS, and the ratio controller IIC-101 clamps the liquid separation flow setpoint to a default value of 500 Nm³/hr. Similarly, if IT-102 fails or reports a liquid separation flow rate outside its calibrated range of 0–2000 Nm³/hr, the control system disables LCV-101 modulation and activates a high-priority alarm. A deviation alarm is triggered if the calculated ratio deviates by more than 10% from the setpoint, prompting operator intervention. Deadband logic within IIC-101 prevents hunting by ignoring ratio deviations smaller than 1%. All alarms are logged and displayed on the operator interface, and fault conditions are latched until manually cleared by the operator.

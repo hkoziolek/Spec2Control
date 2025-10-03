@@ -1,0 +1,16 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of motor's purpose.
+Input,Start_Cmd,BOOL,Command to start the VSD.
+Input,Stop_Cmd,BOOL,Command to stop the VSD.
+Input,Speed_SP,REAL,Desired speed setpoint (e.g., 0-100%).
+Input,Accel_Ramp,TIME,Acceleration ramp time.
+Input,Decel_Ramp,TIME,Deceleration ramp time.
+Input,Inhibit,BOOL,Inhibits starting the motor and can receive alarm signals.
+Output,Speed_Out,REAL,Analog output to VSD for speed command.
+Output,FB_Running,BOOL,Feedback from VSD indicating it is running.
+Output,FB_Fault,BOOL,Feedback from VSD indicating a fault.
+Output,FB_Ready,BOOL,Feedback from VSD indicating it is ready to run.
+Output,FB_ActualSpeed,REAL,Actual motor speed feedback from VSD.
+Output,Alarm_Speed_Deviation,BOOL,Indicates a significant difference between commanded and actual speed.
+Output,Alarm_Comm_Fail,BOOL,Indicates communication failure with VSD.

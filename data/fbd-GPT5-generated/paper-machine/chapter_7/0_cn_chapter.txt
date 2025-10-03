@@ -1,0 +1,39 @@
+## 7 **Approach Flow and Forming**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|ALM-601 | Level Alarm | High-level alarm for slurry tank overflow protection |
+|ALM-602 | Level Alarm | Low-level alarm for slurry tank underflow detection |
+|ALM-603 | General Alarm | Alarm for abnormal system conditions |
+|ALM-604 | General Alarm | Alarm for equipment malfunction or failure |
+|CT-601 | Consistency Transmitter | Measures fibre slurry consistency in the range of 0.5–3.0% |
+|FIC-601 | Flow Controller | Regulates dilution water flow based on ratio control setpoint |
+|FS-601 | Flow Switch | Detects flow presence or absence in the dilution water line |
+|FT-601 | Flow Transmitter | Measures dilution water flow rate in the range of 0–500 m³/hr |
+|FV-601 | Flow Valve | Controls dilution water flow rate to maintain setpoint |
+|P-601 | Pump | Transfers fibre slurry to the forming system |
+|PIT-601 | Pressure Transmitter | Monitors pressure in the slurry pipeline |
+|VT-601 | Vibration Transmitter | Detects vibration levels in the pump or pipeline system |
+
+### 7.1) Control Strategy Description
+
+The approach flow and forming system employs ratio control to maintain precise proportional relationships between the fibre slurry consistency and dilution water flow rate. The wild flow measurement is provided by the consistency transmitter CT-601, which measures the fibre slurry consistency in the range of 0.5–3.0%. The controlled flow is the dilution water flow rate, regulated by the flow control valve FV-601, with flow measured by the flow transmitter FT-601 in the range of 0–500 m³/hr. The ratio controller, designated as FFIC-601, calculates the setpoint for the dilution water flow (FT-601) based on the measured consistency (CT-601) and the operator-defined ratio setpoint.
+
+The ratio is configured to maintain a dilution water-to-slurry consistency ratio of 2.5:1 under normal operating conditions. The ratio controller FFIC-601 calculates the dilution water flow setpoint as follows:
+**FT-601 SP = CT-601 PV × Ratio SP**,
+where the Ratio SP is adjustable between 2.0:1 and 3.0:1. The calculated setpoint is sent to the flow controller FIC-601, which modulates the flow control valve FV-601 to maintain the desired dilution water flow.
+
+A low flow cutoff is implemented to prevent instability during low-consistency operation. If the fibre slurry consistency (CT-601) falls below 0.5%, the ratio controller FFIC-601 clamps the dilution water flow setpoint (FT-601 SP) to a minimum value of 10 m³/hr. The operator has manual bias capability to adjust the ratio within ±0.2 of the setpoint for fine-tuning during transitions or process upsets.
+
+### 7.2) Interlocks and Permissives
+
+The ratio control loop FFIC-601 is enabled only when the fan pump P-601 is running, as verified by the pump status signal P-601 RUN. Additionally, the dilution water system must be operational, confirmed by the flow switch FS-601, which ensures a minimum flow of 5 m³/hr through the dilution water line. If either condition is not met, the ratio controller FFIC-601 is placed in manual mode, and the flow control valve FV-601 is set to a fail-safe position of 20% open.
+
+To prevent cavitation in the fan pump P-601, the pressure at the pump discharge, measured by PIT-601, must exceed 300 kPa. If the pressure falls below this threshold, the ratio control loop is disabled, and an alarm is triggered. The system also includes a permissive to ensure that the vacuum deaerator is operational, verified by the vacuum transmitter VT-601, which must indicate a vacuum level of at least 30 kPa before the ratio control loop is activated.
+
+### 7.3) Alarm and Fault Handling
+
+An alarm is generated if the ratio controller FFIC-601 detects that the calculated dilution water flow setpoint (FT-601 SP) exceeds the maximum allowable flow of 500 m³/hr or falls below the minimum allowable flow of 10 m³/hr. The alarm tag is configured as ALM-601, with a priority level of 2 for high flow and 3 for low flow.
+
+If the consistency transmitter CT-601 fails, as indicated by a diagnostic signal or a reading outside the valid range of 0.5–3.0%, the ratio controller FFIC-601 transitions to manual mode, and the dilution water flow setpoint (FT-601 SP) is held at the last valid value. A transmitter failure alarm, ALM-602, is triggered with a priority level of 1. Similarly, if the flow transmitter FT-601 fails, the flow control valve FV-601 is driven to its fail-safe position of 20% open, and an alarm, ALM-603, is generated.
+
+In the event of a sudden process upset, such as a rapid change in slurry consistency exceeding 0.5% per second, the ratio controller FFIC-601 implements a lead-lag compensation with a time constant of 2 seconds to stabilize the dilution water flow. If the upset persists for more than 10 seconds, an alarm, ALM-604, is triggered to notify the operator of the abnormal condition.

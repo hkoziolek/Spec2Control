@@ -1,0 +1,88 @@
+      <pou name="MOTOR_VSD" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Start_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Stop_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Speed_SP">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Accel_Ramp">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Decel_Ramp">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Speed_Out">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="FB_Running">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_Ready">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_ActualSpeed">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Speed_Deviation">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Comm_Fail">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

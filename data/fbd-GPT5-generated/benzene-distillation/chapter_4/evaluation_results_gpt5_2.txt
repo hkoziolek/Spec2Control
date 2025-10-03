@@ -1,0 +1,109 @@
+Evaluation Results for benzene-distillation - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_4\1_categorization.txt
+Ground truth strategy: Cascade Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(3), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(3), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, PID_BASIC1.PV
+PID_BASIC1.XOUT, PID_BASIC2.SP
+ANALOG_IN2.PV, PID_BASIC2.PV
+PID_BASIC2.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LT-105
+ANALOG_IN FT-107
+ANALOG_IN PT-104
+PID_BASIC LIC-104
+PID_BASIC FIC-107
+PID_BASIC PIC-104
+VALVE_ELECTRIC LV-107
+VALVE_ON_OFF XV-103
+DIGITAL_IN LAH-104
+DIGITAL_IN LAL-104
+TON StartupDelay
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LT-105
+ANALOG_IN FT-107
+ANALOG_IN PT-104
+PID_BASIC LIC-104
+PID_BASIC FIC-107
+PID_BASIC PIC-104
+VALVE_ELECTRIC LV-107
+
+ALL DATA CONNECTIONS:
+LT-105.PV, LIC-104.PV
+LIC-104.XOUT, RSP_Scale.IN1
+RSP_Scale.OUT, FIC-107.SP
+FT-107.PV, FIC-107.PV
+FIC-107.XOUT, LV-107.Control_Signal
+XV-103.FB_Opened, XV103_NotOpen.IN
+PT-104.High_Alarm, CascadeInhibit.IN1
+PT-104.Low_Alarm, CascadeInhibit.IN2
+LT-105.Low_Alarm, CascadeInhibit.IN3
+XV103_NotOpen.OUT, CascadeInhibit.IN4
+FT-107.General_Fault, CascadeInhibit.IN5
+LV-107.Position_Error, CascadeInhibit.IN6
+CascadeInhibit.OUT, LIC-104.Inhibit
+CascadeInhibit.OUT, FIC-107.Inhibit
+PT-104.High_Alarm, LV-107.Inhibit
+PT-104.High_Alarm, LV-107.Manual_Mode
+CascadeInhibit.OUT, CascadePermissive.IN
+CascadePermissive.OUT, StartupDelay.IN
+CascadePermissive.OUT, FIC-107.AUTO
+StartupDelay.Q, LIC-104.AUTO
+PT-104.PV, PIC-104.PV
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> PID_BASIC1.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 = LT-105, PID_BASIC1 = LIC-104
+   Actual Connection: LT-105.PV -> LIC-104.PV
+   Notes: Direct tie confirms LIC-104 is cascaded from level PV LT-105.
+
+Intended: PID_BASIC1.XOUT -> PID_BASIC2.SP
+   Status: FOUND INDIRECT
+   Mapping: PID_BASIC1 = LIC-104, PID_BASIC2 = FIC-107
+   Actual Connection: LIC-104.XOUT -> RSP_Scale.IN1; RSP_Scale.OUT -> FIC-107.SP
+   Notes: Setpoint is routed through a scaling block (RSP_Scale), typical for cascade ratio/ramp/limits. Ensure RSP_Scale configuration matches process intent.
+
+Intended: ANALOG_IN2.PV -> PID_BASIC2.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2 = FT-107, PID_BASIC2 = FIC-107
+   Actual Connection: FT-107.PV -> FIC-107.PV
+   Notes: Direct PV link for flow control is correct.
+
+Intended: PID_BASIC2.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC2 = FIC-107, VALVE_ELECTRIC = LV-107
+   Actual Connection: FIC-107.XOUT -> LV-107.Control_Signal
+   Notes: Valve actuation is directly driven by FIC output. Additional protections present: PT-104.High_Alarm drives LV-107.Inhibit and Manual_Mode; CascadeInhibit feeds LIC-104 and FIC-107 Inhibit; AUTO states are managed via permissives (CascadePermissive/StartupDelay). The alternative MOTOR_VSD.Speed_SP path is not used here.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: Robust cascade implementation with appropriate scaling of the secondary SP, permissives, inhibits, and startup sequencing. Interlocks and alarm-based overrides enhance safety and operability.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

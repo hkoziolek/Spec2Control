@@ -1,0 +1,108 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_3\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(3), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 0.83%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TIT-103
+ANALOG_IN LT-105
+ANALOG_IN FC-004
+PID_BASIC TIC-101
+PID_BASIC LIC-106
+VALVE_ELECTRIC XV-102
+VALVE_ELECTRIC LV-104
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TIT-103
+ANALOG_IN LT-105
+ANALOG_IN FC-004
+PID_BASIC TIC-101
+PID_BASIC LIC-106
+VALVE_ELECTRIC XV-102
+VALVE_ELECTRIC LV-104
+
+ALL DATA CONNECTIONS:
+TIT-103.PV, TIC-101.PV
+TIC-101.XOUT, XV-102.Control_Signal
+LT-105.PV, LIC-106.PV
+LIC-106.XOUT, LV-104.Control_Signal
+XV-102.Position_Error, TIC101_Inhibit_OR.IN1
+TIT-103.High_Alarm, TIC101_Inhibit_OR.IN2
+FC-004.Low_Alarm, TIC101_Inhibit_OR.IN3
+TIT-103.General_Fault, TIC101_Inhibit_OR.IN4
+TIC101_Inhibit_OR.OUT, TIC-101.Inhibit
+LV-104.Position_Error, LIC106_Inhibit_OR.IN1
+LT-105.General_Fault, LIC106_Inhibit_OR.IN2
+XV-102.Alarm, LIC106_Inhibit_OR.IN3
+LIC106_Inhibit_OR.OUT, LIC-106.Inhibit
+TIT-103.High_Alarm, XV-102.Inhibit
+LT-105.High_Alarm, LV-104.Inhibit
+FC-004.PV, FC004_Above10_GT.IN1
+FC004_Above10_GT.OUT, TIC101_StartDelay_TON.IN
+TIC101_StartDelay_TON.Q, TIC101_Enable_AND.IN1
+XV-102.Position_Error, XV102_PosErr_NOT.IN
+XV102_PosErr_NOT.OUT, TIC101_Enable_AND.IN2
+TIC101_Enable_AND.OUT, TIC-101.AUTO
+TIC-101.AUTO, LIC106_StartDelay_TON.IN
+XV-102.Alarm, XV102_Alarm_NOT.IN
+XV102_Alarm_NOT.OUT, LIC106_Enable_AND.IN1
+LIC106_StartDelay_TON.Q, LIC106_Enable_AND.IN2
+LV-104.Position_Error, LV104_PosErr_NOT.IN
+LV104_PosErr_NOT.OUT, LIC106_Enable_AND.IN3
+LIC106_Enable_AND.OUT, LIC-106.AUTO
+TIT-103.High_Alarm, XV-102.Manual_Mode
+LT-105.High_Alarm, LV-104.Manual_Mode
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+- Status: FOUND DIRECT
+  Mapping: ANALOG_IN1=TIT-103; PID_BASIC1=TIC-101
+  Actual Connection: TIT-103.PV, TIC-101.PV
+  Notes: Direct PV feed from temperature transmitter to TIC-101. Additional inhibit logic present for TIC-101 based on XV-102 position error, TIT-103 alarms, and FC-004 low alarm.
+
+- Status: FOUND DIRECT
+  Mapping: ANALOG_IN2=LT-105; PID_BASIC2=LIC-106
+  Actual Connection: LT-105.PV, LIC-106.PV
+  Notes: Direct PV feed from level transmitter to LIC-106. Inhibit logic present using LV-104 position error, LT-105 general fault, and XV-102 alarm.
+
+- Status: FOUND DIRECT
+  Mapping: PID_BASIC1=TIC-101; VALVE_ELECTRIC1=XV-102
+  Actual Connection: TIC-101.XOUT, XV-102.Control_Signal
+  Notes: Direct control signal from TIC-101 to valve XV-102. Auto enable gated by start delay and position error OK; manual mode forced on high alarm from TIT-103.
+
+- Status: FOUND DIRECT
+  Mapping: PID_BASIC2=LIC-106; VALVE_ELECTRIC2=LV-104
+  Actual Connection: LIC-106.XOUT, LV-104.Control_Signal
+  Notes: Direct control signal from LIC-106 to valve LV-104. Auto enable gated by TIC-101 auto, start delay, and position/alarms; manual mode forced on LT-105 high alarm.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: Both intended connection types are implemented cleanly and directly for each PID/valve pair. Robust interlock, inhibit, and auto-enable conditioning is present, indicating a well-considered start-up and fault-handling strategy. No indirect paths (e.g., to MOTOR_VSD.Speed_SP) are used or needed here.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

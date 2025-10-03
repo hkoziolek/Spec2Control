@@ -1,0 +1,99 @@
+* Function Blocks *
+ANALOG_IN FT-601
+ANALOG_IN LT-601
+ANALOG_IN TT-104
+PID_BASIC FIC-601
+MOTOR_VSD P-601A
+MOTOR_VSD P-601B
+TON PumpStartA_TON
+TON PumpStartB_TON
+TON LowFlowAlarm_TON
+
+* Variables *
+REAL FT601_FlowRate_PV
+REAL LT601_SiloLevel_PV
+REAL TT104_Temperature_PV
+REAL FIC601_MV_PumpSpeedCmd
+BOOL LAH_SiloHighLevel
+BOOL FA601_LowFlowAlarm
+BOOL TAH104_HighTempAlarm
+BOOL PumpA_Running
+BOOL PumpB_Running
+BOOL InterlockOK
+
+* Functions *
+OR PumpProtections_OR
+NOT LevelOK_NOT
+LT TempBelow80_LT
+AND StartPermissive_AND
+NOT A_Fault_NOT
+AND StartA_AND
+AND StartB_AND
+NOT FT_Fault_NOT
+
+* Data Connections * 
+FT-601.PV, FIC-601.PV
+FIC-601.XOUT, P-601A.Speed_SP
+FIC-601.XOUT, P-601B.Speed_SP
+LT-601.Low_Alarm, PumpProtections_OR.IN1
+TT-104.High_Alarm, PumpProtections_OR.IN2
+PumpProtections_OR.OUT, P-601A.Inhibit
+PumpProtections_OR.OUT, P-601B.Inhibit
+LT-601.Low_Alarm, LevelOK_NOT.IN
+LevelOK_NOT.OUT, StartPermissive_AND.IN1
+TT-104.PV, TempBelow80_LT.IN1
+TempBelow80_LT.OUT, StartPermissive_AND.IN2
+StartPermissive_AND.OUT, StartA_AND.IN1
+P-601A.FB_Fault, A_Fault_NOT.IN
+A_Fault_NOT.OUT, StartA_AND.IN2
+StartA_AND.OUT, PumpStartA_TON.IN
+StartPermissive_AND.OUT, StartB_AND.IN1
+P-601A.FB_Fault, StartB_AND.IN2
+StartB_AND.OUT, PumpStartB_TON.IN
+PumpStartA_TON.Q, P-601A.Start_Cmd
+PumpStartB_TON.Q, P-601B.Start_Cmd
+FT-601.Low_Alarm, LowFlowAlarm_TON.IN
+LowFlowAlarm_TON.Q, FA601_LowFlowAlarm
+LT-601.High_Alarm, LAH_SiloHighLevel
+TT-104.High_Alarm, TAH104_HighTempAlarm
+FT-601.PV, FT601_FlowRate_PV
+LT-601.PV, LT601_SiloLevel_PV
+TT-104.PV, TT104_Temperature_PV
+FIC-601.XOUT, FIC601_MV_PumpSpeedCmd
+P-601A.FB_Running, PumpA_Running
+P-601B.FB_Running, PumpB_Running
+StartPermissive_AND.OUT, InterlockOK
+FT-601.General_Fault, FT_Fault_NOT.IN
+FT_Fault_NOT.OUT, FIC-601.AUTO
+
+* Parameter Data Connections *
+150.0, FIC-601.SP
+2.0, FIC-601.KP
+1.5, FIC-601.TR
+0.3, FIC-601.TD
+20.0, FIC-601.MV_MIN
+100.0, FIC-601.MV_MAX
+200.0, FIC-601.PV_High
+100.0, FIC-601.PV_Low
+TRUE, FT-601.Alarm_Enable
+250.0, FT-601.PV_High
+80.0, FT-601.PV_Low
+15.625, FT-601.Scaling_Slope
+-62.5, FT-601.Scaling_Offset
+TRUE, LT-601.Alarm_Enable
+90.0, LT-601.PV_High
+10.0, LT-601.PV_Low
+TRUE, TT-104.Alarm_Enable
+85.0, TT-104.PV_High
+0.0, TT-104.PV_Low
+T#5s, P-601A.Accel_Ramp
+T#5s, P-601A.Decel_Ramp
+FALSE, P-601A.Stop_Cmd
+T#5s, P-601B.Accel_Ramp
+T#5s, P-601B.Decel_Ramp
+FALSE, P-601B.Stop_Cmd
+T#5s, PumpStartA_TON.PT
+T#5s, PumpStartB_TON.PT
+T#10s, LowFlowAlarm_TON.PT
+80.0, TempBelow80_LT.IN2
+

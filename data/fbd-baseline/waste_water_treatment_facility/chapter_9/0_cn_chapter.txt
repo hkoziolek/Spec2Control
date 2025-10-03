@@ -1,0 +1,23 @@
+## 9 **Disinfection**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CL-801 | Chlorination System | Provides chlorine dosage for effluent disinfection |
+|DC-801 | Dechlorination System | Supplies dechlorination agent to neutralize chlorine residuals |
+|FIC-101 | Flow Controller | Maintains chlorination dosage ratio to effluent flow rate |
+|FIC-102 | Flow Controller | Maintains dechlorination dosage ratio to effluent flow rate |
+|FT-801 | Flow Transmitter | Measures effluent flow rate for ratio control calculations |
+|LV-105 | Level Valve | Regulates level control in associated process equipment |
+|UV-801 | Ultraviolet System | Provides UV disinfection for effluent treatment |
+|XV-106 | On-Off Valve | Isolates or permits flow in the associated pipeline |
+
+### 9.1) Control Strategy Description
+
+The disinfection process employs ratio control to maintain a proportional relationship between the effluent flow rate measured by FT-801 and the disinfectant dosing systems, including chlorination (CL-801) and dechlorination (DC-801). The effluent flow rate, measured by FT-801, serves as the wild flow variable, while the controlled flow setpoints for CL-801 and DC-801 are calculated using ratio controllers FIC-101 and FIC-102, respectively. FIC-101 maintains a chlorination dosage ratio of 2.5:1 (chlorine dosage to effluent flow), while FIC-102 maintains a dechlorination dosage ratio of 1.2:1 (dechlorination agent to effluent flow). For example, if FT-801 measures an effluent flow rate of 500 m³/hr, FIC-101 adjusts the chlorine flow setpoint to 1250 m³/hr, and FIC-102 adjusts the dechlorination agent flow setpoint to 600 m³/hr. Ratio limits are clamped between 2.0:1 and 3.0:1 for chlorination and 1.0:1 to 1.5:1 for dechlorination to ensure safe operation. Both ratio controllers include manual bias adjustment capabilities for operator intervention and automatic trim adjustments based on effluent quality feedback. Signal scaling ensures all flow measurements are normalized to a 0-100% scale, with engineering units converted to m³/hr for accurate ratio calculations.
+
+### 9.2) Interlocks and Permissives
+
+The ratio control logic for disinfection is interlocked with permissives to ensure safe and reliable operation. Chlorination via CL-801 is inhibited unless FT-801 confirms a minimum effluent flow rate of 50 m³/hr, and XV-106 verifies the shut-off valve is fully open. Similarly, dechlorination via DC-801 is permitted only when FT-801 measures an effluent flow greater than 50 m³/hr and the chlorination system (CL-801) is operational. If FT-801 detects a flow rate below the low-flow cutoff of 50 m³/hr, both FIC-101 and FIC-102 output signals are forced to zero to prevent overdosing. Additionally, an interlock ensures that UV-801 remains active unless both chlorination and dechlorination systems are disabled, preventing simultaneous operation of UV and chemical disinfection systems. Ratio controllers FIC-101 and FIC-102 are disabled if effluent flow exceeds 1000 m³/hr to prevent system overload.
+
+### 9.3) Alarm and Fault Handling
+
+Alarms are configured for both ratio controllers to alert operators of deviations from the expected ratio setpoints. FIC-101 generates a high-ratio alarm if the chlorination dosage exceeds the upper limit of 3.0:1 or falls below the lower limit of 2.0:1. Similarly, FIC-102 triggers a low-ratio alarm if the dechlorination dosage drops below the minimum limit of 1.0:1 or exceeds the maximum limit of 1.5:1. FT-801 includes a fault alarm for signal loss or measurement outside the calibrated range of 0-1000 m³/hr. In the event of a fault in FT-801, both FIC-101 and FIC-102 enter manual mode, allowing operators to directly adjust dosing rates. Deadband logic is implemented in both ratio controllers to prevent hunting during minor flow fluctuations, with a deadband range of ±0.1 ratio units. If any critical valve, such as XV-106 or LV-105, fails to respond within 5 seconds, an interlock disables the associated dosing system and generates a fault alarm. All alarms are displayed on the SCADA system with priority levels for operator response.

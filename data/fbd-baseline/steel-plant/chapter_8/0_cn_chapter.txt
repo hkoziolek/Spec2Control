@@ -1,0 +1,26 @@
+## 8 ** Rolling Mills ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|ALM-701 | Level Alarm | High level alarm for reheating furnace safety. |
+|ALM-702 | Level Alarm | Low level alarm for reheating furnace safety. |
+|ALM-703 | Level Alarm | High level alarm for fuel storage tank. |
+|ALM-704 | Level Alarm | Low level alarm for fuel storage tank. |
+|BLS-701 | Burner Safety Interlock | Ensures safe operation of reheating furnace burners. |
+|FIC-702 | Flow Controller | Regulates air flow to maintain combustion efficiency. |
+|FLT-701 | Level Transmitter | Measures fuel tank level for inventory control. |
+|FT-701 | Flow Transmitter | Measures fuel flow rate for combustion control. |
+|FT-702 | Flow Transmitter | Measures air flow rate for combustion control. |
+|FV-702 | Flow Control Valve | Modulates air flow to achieve combustion setpoint. |
+|TT-701 | Temperature Transmitter | Monitors reheating furnace temperature. |
+
+### 8.1) Control Strategy Description
+
+In Section 8, the ratio control strategy for the rolling mills ensures proportional relationships between the reheating furnace fuel flow and combustion air flow to maintain optimal combustion efficiency. The wild flow measurement is provided by FT-701 (Fuel Flow Transmitter) with a calibrated range of 0-5000 kg/hr. The controlled flow measurement is provided by FT-702 (Air Flow Transmitter) with a calibrated range of 0-15000 Nm³/hr. The ratio controller FFIC-701 calculates the air flow setpoint based on the fuel flow measurement and a fixed operator-set ratio of 10:1 (air-to-fuel). The ratio control equation is implemented as FT-702 SP = FT-701 PV × 10, where FT-701 PV represents the process variable of the fuel flow transmitter. The air flow control loop modulates FV-702 (Air Flow Control Valve) via FIC-702 (Air Flow Controller) to achieve the calculated setpoint. Ratio limits are clamped between 8:1 and 12:1 to ensure safe and efficient combustion. Manual bias adjustment is available through FFIC-701 to compensate for variations in fuel quality or reheating furnace temperature deviations, with a bias adjustment range of ±10%. Lead compensation is applied to the air flow controller to account for delays in air delivery. Low flow cutoff logic disables ratio control if FT-701 PV falls below 200 kg/hr to prevent unstable operation during low fuel flow conditions.
+
+### 8.2) Interlocks and Permissives
+
+The ratio control system is interlocked with TT-701 (Reheating Furnace Temperature Transmitter) to ensure safe operation. If TT-701 PV exceeds 1200°C, FFIC-701 automatically reduces the air-to-fuel ratio to 8:1 to prevent overheating. Additionally, FT-701 and FT-702 must both be operational and transmitting valid signals for FFIC-701 to enable ratio control. A permissive condition requires the reheating furnace burner status to be ON, as indicated by BLS-701 (Burner Logic Status), before FFIC-701 can calculate and output the air flow setpoint. Boolean glue logic ensures that FV-702 remains closed if FT-701 PV is below 200 kg/hr or if TT-701 PV is below 800°C, preventing unsafe combustion conditions. Mode selection for FFIC-701 allows operators to switch between automatic ratio control, manual air flow control, and individual fuel flow control.
+
+### 8.3) Alarm and Fault Handling
+
+Alarm conditions are configured to alert operators of deviations in ratio control and equipment faults. If the calculated air-to-fuel ratio exceeds 12:1 or falls below 8:1, FFIC-701 triggers a high/low ratio alarm (ALM-701) and clamps the ratio within safe bounds. FT-701 and FT-702 transmitters are equipped with diagnostic alarms (ALM-702 and ALM-703) to indicate signal loss or sensor malfunction. If either transmitter fails, FFIC-701 transitions to manual control mode and generates a fault alarm (FLT-701) to notify operators. TT-701 high-temperature alarm (ALM-704) activates if the reheating furnace temperature exceeds 1200°C, prompting FFIC-701 to reduce the air-to-fuel ratio and FV-702 to close partially. Deadband logic within FFIC-701 prevents ratio hunting by ignoring minor fluctuations in FT-701 PV below 5 kg/hr, ensuring stable operation. Alarm acknowledgment requires operator intervention to reset the system and resume automatic ratio control.

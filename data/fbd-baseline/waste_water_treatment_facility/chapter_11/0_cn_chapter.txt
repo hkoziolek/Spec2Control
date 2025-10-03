@@ -1,0 +1,21 @@
+## 11 **Utilities, Chemicals & Controls**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CD-1001 | Pump | Provides chemical dosing based on flow controller setpoint |
+|FFIC-107 | Flow Controller | Ratio controller for chemical-to-influent flow adjustment |
+|FIC-106 | Flow Controller | Regulates chemical dosing setpoint based on ratio control |
+|FIT-104 | Flow Transmitter | Measures influent flow rate for ratio control calculations |
+|PV-101 | Pressure Valve | Regulates pressure in the chemical dosing system |
+|XV-102 | On-Off Valve | Enables or disables chemical dosing flow path |
+
+### 11.1) Control Strategy Description
+
+The chemical dosing system employs ratio control to maintain proportional relationships between influent flow and chemical dosing rates for optimal process performance. The wild flow measurement is provided by FIT-104, which measures the influent flow rate within a range of 0-5000 L/min. The controlled flow is regulated by FIC-106, which adjusts the setpoint for the chemical dosing pumps CD-1001 based on the ratio controller FFIC-107. The ratio setpoint is configured to maintain a 2.5:1 chemical-to-influent flow ratio, ensuring precise dosing. The ratio calculation is performed as follows: the controlled flow setpoint from FIC-106 is calculated as the product of the influent flow rate measured by FIT-104 and the ratio setpoint of 2.5. The ratio controller FFIC-107 includes provisions for manual bias adjustments between ±10% of the calculated setpoint to accommodate process variability. Flow measurement signals are scaled linearly from 0-100% to match the input range of FFIC-107, and a deadband of 3% is implemented to reduce wear on CD-1001 during stable operation. Ratio limits are clamped between 2.0:1 and 3.0:1 to ensure safe operation under varying influent conditions.
+
+### 11.2) Interlocks and Permissives
+
+The chemical dosing system interlocks ensure safe operation and prevent overdosing or underdosing. The ratio controller FFIC-107 is interlocked with FIT-104 to disable chemical dosing if the influent flow rate falls below 100 L/min, as measured by FIT-104, to avoid chemical wastage during low-flow conditions. Additionally, the chemical dosing pumps CD-1001 are prevented from starting unless the shut-off valve XV-102 is confirmed open and the pressure control valve PV-101 is maintaining a minimum pressure of 2 bar. The ratio control mode is permissive only when the influent flow measurement from FIT-104 and the chemical dosing pump feedback signals are within acceptable ranges. Manual control mode overrides are allowed but require operator confirmation and supervisory approval.
+
+### 11.3) Alarm and Fault Handling
+
+The ratio controller FFIC-107 generates alarms under the following conditions: if the calculated ratio exceeds the configured limits of 3.0:1 or drops below 2.0:1, or if the influent flow rate measured by FIT-104 is outside the range of 0-5000 L/min. A high-priority alarm is triggered if the chemical dosing pumps CD-1001 fail to respond to control signals from FIC-106 within 5 seconds. If FIT-104 fails to transmit a valid signal, FFIC-107 will enter a fault state and revert to manual control mode with a default chemical dosing rate of 500 L/min until the fault is resolved. Deadband logic prevents nuisance alarms by ignoring deviations within 3% of the setpoint. All alarms are logged in the SCADA system and require operator acknowledgment before resuming automatic ratio control.

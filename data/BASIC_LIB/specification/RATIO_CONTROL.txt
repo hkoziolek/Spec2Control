@@ -1,0 +1,17 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer text explaining the loop's purpose and location.
+Input,Auto,BOOL,TRUE=automatic ratio control; FALSE=manual output.
+Input,PrimaryPV,REAL,Measured master process value (e.g., water flow).
+Input,SecondaryPV,REAL,Measured slave process value (e.g., chemical flow).
+Input,RatioSP,REAL,Desired Secondary/Primary ratio.
+Input,Bias,REAL,Additive bias applied to the computed setpoint (engineering units).
+Input,TrimKp,REAL,Proportional trim gain applied to ratio error (ActiveRatio−RatioSP).
+Input,TrimTi,TIME,Integral time for trim action; T#0s disables integration.
+Input,MV_MIN,REAL,Manipulated value minimum: for clamping the slave setpoint output signal.
+Input,MV_MAX,REAL,Manipulated value maximum: for clamping the slave setpoint output signal.
+Input,ManOut,REAL,Operator-provided output when Auto=FALSE.
+Input,Inhibit,BOOL,Inhibits ratio control functionality can receive alarm signals.
+Output,SlaveSP,REAL,Setpoint to the slave controlle
+Output,ActiveRatio,REAL,Computed actual ratio = SecondaryPV/PrimaryPV (valid when PrimaryPV>0).
+Output,RatioErr,REAL,Ratio error = ActiveRatio−RatioSP.

@@ -1,0 +1,12 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the Split Range block for HMI.
+Input,Description,STRING,Longer description of the split range purpose.
+Input,IN,REAL,Single analog input from the upstream controller (0-100 percent).
+Input,Split_Point,REAL,The controller input value where the control action shifts between outputs (e.g., 50 percent).
+Input,Output1_Start,REAL,The controller input value where Output 1 begins to change.
+Input,Output1_End,REAL,The controller input value where Output 1 reaches its end state.
+Input,Output2_Start,REAL,The controller input value where Output 2 begins to change.
+Input,Output2_End,REAL,The controller input value where Output 2 reaches its end state.
+Input,Inhibit,BOOL,Inhibits split range functionality can receive alarm signals.
+Output,OUT1,REAL,Analog output signal for the first final control element (0-100 percent).
+Output,OUT2,REAL,Analog output signal for the second final control element (0-100 percent).

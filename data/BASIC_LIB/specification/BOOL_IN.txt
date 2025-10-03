@@ -1,0 +1,11 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of the measurement purpose.
+Input,Bool_In,BOOL,The boolean value to be monitored.
+Input,Alarm_OnTrue,BOOL,Enable alarm when Bool_In is TRUE.
+Input,Alarm_OnFalse,BOOL,Enable alarm when Bool_In is FALSE.
+Input,Latch_Enable,BOOL,Enables latching of the alarm/status.
+Input,Reset_Latch,BOOL,Resets a latched alarm/status.
+Output,Bool_Out,BOOL,The monitored boolean value.
+Output,Alarm_Active,BOOL,Indicates if an alarm condition is active.
+Output,Latched_Status,BOOL,The latched state if latching is enabled.

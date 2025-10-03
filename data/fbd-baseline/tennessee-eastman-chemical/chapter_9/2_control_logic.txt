@@ -1,0 +1,78 @@
+* Function Blocks *
+ANALOG_IN TIT-101
+ANALOG_IN FI-103
+PID_BASIC FIC-103
+VALVE_ELECTRIC LV-102
+VALVE_ON_OFF XV-104
+BOOL_IN LC-002
+
+* Variables *
+REAL TIT101_Temperature_PV_C
+REAL FI103_Flow_PV
+REAL FIC103_Output_MV_Percent
+REAL LV102_ValvePositionCmd_Percent
+BOOL XV104_Open_FB
+BOOL LC002_ValidLevel
+BOOL LC002_LevelValid_In
+
+* Functions *
+NOT XV104NotOpen_NOT
+NOT LC002NotActive_NOT
+OR LV102Inhibit_OR
+OR XV104Inhibit_OR
+OR FIC103Inhibit_OR
+NOT XV104OpenCmd_NOT
+
+* Data Connections *
+TIT-101.PV, FIC-103.PV
+FIC-103.XOUT, LV-102.Control_Signal
+XV-104.FB_Opened, XV104NotOpen_NOT.IN
+LC-002.Bool_Out, LC002NotActive_NOT.IN
+XV104NotOpen_NOT.OUT, LV102Inhibit_OR.IN1
+FI-103.Low_Alarm, LV102Inhibit_OR.IN2
+TIT-101.General_Fault, LV102Inhibit_OR.IN3
+LC002NotActive_NOT.OUT, LV102Inhibit_OR.IN4
+TIT-101.High_Alarm, LV102Inhibit_OR.IN5
+XV-104.Alarm_General, LV102Inhibit_OR.IN6
+LV102Inhibit_OR.OUT, LV-102.Inhibit
+FI-103.Low_Alarm, XV104Inhibit_OR.IN1
+TIT-101.High_Alarm, XV104Inhibit_OR.IN2
+XV104Inhibit_OR.OUT, XV-104.Inhibit
+TIT-101.General_Fault, FIC103Inhibit_OR.IN1
+TIT-101.Low_Alarm, FIC103Inhibit_OR.IN2
+LC002NotActive_NOT.OUT, FIC103Inhibit_OR.IN3
+FIC103Inhibit_OR.OUT, FIC-103.Inhibit
+XV104Inhibit_OR.OUT, XV104OpenCmd_NOT.IN
+XV104OpenCmd_NOT.OUT, XV-104.Open_Cmd
+XV104Inhibit_OR.OUT, XV-104.Close_Cmd
+LC002_LevelValid_In, LC-002.Bool_In
+TIT-101.PV, TIT101_Temperature_PV_C
+FI-103.PV, FI103_Flow_PV
+FIC-103.XOUT, FIC103_Output_MV_Percent
+LV-102.Valve_Position, LV102_ValvePositionCmd_Percent
+XV-104.FB_Opened, XV104_Open_FB
+LC-002.Bool_Out, LC002_ValidLevel
+
+* Parameter Data Connections *
+6.25, TIT-101.Scaling_Slope
+-25.0, TIT-101.Scaling_Offset
+55.0, TIT-101.PV_High
+TRUE, TIT-101.Alarm_Enable
+6.25, FI-103.Scaling_Slope
+-25.0, FI-103.Scaling_Offset
+5.0, FI-103.PV_Low
+TRUE, FI-103.Alarm_Enable
+45.0, FIC-103.SP
+0.0, FIC-103.MV_MIN
+100.0, FIC-103.MV_MAX
+3.0, FIC-103.KP
+1.2, FIC-103.TR
+0.3, FIC-103.TD
+TRUE, FIC-103.AUTO
+0.0, FIC-103.X0
+0.0, LV-102.Close_Limit
+100.0, LV-102.Open_Limit
+T#2s, LV-102.Timeout
+FALSE, LV-102.Manual_Mode
+0.0, LV-102.Manual_Position
+T#2s, XV-104.Timeout

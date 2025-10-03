@@ -1,0 +1,58 @@
+* Function Blocks *
+VALVE_ELECTRIC FV-102
+ANALOG_IN PT-501
+ANALOG_IN LI-502
+PID_BASIC PIC-501
+
+* Variables *
+REAL PT501_PressurePV
+REAL LI502_LevelPV
+REAL PIC501_ControlOutput
+
+* Functions *
+OR PIC501_Inhibit_OR
+OR ValveShutdown_OR
+NOT PT501FaultAuto_NOT
+
+* Data Connections *
+PT-501.PV, PIC-501.PV
+PIC-501.XOUT, FV-102.Control_Signal
+FV-102.Feedback_Pos, PIC-501.X0
+PT-501.General_Fault, PIC501_Inhibit_OR.IN1
+PT-501.High_Alarm, PIC501_Inhibit_OR.IN2
+PT-501.Low_Alarm, PIC501_Inhibit_OR.IN3
+LI-502.Low_Alarm, PIC501_Inhibit_OR.IN4
+LI-502.High_Alarm, PIC501_Inhibit_OR.IN5
+PIC501_Inhibit_OR.OUT, PIC-501.Inhibit
+PT-501.General_Fault, ValveShutdown_OR.IN1
+PIC-501.PV_High_Alarm, ValveShutdown_OR.IN2
+ValveShutdown_OR.OUT, FV-102.Inhibit
+PT-501.General_Fault, PT501FaultAuto_NOT.IN
+PT501FaultAuto_NOT.OUT, PIC-501.AUTO
+PT-501.PV, PT501_PressurePV
+LI-502.PV, LI502_LevelPV
+PIC-501.XOUT, PIC501_ControlOutput
+
+* Parameter Data Connections *
+9.375, PT-501.Scaling_Slope
+-37.5, PT-501.Scaling_Offset
+85.0, PT-501.PV_High
+65.0, PT-501.PV_Low
+TRUE, PT-501.Alarm_Enable
+6.25, LI-502.Scaling_Slope
+-25.0, LI-502.Scaling_Offset
+90.0, LI-502.PV_High
+5.0, LI-502.PV_Low
+TRUE, LI-502.Alarm_Enable
+75.0, PIC-501.SP
+0.0, PIC-501.MV_MIN
+100.0, PIC-501.MV_MAX
+-2.0, PIC-501.KP
+0.5, PIC-501.TR
+0.1, PIC-501.TD
+90.0, PIC-501.PV_High
+65.0, PIC-501.PV_Low
+0.0, FV-102.Close_Limit
+100.0, FV-102.Open_Limit
+FALSE, FV-102.Manual_Mode
+

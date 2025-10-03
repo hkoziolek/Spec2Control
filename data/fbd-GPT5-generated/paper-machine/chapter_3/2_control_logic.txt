@@ -1,0 +1,85 @@
+* Function Blocks *
+ANALOG_IN PT-101
+ANALOG_IN TT-103
+PID_BASIC PIC-101
+PID_BASIC TIC-104
+PID_BASIC FC-202
+PID_BASIC FC-203
+VALVE_ELECTRIC FV-202
+VALVE_ELECTRIC SV-203
+
+* Variables *
+REAL TIC104_RSP_to_FC203
+REAL PIC101_RSP_to_FC202
+REAL FC203_ControlSignal_SV203
+REAL FC202_ControlSignal_FV202
+
+* Functions *
+OR SteamTrip
+OR TICManualCondition
+OR PICManualCondition
+
+* Data Connections * 
+TT-103.PV, TIC-104.PV
+TIC-104.XOUT, FC-203.SP
+SV-203.Feedback_Pos, FC-203.PV
+FC-203.XOUT, SV-203.Control_Signal
+PT-101.PV, PIC-101.PV
+PIC-101.XOUT, FC-202.SP
+FV-202.Feedback_Pos, FC-202.PV
+FC-202.XOUT, FV-202.Control_Signal
+PT-101.High_Alarm, SteamTrip.IN1
+TT-103.High_Alarm, SteamTrip.IN2
+SteamTrip.OUT, SV-203.Inhibit
+SteamTrip.OUT, FC-203.Inhibit
+PT-101.Low_Alarm, FV-202.Inhibit
+PT-101.Low_Alarm, FC-202.Inhibit
+TT-103.General_Fault, TICManualCondition.IN1
+SV-203.Position_Error, TICManualCondition.IN2
+TICManualCondition.OUT, TIC-104.Inhibit
+PT-101.General_Fault, PICManualCondition.IN1
+FV-202.Position_Error, PICManualCondition.IN2
+PICManualCondition.OUT, PIC-101.Inhibit
+TIC-104.XOUT, TIC104_RSP_to_FC203
+PIC-101.XOUT, PIC101_RSP_to_FC202
+FC-203.XOUT, FC203_ControlSignal_SV203
+FC-202.XOUT, FC202_ControlSignal_FV202
+
+* Parameter Data Connections *
+170, TIC-104.SP
+1.2, TIC-104.KP
+2.0, TIC-104.TR
+0, TIC-104.MV_MIN
+100, TIC-104.MV_MAX
+TRUE, TIC-104.AUTO
+180, TIC-104.PV_High
+160, TIC-104.PV_Low
+5.1, TIC-104.Deviation_Limit
+11.25, TT-103.Scaling_Slope
+-25, TT-103.Scaling_Offset
+185, TT-103.PV_High
+160, TT-103.PV_Low
+TRUE, TT-103.Alarm_Enable
+3.5, FC-203.KP
+0.3, FC-203.TR
+0, FC-203.MV_MIN
+100, FC-203.MV_MAX
+TRUE, FC-203.AUTO
+800, PIC-101.SP
+1.2, PIC-101.KP
+2.0, PIC-101.TR
+0, PIC-101.MV_MIN
+100, PIC-101.MV_MAX
+TRUE, PIC-101.AUTO
+850, PIC-101.PV_High
+750, PIC-101.PV_Low
+24, PIC-101.Deviation_Limit
+900, PT-101.PV_High
+700, PT-101.PV_Low
+TRUE, PT-101.Alarm_Enable
+3.5, FC-202.KP
+0.2857, FC-202.TR
+0, FC-202.MV_MIN
+100, FC-202.MV_MAX
+TRUE, FC-202.AUTO
+

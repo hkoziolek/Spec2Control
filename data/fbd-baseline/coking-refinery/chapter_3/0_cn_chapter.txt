@@ -1,0 +1,32 @@
+## 3 **Vacuum Distillation Unit (VDU)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|PIC-102 | Pressure Controller | Controls vacuum column pressure in the VDU using PID feedback loop. |
+|PIT-103 | Pressure Transmitter | Measures vacuum column pressure and provides 4-20 mA signal to controller. |
+|PV-101 | Pressure Valve | Modulates position to maintain column pressure within the desired range. |
+
+### 3.1) Control Strategy Description
+
+The vacuum column pressure in the Vacuum Distillation Unit (VDU) is controlled via a single-loop feedback PID control strategy implemented on PIC-102. The process variable (PV) is the column pressure measured by PIT-103, with a transmitter range of 0-760 mmHg absolute, providing a 4-20 mA signal to the controller. The target setpoint (SP) for the column pressure is maintained at 50 mmHg absolute to optimize separation efficiency and prevent column flooding.
+
+PIC-102 is configured as a reverse-acting controller, where an increase in the PV results in a decrease in the manipulated variable (MV) to reduce pressure. The PID tuning parameters are set as follows: proportional gain (Kp) = 1.8, integral time (Ki) = 2.0 minutes, and derivative time (Kd) = 0.5 minutes. The controller output (MV) ranges from 0% to 100% and is scaled to modulate the position of PV-101, a pneumatically actuated pressure control valve.
+
+The final control element, PV-101, is a fail-closed valve with a linear flow characteristic. The valve position is adjusted based on the MV signal from PIC-102, which is transmitted as a 4-20 mA signal to the valve positioner. The valve's operating range is calibrated to correspond to a pressure control range of 10-100 mmHg absolute. Anti-windup logic is implemented in PIC-102 to prevent integral windup during valve saturation conditions, and bumpless transfer is enabled to ensure smooth transitions between manual and automatic modes.
+
+A signal scaling block normalizes the 4-20 mA input from PIT-103 to a 0-100% range for the controller. The setpoint is clamped between 30 mmHg and 70 mmHg to ensure safe operating conditions. A hysteresis of 1 mmHg is applied to the control output to prevent oscillations near the setpoint.
+
+### 3.2) Interlocks and Permissives
+
+The operation of PIC-102 and PV-101 is subject to the following interlocks and permissives to ensure safe and reliable control. The control loop is enabled only when the VDU column is in operation, verified by the column startup permissive logic. The permissive signal (VDU_START_OK) must be active for PIC-102 to operate in automatic mode.
+
+A high-pressure trip interlock is configured to override the controller output and fully close PV-101 if the column pressure exceeds 120 mmHg absolute, as indicated by PIT-103. This interlock is hardwired and latches until manually reset. Additionally, a low-pressure permissive ensures that PIC-102 is disabled if the column pressure falls below 5 mmHg absolute to prevent vacuum pump cavitation.
+
+The control system includes a maintenance bypass permissive (MAINT_BYPASS_OK) for PV-101, which allows manual operation during maintenance activities. When this permissive is active, PIC-102 is forced into manual mode, and the operator is required to manually adjust the valve position.
+
+### 3.3) Alarm and Fault Handling
+
+The control system generates alarms for deviations in the column pressure and equipment faults. A high-pressure alarm (PIT-103_HI) is triggered if the column pressure exceeds 80 mmHg absolute, while a low-pressure alarm (PIT-103_LO) is activated if the pressure drops below 20 mmHg absolute. Both alarms are configured with a 2-second delay to filter out transient fluctuations.
+
+In the event of a transmitter fault, such as a loss of signal from PIT-103 (signal < 3.6 mA or > 21 mA), PIC-102 transitions to manual mode, and an alarm (PIT-103_FAULT) is raised. The operator is required to manually control PV-101 until the fault is resolved. A fault in PV-101, such as a positioner failure, triggers an alarm (PV-101_FAULT) and forces the valve to its fail-closed position.
+
+The control system includes diagnostic logic to detect excessive oscillations in the control loop. If the oscillation amplitude exceeds 5 mmHg for more than 60 seconds, an alarm (PIC-102_OSC) is raised, and the controller tuning should be reviewed.

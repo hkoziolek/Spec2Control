@@ -1,0 +1,112 @@
+Evaluation Results for steel-plant - chapter_9
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_9\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_9\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_9\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(7), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(7), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_9\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AL-801
+ANALOG_IN AL-802
+ANALOG_IN AL-803
+ANALOG_IN AL-804
+ANALOG_IN FT-801
+ANALOG_IN FT-802
+ANALOG_IN PT-801
+RATIO_CONTROL FFIC-801
+PID_BASIC FIC-802
+VALVE_ELECTRIC FV-802
+TON HighRatio_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AL-801
+ANALOG_IN AL-802
+ANALOG_IN AL-803
+ANALOG_IN AL-804
+ANALOG_IN FT-801
+ANALOG_IN FT-802
+ANALOG_IN PT-801
+RATIO_CONTROL FFIC-801
+PID_BASIC FIC-802
+VALVE_ELECTRIC FV-802
+
+ALL DATA CONNECTIONS:
+FT-801.PV, FFIC-801.PrimaryPV
+FT-802.PV, FFIC-801.SecondaryPV
+FFIC-801.SlaveSP, FIC-802.SP
+FT-802.PV, FIC-802.PV
+FIC-802.XOUT, FV-802.Control_Signal
+PT-801.High_Alarm, PT801_OutOfRange_OR.IN1
+PT-801.Low_Alarm, PT801_OutOfRange_OR.IN2
+PT801_OutOfRange_OR.OUT, FV-802.Inhibit
+FIC802_Manual2_OR.OUT, RatioInhibitCombine_OR.IN1
+FT-802.High_Alarm, RatioInhibitCombine_OR.IN2
+RatioInhibitCombine_OR.OUT, RatioInhibitFinal_OR.IN1
+PT801_OutOfRange_OR.OUT, RatioInhibitFinal_OR.IN2
+RatioInhibitFinal_OR.OUT, FFIC-801.Inhibit
+FT-801.Low_Alarm, FIC802_Manual_OR.IN1
+FT-801.General_Fault, FIC802_Manual_OR.IN2
+FIC802_Manual_OR.OUT, FIC802_Manual2_OR.IN1
+PT-801.General_Fault, FIC802_Manual2_OR.IN2
+FIC802_Manual2_OR.OUT, FIC-802.Inhibit
+FFIC-801.ActiveRatio, HighRatio_GT.IN1
+HighRatio_GT.OUT, HighRatio_TON.IN
+FFIC-801.ActiveRatio, LowRatio_LT.IN1
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = FT-801; RATIO_CONTROL = FFIC-801
+- Actual Connection: FT-801.PV, FFIC-801.PrimaryPV
+- Notes: FT-801 is used as the primary flow PV for the ratio controller.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 = FT-802; RATIO_CONTROL = FFIC-801
+- Actual Connection: FT-802.PV, FFIC-801.SecondaryPV
+- Notes: FT-802 provides the secondary flow PV for the ratio controller.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: FOUND DIRECT
+- Mapping: RATIO_CONTROL = FFIC-801; PID_BASIC = FIC-802
+- Actual Connection: FFIC-801.SlaveSP, FIC-802.SP
+- Notes: The cascade from ratio to the PID setpoint is correctly implemented. Additionally, FT-802.PV is wired to FIC-802.PV, consistent with the PID’s process variable source.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC = FIC-802; VALVE_ELECTRIC = FV-802
+- Actual Connection: FIC-802.XOUT, FV-802.Control_Signal
+- Notes: Direct actuation path exists; indirect path to a VSD speed setpoint was not required. There are inhibits interlocked via alarms/faults impacting FV-802 and FFIC-801, indicating robust safing.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with clear, consistent instance mapping. Additional alarm/fault inhibit logic enhances safety and operability without conflicting with the intended paths.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,260 @@
+* Function Blocks *
+RATIO_CONTROL FFIC-103
+PID_BASIC FIC-104
+VALVE_ELECTRIC FV-105
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN PT-103
+ANALOG_IN PT-104
+ANALOG_IN PIT-105
+ANALOG_IN PIT-106
+ANALOG_IN PT-108
+BOOL_IN SW-SCREEN-1
+BOOL_IN SW-SCREEN-2
+BOOL_IN SW-SCREEN-3
+BOOL_IN SW-SCREEN-4
+BOOL_IN SW-SCREEN-5
+BOOL_IN SW-SCREEN-6
+BOOL_IN RES-SCREEN-1
+BOOL_IN RES-SCREEN-2
+BOOL_IN RES-SCREEN-3
+BOOL_IN RES-SCREEN-4
+
+* Variables *
+REAL FT102_SP_FromRatio
+REAL FV105_Feedback_Position
+
+* Functions *
+LT LowFlowOn
+GT LowFlowOff
+RS LowFlowLatch
+NOT AutoEnableInv
+OR DownstreamOutOfRange
+OR SupplyPressureTrip
+OR ValveInhibit
+OR Screen1Others
+OR Screen2Others
+OR Screen3Others
+OR Screen4Others
+OR Screen5Others
+OR Screen6Others
+OR Res1Others
+OR Res2Others
+OR Res3Others
+OR Res4Others
+AND Screen1WithAnother
+AND Screen2WithAnother
+AND Screen3WithAnother
+AND Screen4WithAnother
+AND Screen5WithAnother
+AND Screen6WithAnother
+AND Res1WithAnother
+AND Res2WithAnother
+AND Res3WithAnother
+AND Res4WithAnother
+OR ScreenConflict
+OR RatioInhibit
+
+* Data Connections *
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-104.SP
+FT-102.PV, FIC-104.PV
+FIC-104.XOUT, FV-105.Control_Signal
+
+FT-101.PV, LowFlowOn.IN1
+LowFlowOn.OUT, LowFlowLatch.S
+FT-101.PV, LowFlowOff.IN1
+LowFlowOff.OUT, LowFlowLatch.R
+LowFlowLatch.Q, AutoEnableInv.IN
+AutoEnableInv.OUT, FIC-104.AUTO
+LowFlowLatch.Q, RatioInhibit.IN7
+
+PIT-105.Low_Alarm, DownstreamOutOfRange.IN1
+PIT-105.High_Alarm, DownstreamOutOfRange.IN2
+PIT-106.Low_Alarm, DownstreamOutOfRange.IN3
+PIT-106.High_Alarm, DownstreamOutOfRange.IN4
+
+PT-108.Low_Alarm, SupplyPressureTrip.IN1
+PT-108.High_Alarm, SupplyPressureTrip.IN2
+
+DownstreamOutOfRange.OUT, ValveInhibit.IN1
+SupplyPressureTrip.OUT, ValveInhibit.IN2
+ValveInhibit.OUT, FV-105.Inhibit
+
+SW-SCREEN-2.Bool_Out, Screen1Others.IN1
+SW-SCREEN-3.Bool_Out, Screen1Others.IN2
+SW-SCREEN-4.Bool_Out, Screen1Others.IN3
+SW-SCREEN-5.Bool_Out, Screen1Others.IN4
+SW-SCREEN-6.Bool_Out, Screen1Others.IN5
+RES-SCREEN-1.Bool_Out, Screen1Others.IN6
+RES-SCREEN-2.Bool_Out, Screen1Others.IN7
+RES-SCREEN-3.Bool_Out, Screen1Others.IN8
+RES-SCREEN-4.Bool_Out, Screen1Others.IN9
+SW-SCREEN-1.Bool_Out, Screen1WithAnother.IN1
+Screen1Others.OUT, Screen1WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Screen2Others.IN1
+SW-SCREEN-3.Bool_Out, Screen2Others.IN2
+SW-SCREEN-4.Bool_Out, Screen2Others.IN3
+SW-SCREEN-5.Bool_Out, Screen2Others.IN4
+SW-SCREEN-6.Bool_Out, Screen2Others.IN5
+RES-SCREEN-1.Bool_Out, Screen2Others.IN6
+RES-SCREEN-2.Bool_Out, Screen2Others.IN7
+RES-SCREEN-3.Bool_Out, Screen2Others.IN8
+RES-SCREEN-4.Bool_Out, Screen2Others.IN9
+SW-SCREEN-2.Bool_Out, Screen2WithAnother.IN1
+Screen2Others.OUT, Screen2WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Screen3Others.IN1
+SW-SCREEN-2.Bool_Out, Screen3Others.IN2
+SW-SCREEN-4.Bool_Out, Screen3Others.IN3
+SW-SCREEN-5.Bool_Out, Screen3Others.IN4
+SW-SCREEN-6.Bool_Out, Screen3Others.IN5
+RES-SCREEN-1.Bool_Out, Screen3Others.IN6
+RES-SCREEN-2.Bool_Out, Screen3Others.IN7
+RES-SCREEN-3.Bool_Out, Screen3Others.IN8
+RES-SCREEN-4.Bool_Out, Screen3Others.IN9
+SW-SCREEN-3.Bool_Out, Screen3WithAnother.IN1
+Screen3Others.OUT, Screen3WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Screen4Others.IN1
+SW-SCREEN-2.Bool_Out, Screen4Others.IN2
+SW-SCREEN-3.Bool_Out, Screen4Others.IN3
+SW-SCREEN-5.Bool_Out, Screen4Others.IN4
+SW-SCREEN-6.Bool_Out, Screen4Others.IN5
+RES-SCREEN-1.Bool_Out, Screen4Others.IN6
+RES-SCREEN-2.Bool_Out, Screen4Others.IN7
+RES-SCREEN-3.Bool_Out, Screen4Others.IN8
+RES-SCREEN-4.Bool_Out, Screen4Others.IN9
+SW-SCREEN-4.Bool_Out, Screen4WithAnother.IN1
+Screen4Others.OUT, Screen4WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Screen5Others.IN1
+SW-SCREEN-2.Bool_Out, Screen5Others.IN2
+SW-SCREEN-3.Bool_Out, Screen5Others.IN3
+SW-SCREEN-4.Bool_Out, Screen5Others.IN4
+SW-SCREEN-6.Bool_Out, Screen5Others.IN5
+RES-SCREEN-1.Bool_Out, Screen5Others.IN6
+RES-SCREEN-2.Bool_Out, Screen5Others.IN7
+RES-SCREEN-3.Bool_Out, Screen5Others.IN8
+RES-SCREEN-4.Bool_Out, Screen5Others.IN9
+SW-SCREEN-5.Bool_Out, Screen5WithAnother.IN1
+Screen5Others.OUT, Screen5WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Screen6Others.IN1
+SW-SCREEN-2.Bool_Out, Screen6Others.IN2
+SW-SCREEN-3.Bool_Out, Screen6Others.IN3
+SW-SCREEN-4.Bool_Out, Screen6Others.IN4
+SW-SCREEN-5.Bool_Out, Screen6Others.IN5
+RES-SCREEN-1.Bool_Out, Screen6Others.IN6
+RES-SCREEN-2.Bool_Out, Screen6Others.IN7
+RES-SCREEN-3.Bool_Out, Screen6Others.IN8
+RES-SCREEN-4.Bool_Out, Screen6Others.IN9
+SW-SCREEN-6.Bool_Out, Screen6WithAnother.IN1
+Screen6Others.OUT, Screen6WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Res1Others.IN1
+SW-SCREEN-2.Bool_Out, Res1Others.IN2
+SW-SCREEN-3.Bool_Out, Res1Others.IN3
+SW-SCREEN-4.Bool_Out, Res1Others.IN4
+SW-SCREEN-5.Bool_Out, Res1Others.IN5
+SW-SCREEN-6.Bool_Out, Res1Others.IN6
+RES-SCREEN-2.Bool_Out, Res1Others.IN7
+RES-SCREEN-3.Bool_Out, Res1Others.IN8
+RES-SCREEN-4.Bool_Out, Res1Others.IN9
+RES-SCREEN-1.Bool_Out, Res1WithAnother.IN1
+Res1Others.OUT, Res1WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Res2Others.IN1
+SW-SCREEN-2.Bool_Out, Res2Others.IN2
+SW-SCREEN-3.Bool_Out, Res2Others.IN3
+SW-SCREEN-4.Bool_Out, Res2Others.IN4
+SW-SCREEN-5.Bool_Out, Res2Others.IN5
+SW-SCREEN-6.Bool_Out, Res2Others.IN6
+RES-SCREEN-1.Bool_Out, Res2Others.IN7
+RES-SCREEN-3.Bool_Out, Res2Others.IN8
+RES-SCREEN-4.Bool_Out, Res2Others.IN9
+RES-SCREEN-2.Bool_Out, Res2WithAnother.IN1
+Res2Others.OUT, Res2WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Res3Others.IN1
+SW-SCREEN-2.Bool_Out, Res3Others.IN2
+SW-SCREEN-3.Bool_Out, Res3Others.IN3
+SW-SCREEN-4.Bool_Out, Res3Others.IN4
+SW-SCREEN-5.Bool_Out, Res3Others.IN5
+SW-SCREEN-6.Bool_Out, Res3Others.IN6
+RES-SCREEN-1.Bool_Out, Res3Others.IN7
+RES-SCREEN-2.Bool_Out, Res3Others.IN8
+RES-SCREEN-4.Bool_Out, Res3Others.IN9
+RES-SCREEN-3.Bool_Out, Res3WithAnother.IN1
+Res3Others.OUT, Res3WithAnother.IN2
+
+SW-SCREEN-1.Bool_Out, Res4Others.IN1
+SW-SCREEN-2.Bool_Out, Res4Others.IN2
+SW-SCREEN-3.Bool_Out, Res4Others.IN3
+SW-SCREEN-4.Bool_Out, Res4Others.IN4
+SW-SCREEN-5.Bool_Out, Res4Others.IN5
+SW-SCREEN-6.Bool_Out, Res4Others.IN6
+RES-SCREEN-1.Bool_Out, Res4Others.IN7
+RES-SCREEN-2.Bool_Out, Res4Others.IN8
+RES-SCREEN-3.Bool_Out, Res4Others.IN9
+RES-SCREEN-4.Bool_Out, Res4WithAnother.IN1
+Res4Others.OUT, Res4WithAnother.IN2
+
+Screen1WithAnother.OUT, ScreenConflict.IN1
+Screen2WithAnother.OUT, ScreenConflict.IN2
+Screen3WithAnother.OUT, ScreenConflict.IN3
+Screen4WithAnother.OUT, ScreenConflict.IN4
+Screen5WithAnother.OUT, ScreenConflict.IN5
+Screen6WithAnother.OUT, ScreenConflict.IN6
+Res1WithAnother.OUT, ScreenConflict.IN7
+Res2WithAnother.OUT, ScreenConflict.IN8
+Res3WithAnother.OUT, ScreenConflict.IN9
+Res4WithAnother.OUT, ScreenConflict.IN10
+
+PT-103.Low_Alarm, RatioInhibit.IN1
+DownstreamOutOfRange.OUT, RatioInhibit.IN2
+SupplyPressureTrip.OUT, RatioInhibit.IN3
+FV-105.Position_Error, RatioInhibit.IN4
+ScreenConflict.OUT, RatioInhibit.IN5
+FIC-104.Deviation_Alarm, RatioInhibit.IN6
+LowFlowLatch.Q, RatioInhibit.IN7
+PT-104.Low_Alarm, RatioInhibit.IN8
+RatioInhibit.OUT, FFIC-103.Inhibit
+
+FT-101.PV, PT-103.Low_Alarm
+FT-101.PV, PT-104.Low_Alarm
+
+FFIC-103.SlaveSP, FT102_SP_FromRatio
+FV-105.Feedback_Pos, FV105_Feedback_Position
+
+* Parameter Data Connections *
+2.0, FFIC-103.RatioSP
+0.0, FFIC-103.MV_MIN
+500.0, FFIC-103.MV_MAX
+
+31.25, FT-101.Scaling_Slope
+-125.0, FT-101.Scaling_Offset
+50.0, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+
+31.25, FT-102.Scaling_Slope
+-125.0, FT-102.Scaling_Offset
+
+TRUE, PT-103.Alarm_Enable
+TRUE, PT-104.Alarm_Enable
+
+TRUE, PIT-105.Alarm_Enable
+
+TRUE, PIT-106.Alarm_Enable
+
+5.0, PT-108.PV_Low
+9.0, PT-108.PV_High
+TRUE, PT-108.Alarm_Enable
+
+T#2s, FV-105.Timeout
+
+50.0, LowFlowOn.IN2
+50.0, LowFlowOff.IN2
+

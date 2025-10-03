@@ -1,0 +1,53 @@
+* Function Blocks *
+ANALOG_IN PT-501
+ANALOG_IN LI-502
+PID_BASIC PIC-501
+VALVE_ELECTRIC FV-102
+
+* Variables *
+REAL PT501_Pressure_PV
+REAL LI502_Level_PV
+REAL PIC501_Output_To_FV102
+
+* Functions *
+OR SeparatorShutdown_OR
+OR PIC501_Inhibit_OR
+
+* Data Connections *
+PT-501.PV, PIC-501.PV
+PIC-501.XOUT, FV-102.Control_Signal
+FV-102.Feedback_Pos, PIC-501.X0
+PT-501.General_Fault, SeparatorShutdown_OR.IN1
+PIC-501.PV_High_Alarm, SeparatorShutdown_OR.IN2
+SeparatorShutdown_OR.OUT, FV-102.Inhibit
+SeparatorShutdown_OR.OUT, PIC501_Inhibit_OR.IN1
+PT-501.High_Alarm, PIC501_Inhibit_OR.IN2
+PT-501.Low_Alarm, PIC501_Inhibit_OR.IN3
+LI-502.Low_Alarm, PIC501_Inhibit_OR.IN4
+LI-502.High_Alarm, PIC501_Inhibit_OR.IN5
+FV-102.Alarm, PIC501_Inhibit_OR.IN7
+PIC501_Inhibit_OR.OUT, PIC-501.Inhibit
+PT-501.PV, PT501_Pressure_PV
+LI-502.PV, LI502_Level_PV
+PIC-501.XOUT, PIC501_Output_To_FV102
+
+* Parameter Data Connections *
+9.375, PT-501.Scaling_Slope
+-37.5, PT-501.Scaling_Offset
+85.0, PT-501.PV_High
+65.0, PT-501.PV_Low
+6.25, LI-502.Scaling_Slope
+-25.0, LI-502.Scaling_Offset
+90.0, LI-502.PV_High
+5.0, LI-502.PV_Low
+75.0, PIC-501.SP
+2.0, PIC-501.KP
+0.5, PIC-501.TR
+0.1, PIC-501.TD
+0.0, PIC-501.MV_MIN
+100.0, PIC-501.MV_MAX
+TRUE, PIC-501.AUTO
+FALSE, FV-102.Manual_Mode
+100.0, FV-102.Open_Limit
+0.0, FV-102.Close_Limit
+

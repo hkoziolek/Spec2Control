@@ -1,0 +1,31 @@
+## 7 **Petroleum Coke Handling System**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FA-601 | Flow Alarm | Low flow alarm for system protection |
+|FIC-601 | Flow Controller | Regulates flow rate of petroleum coke slurry |
+|FT-601 | Flow Transmitter | Measures flow rate of petroleum coke slurry |
+|LT-601 | Level Transmitter | Monitors level in the feed silo |
+|MCC-601 | Motor Control Center | Controls power supply for P-601A pump |
+|MCC-602 | Motor Control Center | Controls power supply for P-601B pump |
+|P-601A | Pump | Primary handling pump for petroleum coke slurry |
+|P-601B | Pump | Backup handling pump for petroleum coke slurry |
+|TAH-104 | Temperature Alarm | High temperature alarm for system safety |
+|TT-104 | Temperature Transmitter | Measures temperature in the system |
+
+### 7.1) Control Strategy Description
+
+The petroleum coke handling system utilizes PID control to regulate the flow rate of petroleum coke slurry through the handling pumps (P-601A/B) to ensure stable transport to storage silos. The primary controlled variable is the flow rate measured by flow transmitter FT-601, with the setpoint (SP) defined by operator input through the HMI. The PID controller, FIC-601, operates in reverse-acting mode to modulate the pump speed via a variable frequency drive (VFD). The target setpoint for flow rate is 150 m³/h, with a permissible range of 100-200 m³/h to maintain system stability.
+
+The PID tuning parameters are configured as follows: proportional gain (Kp) = 2.0, integral time (Ki) = 1.5 min, and derivative time (Kd) = 0.3 min. The controller output (MV) is constrained between 20% and 100% to prevent pump cavitation at low speeds and overloading at high speeds. The measurement signal from FT-601 is scaled to a 4-20mA range corresponding to 0-250 m³/h, normalized to a 0-100% scale within FIC-601. Bumpless transfer is implemented to ensure smooth transitions between manual and automatic modes, with anti-windup logic preventing integral term accumulation during manual operation.
+
+### 7.2) Interlocks and Permissives
+
+Interlocks are integrated to protect equipment and ensure safe operation. The handling pumps P-601A/B are interlocked with the level transmitter LT-601 on the feed silo. If the level in the silo drops below 10% (LL), the pumps are automatically stopped to prevent dry running. Additionally, the crusher motor MCC-601 is interlocked with the conveyor belt motor MCC-602 to ensure the crusher only operates when the conveyor is running. A permissive signal from TT-104 ensures that the slurry temperature remains below 80°C before the pumps can start, preventing damage to downstream equipment.
+
+The setpoint for FIC-601 is clamped within the range of 100-200 m³/h to prevent excessive flow rates that could overload the silos. A 5-second delay timer is applied to the pump start command to allow the system to stabilize after interlock conditions are cleared.
+
+### 7.3) Alarm and Fault Handling
+
+Alarms are configured to alert operators of abnormal conditions. A high-level alarm (LAH) is triggered if LT-601 detects a silo level above 90%, indicating potential overflow. A low-flow alarm (FA-601) is generated if FT-601 measures a flow rate below 80 m³/h for more than 10 seconds, suggesting pump or pipeline blockage. High-temperature alarm (TAH-104) is activated if TT-104 detects a slurry temperature exceeding 85°C, requiring immediate operator intervention to prevent equipment damage.
+
+Fault handling includes automatic shutdown sequences. If FT-601 fails to transmit a valid signal (signal loss or out-of-range condition), FIC-601 enters manual mode, and the pump speed is set to 0% output. In the event of a VFD fault on P-601A, the standby pump P-601B is automatically started, provided permissive conditions are met. All faults are logged in the control system for diagnostic purposes, and operators are prompted to investigate and resolve issues before restarting affected equipment.

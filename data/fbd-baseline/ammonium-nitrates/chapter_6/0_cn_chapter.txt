@@ -1,0 +1,39 @@
+## 6 **Storage and Load-Out**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AP-503 | Analyzer | Monitors product quality parameters during load-out operations. |
+|FIC-507 | Flow Controller | Regulates SC-504 discharge rate to maintain desired flow ratio. |
+|LT-501 | Level Transmitter | Measures silo level to prevent overloading or underfeeding. |
+|PLC-506 | Programmable Logic Controller | Executes control logic for storage and load-out processes. |
+|PRV-502 | Pressure Relief Valve | Protects system from overpressure conditions. |
+|RIC-506 | Ratio Controller | Calculates flow setpoint for SC-504 based on WB-505 flow and ratio setpoint. |
+|SC-504 | Screw Conveyor | Transfers product from silo at controlled discharge rate. |
+|WB-505 | Weighbridge | Provides continuous product flow rate measurement for ratio control. |
+
+### 6.1) Control Strategy Description
+
+The **Storage and Load-Out** section utilizes ratio control to maintain proportional relationships between product flow rates during silo discharge and load-out operations. The wild flow measurement is derived from the weighbridge WB-505, which provides a continuous product flow rate signal in the range of 0–2000 kg/hr. The controlled flow measurement is the reclaim screw conveyor SC-504, which adjusts its discharge rate based on the desired ratio. The ratio controller RIC-506 calculates the controlled flow setpoint using the formula:
+**SC-504 Flow SP = WB-505 Flow × Ratio SP**.
+
+The ratio setpoint is configured to maintain a 1.5:1 relationship between the weighbridge flow and the screw conveyor flow. This ensures that the product discharge rate from the silo matches the load-out requirements while avoiding overfilling or underfeeding. The ratio controller RIC-506 outputs the calculated setpoint to the flow controller FIC-507, which modulates the speed of SC-504 via its motor drive to achieve the desired flow.
+
+The ratio adjustment limits are defined as 1.0:1 to 2.0:1 to accommodate varying load-out conditions. A manual bias adjustment is available through the HMI, allowing operators to fine-tune the ratio within these bounds. Automatic ratio trim is implemented based on silo level feedback from LT-501; if the silo level exceeds 80%, the ratio is reduced to prevent overloading SC-504. Conversely, if the silo level drops below 20%, the ratio is increased to expedite load-out operations.
+
+### 6.2) Interlocks and Permissives
+
+The ratio control logic is integrated with interlocks and permissives to ensure safe and reliable operation. The reclaim screw conveyor SC-504 will not start unless the following conditions are met:
+1. The silo level LT-501 must be above the low-level threshold of 10%.
+2. The aeration pads AP-503 must be active to ensure product flowability.
+3. The over-pressure relief valve PRV-502 must be closed, confirming that the silo is operating within safe pressure limits.
+
+The weighbridge WB-505 signal is normalized to a 0–100% scale to ensure compatibility with the ratio controller RIC-506. A Boolean interlock disables ratio control if the WB-505 flow rate falls below 100 kg/hr, preventing erroneous operation during low-flow conditions. Mode switching between automatic ratio control and manual operation is bumpless, with safety checks to ensure that the reclaim screw conveyor SC-504 does not exceed its maximum speed of 1500 RPM during transitions.
+
+### 6.3) Alarm and Fault Handling
+
+Alarm handling is implemented to address deviations in ratio control and equipment faults. If the calculated ratio exceeds the configured limits of 1.0:1 to 2.0:1, an alarm is triggered on the HMI, and the ratio controller RIC-506 clamps the setpoint to the nearest limit. A low-flow alarm is activated if the weighbridge WB-505 signal drops below 100 kg/hr, and the reclaim screw conveyor SC-504 is stopped to prevent damage or underfeeding.
+
+Silo level alarms are configured as follows:
+- High-level alarm at 90% (LT-501) triggers a reduction in the ratio setpoint to 1.0:1.
+- Low-level alarm at 10% (LT-501) stops SC-504 and activates the aeration pads AP-503 to restore flowability.
+
+Fault conditions in PRV-502 or AP-503 result in an immediate shutdown of SC-504 and disable ratio control. Hysteresis of 5% is applied to alarm thresholds to prevent nuisance alarms due to minor fluctuations. All alarms and faults are logged in PLC-506 for operator review and troubleshooting.

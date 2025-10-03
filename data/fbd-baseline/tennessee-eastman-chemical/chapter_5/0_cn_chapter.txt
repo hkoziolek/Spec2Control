@@ -1,0 +1,38 @@
+## 5 **Column 2 and Reboiler**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FV-105 | Flow Valve | Regulates steam flow to the reboiler for temperature control |
+|LIC-107 | Level Controller | Maintains liquid level in Column 2 |
+|LT-107 | Level Transmitter | Measures liquid level in Column 2 |
+|LV-102 | Level Valve | Controls liquid discharge from Column 2 |
+|TIC-106 | Temperature Controller | Regulates reboiler temperature using steam flow |
+|TIT-106 | Temperature Transmitter | Measures reboiler temperature for feedback control |
+
+### 5.1) Control Strategy Description
+
+The control of Column 2 and its associated reboiler is implemented using PID feedback loops to maintain stable process conditions. The primary control objectives are to regulate the temperature of the reboiler using steam flow and to maintain the liquid level in Column 2.
+
+**Temperature Control:**
+The reboiler temperature is controlled by the temperature control loop with the tagname TIC-106. The process variable (PV) is measured by TIT-106, which has a calibrated range of 0 to 300°C and outputs a 4-20mA signal. The setpoint (SP) for TIC-106 is operator-adjustable within the range of 150°C to 250°C, with a default setpoint of 200°C. The controller is configured as reverse acting since an increase in temperature requires a decrease in steam flow. The PID tuning parameters are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.2 minutes. The manipulated variable (MV) from TIC-106 modulates the position of FV-105, a fail-closed valve, which regulates the steam flow to the reboiler. The valve position is limited to a range of 0-100% to prevent overdriving the actuator. Bumpless transfer is implemented for smooth transitions between automatic and manual modes.
+
+**Level Control:**
+The liquid level in Column 2 is maintained by the level control loop LIC-107. The PV is provided by LT-107, which measures the column level with a range of 0-100% and outputs a 4-20mA signal. The SP for LIC-107 is set to 50% of the column height, with clamping to prevent values outside the range of 25% to 75%. The controller is direct acting, as an increase in level requires an increase in liquid outflow. The PID tuning parameters are configured as Kp = 2.5, Ki = 1.0 minutes, and Kd = 0.0 minutes. LIC-107 modulates LV-102, a fail-open valve, to control the outflow of liquid from Column 2. The valve is designed to fully close at 0% MV and fully open at 100% MV. Anti-windup logic is included to prevent integral accumulation when the valve is at its limits.
+
+### 5.2) Interlocks and Permissives
+
+To ensure safe operation, the following interlocks and permissives are implemented:
+1. The steam flow control valve FV-105 will not open unless the reboiler condensate return valve is confirmed open. This is achieved through a permissive signal from a limit switch on the condensate return system.
+2. The level control valve LV-102 is interlocked to close if the level in Column 2, as measured by LT-107, falls below 10% to prevent pump cavitation.
+3. The temperature control loop TIC-106 includes a high-temperature interlock that shuts FV-105 if the temperature measured by TIT-106 exceeds 275°C.
+4. Manual override of LIC-107 is only permitted when the level in Column 2 is within the range of 30% to 70%, as verified by LT-107.
+
+### 5.3) Alarm and Fault Handling
+
+The following alarms and fault-handling mechanisms are configured for Column 2 and the reboiler:
+1. A high-temperature alarm (TIT-106-HI) is triggered if the temperature exceeds 260°C, providing early warning before the high-temperature interlock activates.
+2. A low-level alarm (LT-107-LO) is activated if the column level drops below 20%, alerting operators to potential liquid depletion.
+3. A high-level alarm (LT-107-HI) is generated if the level exceeds 80%, indicating potential overflow conditions.
+4. In the event of a transmitter fault (e.g., TIT-106 or LT-107 signal loss), the associated control loops (TIC-106 and LIC-107) will switch to manual mode with the last known MV held constant. An alarm will be generated to notify operators of the fault.
+5. All alarms are configured with a 5-second delay to prevent nuisance trips due to transient conditions.
+
+This control strategy ensures stable operation of Column 2 and its reboiler while maintaining safety and process efficiency.

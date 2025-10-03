@@ -1,0 +1,73 @@
+* Function Blocks *
+ANALOG_IN FIT-101
+PID_BASIC FIC-104
+VALVE_ELECTRIC PV-103
+VALVE_ON_OFF XV-106
+ANALOG_IN PI-001
+BOOL_IN IAL-101
+DIGITAL_IN FAL-101
+DIGITAL_IN FAL-102
+DIGITAL_IN FAL-103
+
+* Variables *
+REAL FIT_101_Raw_mA
+REAL FIT_101_FlowRate_GPM
+REAL FIC_104_MV_Percent
+REAL PV_103_Feedback_Position_Percent
+REAL PI_001_Raw_mA
+REAL PI_001_Pressure_psig
+
+* Functions *
+NOT ValveOpenInvert
+OR XV106FaultLogic
+OR MasterInhibitLogic
+
+* Data Connections * 
+FIT_101_Raw_mA, FIT-101.Raw_Signal
+FIT-101.PV, FIC-104.PV
+FIC-104.XOUT, PV-103.Control_Signal
+FIT-101.High_Alarm, FAL-101.DI_Raw
+FIT-101.Low_Alarm, FAL-102.DI_Raw
+FIT-101.General_Fault, FAL-103.DI_Raw
+XV-106.FB_Opened, ValveOpenInvert.IN
+XV-106.Alarm_Position_Error, XV106FaultLogic.IN1
+XV-106.Alarm_General, XV106FaultLogic.IN2
+ValveOpenInvert.OUT, XV106FaultLogic.IN3
+XV106FaultLogic.OUT, IAL-101.Bool_In
+PI_001_Raw_mA, PI-001.Raw_Signal
+XV106FaultLogic.OUT, MasterInhibitLogic.IN1
+FAL-103.DI_Out, MasterInhibitLogic.IN3
+PI-001.High_Alarm, MasterInhibitLogic.IN4
+PI-001.Low_Alarm, MasterInhibitLogic.IN5
+MasterInhibitLogic.OUT, FIC-104.Inhibit
+FAL-103.DI_Out, PV-103.Inhibit
+FIT-101.PV, FIT_101_FlowRate_GPM
+FIC-104.XOUT, FIC_104_MV_Percent
+PV-103.Feedback_Pos, PV_103_Feedback_Position_Percent
+PI-001.PV, PI_001_Pressure_psig
+
+* Parameter Data Connections *
+12.5, FIT-101.Scaling_Slope
+-50, FIT-101.Scaling_Offset
+180, FIT-101.PV_High
+40, FIT-101.PV_Low
+TRUE, FIT-101.Alarm_Enable
+100, FIC-104.SP
+0, FIC-104.MV_MIN
+100, FIC-104.MV_MAX
+1.5, FIC-104.KP
+0.6, FIC-104.TR
+0.1, FIC-104.TD
+0, FIC-104.X0
+0, PV-103.Close_Limit
+100, PV-103.Open_Limit
+FALSE, PV-103.Manual_Mode
+0, PV-103.Manual_Position
+6.25, PI-001.Scaling_Slope
+-25, PI-001.Scaling_Offset
+50, PI-001.PV_High
+20, PI-001.PV_Low
+TRUE, PI-001.Alarm_Enable
+TRUE, IAL-101.Alarm_OnTrue
+TRUE, IAL-101.Latch_Enable
+

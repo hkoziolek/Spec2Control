@@ -1,0 +1,92 @@
+Evaluation Results for coking-refinery - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_7\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), MOTOR_VSD(2), PID_BASIC(1)
+Output blocks: ANALOG_IN(3), MOTOR_VSD(2), PID_BASIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-601
+ANALOG_IN LT-601
+ANALOG_IN TT-104
+PID_BASIC FIC-601
+MOTOR_VSD P-601A
+MOTOR_VSD P-601B
+TON PumpStartA_TON
+TON PumpStartB_TON
+TON LowFlowAlarm_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-601
+ANALOG_IN LT-601
+ANALOG_IN TT-104
+PID_BASIC FIC-601
+
+ALL DATA CONNECTIONS:
+FT-601.PV, FIC-601.PV
+FIC-601.XOUT, P-601A.Speed_SP
+FIC-601.XOUT, P-601B.Speed_SP
+LT-601.Low_Alarm, PumpProtections_OR.IN1
+TT-104.High_Alarm, PumpProtections_OR.IN2
+PumpProtections_OR.OUT, P-601A.Inhibit
+PumpProtections_OR.OUT, P-601B.Inhibit
+LT-601.Low_Alarm, LevelOK_NOT.IN
+LevelOK_NOT.OUT, StartPermissive_AND.IN1
+TT-104.PV, TempBelow80_LT.IN1
+TempBelow80_LT.OUT, StartPermissive_AND.IN2
+StartPermissive_AND.OUT, StartA_AND.IN1
+P-601A.FB_Fault, A_Fault_NOT.IN
+A_Fault_NOT.OUT, StartA_AND.IN2
+StartA_AND.OUT, PumpStartA_TON.IN
+StartPermissive_AND.OUT, StartB_AND.IN1
+P-601A.FB_Fault, StartB_AND.IN2
+StartB_AND.OUT, PumpStartB_TON.IN
+PumpStartA_TON.Q, P-601A.Start_Cmd
+PumpStartB_TON.Q, P-601B.Start_Cmd
+FT-601.Low_Alarm, LowFlowAlarm_TON.IN
+FT-601.General_Fault, FT_Fault_NOT.IN
+FT_Fault_NOT.OUT, FIC-601.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1=FT-601, PID_BASIC1=FIC-601
+- Actual Connection: FT-601.PV -> FIC-601.PV
+- Notes: Direct PV mapping from the flow transmitter to the flow controller is correctly implemented. Other analog inputs (LT-601, TT-104) are not used as PID PVs.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND INDIRECT
+- Mapping: PID_BASIC1=FIC-601; VALVE_ELECTRIC=none; Indirect via MOTOR_VSD1=P-601A, MOTOR_VSD2=P-601B
+- Actual Connection: FIC-601.XOUT -> P-601A.Speed_SP; FIC-601.XOUT -> P-601B.Speed_SP
+- Notes: No VALVE_ELECTRIC instance is present. The PID output drives pump VSD speed setpoints, which is acceptable as an indirect implementation per the provided rule. There are two destinations for XOUT; ensure coordination (e.g., lead/lag, selector, or split-range) to prevent conflicting commands.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Good PV-to-PID mapping; PID output routed to VSD speed setpoints instead of a valve is acceptable and appears intentional. Dual XOUT targets may require verification of sequencing/selection logic.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

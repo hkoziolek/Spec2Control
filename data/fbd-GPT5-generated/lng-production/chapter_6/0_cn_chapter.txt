@@ -1,0 +1,29 @@
+## 6 **Liquefaction and Refrigerant System**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-504 | Flow Controller | Modulates mixed refrigerant flow to maintain ratio control with propane flow. |
+|FT-501 | Flow Transmitter | Measures propane refrigerant flow for ratio control reference. |
+|FT-502 | Flow Transmitter | Measures mixed refrigerant flow for ratio control adjustment. |
+|FV-501 | Flow Valve | Regulates propane refrigerant flow to the system. |
+|FV-502 | Flow Valve | Adjusts mixed refrigerant flow based on FIC-504 output. |
+|PT-501 | Pressure Transmitter | Monitors system pressure for operational safety. |
+|TIT-102 | Temperature Transmitter | Measures temperature for process monitoring and control. |
+
+### 6.1) Control Strategy Description
+
+The liquefaction and refrigerant system employs ratio control to maintain precise proportional relationships between the propane refrigerant flow and the mixed refrigerant flow to the Main Cryogenic Heat Exchanger (MCHE-501). The propane refrigerant flow, measured by flow transmitter FT-501 (wild flow), is used as the reference variable for the ratio control strategy. The mixed refrigerant flow, measured by flow transmitter FT-502 (controlled flow), is adjusted to maintain a fixed ratio of 2.5:1 (propane flow to mixed refrigerant flow) under normal operating conditions.
+
+The ratio controller, designated as FFIC-503, calculates the setpoint for the mixed refrigerant flow (FIC-504) using the equation:
+**FT-502 Setpoint = FT-501 (wild flow) × Ratio Setpoint (2.5)**.
+
+The output of FFIC-503 is clamped between ratio limits of 2.0:1 (minimum) and 3.0:1 (maximum) to ensure safe operation. Flow controller FIC-504 modulates control valve FV-502 to achieve the calculated setpoint. The propane flow signal from FT-501 is scaled within the range of 0-5000 kg/hr, while the mixed refrigerant flow signal from FT-502 is scaled within the range of 0-2000 kg/hr. A low-flow cutoff is implemented to disable ratio control when FT-501 measures less than 500 kg/hr, switching FIC-504 to manual mode with a fixed setpoint of 100 kg/hr to prevent instability.
+
+Ratio bias adjustments are allowed via operator input to FFIC-503, with a manual bias range of ±0.2. Automatic ratio trim is enabled based on the outlet temperature of the MCHE-501, measured by TIT-102. If TIT-102 exceeds the high-temperature limit of -155°C, the ratio is automatically increased by 0.1 to enhance cooling capacity.
+
+### 6.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with the propane compressor anti-surge valves (FV-501). If FV-501 is fully open for more than 5 seconds, FFIC-503 is forced into manual mode, and FIC-504 is set to maintain a fixed flow of 1000 kg/hr to protect the compressors. Additionally, the ratio control loop is disabled if the pressure in the end-flash drum (PT-501) falls below 2.0 MPa, as measured by PT-501. A permissive condition requires the propane flow (FT-501) to be within the range of 500–5000 kg/hr and the mixed refrigerant flow (FT-502) to be within 200–2000 kg/hr for ratio control to be active.
+
+### 6.3) Alarm and Fault Handling
+
+A high-ratio deviation alarm (FFIC-503.DV.HI) is triggered if the actual ratio exceeds the setpoint by more than 0.2 for 10 seconds. Similarly, a low-ratio deviation alarm (FFIC-503.DV.LO) is triggered if the ratio falls below the setpoint by more than 0.2 for 10 seconds. If the propane flow (FT-501) or mixed refrigerant flow (FT-502) signals are lost or fall outside their valid ranges, FFIC-503 generates a fault signal (FFIC-503.FLT), which disables the ratio control loop and places FIC-504 in manual mode with a fixed setpoint of 500 kg/hr. A deadband of ±1% is applied to the ratio setpoint to prevent hunting during stable operation.

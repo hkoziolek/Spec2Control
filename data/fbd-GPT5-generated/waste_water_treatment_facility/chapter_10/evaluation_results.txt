@@ -1,0 +1,56 @@
+# EVAL-1
+## Selected Control Strategy
+Duty-Standby
+## Generated Control Strategy
+Duty-Standby
+## STATUS
+PASS
+
+# EVAL-2: Q2M2
+## Instantiated function blocks
+Block_Type,Required,Generated_Count,Generated_Instances,Status
+MOTOR_ON_OFF,2,2,"P-901A, P-901B",SUFFICIENT
+DUTY_STANDBY,1,1,"P-901_DUTY_STANDBY",SUFFICIENT
+TON,1,0,"",INSUFFICIENT
+ANALOG_IN,0,2,"FT-901, LS-901",EXTRA
+VALVE_ON_OFF,0,1,"XV-102",EXTRA
+## STATUS
+FAIL
+## Control Strategy Block Identification Rate
+75.0%
+
+# EVAL-3: Block-to-Block Connection Analysis
+## Intended Connections (from categorization)
+MOTOR_ON_OFF1.FB_Running -> DUTY_STANDBY.PumpA_RunFB
+MOTOR_ON_OFF2.FB_Running -> DUTY_STANDBY.PumpB_RunFB
+<defined time for duty-standby cycle> -> TON1.PT
+TON1.Q -> DUTY_STANDBY.DutyElapsed
+DUTY_STANDBY.CmdPumpA -> MOTOR_ON_OFF1.StartCmd
+DUTY_STANDBY.CmdPumpB -> MOTOR_ON_OFF2.StartCmd
+## Mapped Specific Connections
+P-901A.FB_Running -> DUTY_STANDBY.PumpA_RunFB
+P-901B.FB_Running -> DUTY_STANDBY.PumpB_RunFB
+<defined time for duty-standby cycle> -> TON1.PT
+TON1.Q -> DUTY_STANDBY.DutyElapsed
+DUTY_STANDBY.CmdPumpA -> P-901A.StartCmd
+DUTY_STANDBY.CmdPumpB -> P-901B.StartCmd
+## Block Instance Mapping
+ANALOG_IN: FT-901, LS-901
+MOTOR_ON_OFF: P-901A, P-901B
+VALVE_ON_OFF: XV-102
+DUTY_STANDBY: P-901_DS
+## Connection Analysis Results
+Total Intended Connections: 6
+Successfully Matched: 0
+Success Rate: 0.00%
+
+## Matched Connections
+## Missing Connections
+✗ P-901A.FB_Running -> DUTY_STANDBY.PumpA_RunFB
+✗ P-901B.FB_Running -> DUTY_STANDBY.PumpB_RunFB
+✗ <defined time for duty-standby cycle> -> TON1.PT
+✗ TON1.Q -> DUTY_STANDBY.DutyElapsed
+✗ DUTY_STANDBY.CmdPumpA -> P-901A.StartCmd
+✗ DUTY_STANDBY.CmdPumpB -> P-901B.StartCmd
+## STATUS
+FAIL

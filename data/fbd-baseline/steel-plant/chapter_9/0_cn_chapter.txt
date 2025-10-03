@@ -1,0 +1,24 @@
+## 9 ** By-Product Recovery Systems ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AL-801 | Analyzer | Monitors composition of recovered blast furnace gas for process optimization |
+|AL-802 | Analyzer | Measures combustion air quality to ensure proper mixing with recovered gas |
+|AL-803 | Analyzer | Tracks impurities in off-gases for by-product recovery efficiency |
+|AL-804 | Analyzer | Analyzes steam quality in the generation system for operational control |
+|FIC-802 | Flow Controller | Regulates air flow to maintain the required gas-to-air ratio for combustion |
+|FT-801 | Flow Transmitter | Measures flow rate of recovered blast furnace gas for ratio control |
+|FT-802 | Flow Transmitter | Monitors air flow rate for combustion process control |
+|FV-802 | Flow Valve | Modulates air flow based on setpoint from FIC-802 for combustion efficiency |
+|PT-801 | Pressure Transmitter | Measures pressure of recovered blast furnace gas for permissive interlocks |
+
+### 9.1) Control Strategy Description
+
+The by-product recovery system utilizes ratio control to maintain proportional relationships between recovered off-gases and combustion air for efficient fuel utilization in steam generation. Flow transmitter FT-801 measures the wild flow of recovered blast furnace gas (range: 0-5000 Nm³/hr). Ratio controller FFIC-801 calculates the setpoint for controlled air flow based on a fixed gas-to-air ratio of 1:2.5. The controlled air flow setpoint is determined as FT-801 × 2.5 and is transmitted to flow controller FIC-802, which modulates control valve FV-802 to maintain the required air flow. The ratio setpoint is adjustable between 2.0:1 and 3.0:1 via manual operator input on FFIC-801. Input signals from FT-801 and PT-801 are scaled linearly from 4-20 mA to match the controller input range of 0-100%. A low flow cutoff is implemented to disable ratio control when FT-801 measures less than 100 Nm³/hr, switching FIC-802 to manual mode.
+
+### 9.2) Interlocks and Permissives
+
+The ratio control loop FFIC-801 is interlocked with permissive conditions to ensure safe operation. FT-801 must register a valid signal above 100 Nm³/hr for FFIC-801 to enable ratio control; otherwise, the system defaults to manual control of FIC-802. PT-801 monitors the pressure of recovered gas and must remain within the range of 0.5-2.0 bar for operation; pressures outside this range trigger a permissive lockout that closes FV-802. Boolean interlocks ensure that combustion air flow measured by FT-802 does not exceed 6000 Nm³/hr, clamping the FFIC-801 output to prevent unsafe air-to-gas ratios. A hysteresis of 1% is applied to FT-801 and PT-801 signals to avoid rapid toggling between permissive states near the cutoff thresholds.
+
+### 9.3) Alarm and Fault Handling
+
+The system generates alarms for deviations from the configured ratio or failure of critical transmitters. A high ratio deviation alarm (AL-801) is triggered if the calculated air-to-gas ratio exceeds 3.0:1 for more than 5 seconds, indicating potential over-aeration. A low ratio deviation alarm (AL-802) is triggered if the ratio falls below 2.0:1, signaling insufficient air supply for combustion. FT-801 and PT-801 transmitter faults are monitored by diagnostic alarms (AL-803 and AL-804, respectively), which initiate automatic fallback to manual control mode for FIC-802. In the event of a fault, FV-802 is positioned to a default fail-safe setting of 50% open to maintain minimum air flow. All alarms are logged in the plant's distributed control system (DCS) for operator review and corrective action.

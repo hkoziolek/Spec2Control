@@ -1,0 +1,34 @@
+## 3 **Evaporation and Conditioning**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-102 | Flow Controller | Regulates steam flow to maintain temperature setpoint in secondary loop |
+|FV-102 | Flow Valve | Adjusts steam flow based on control signal from FIC-102 |
+|HS-204 | Hand Switch | Manual override for equipment operation |
+|P-205 | Pump | Circulates neutral liquor in the evaporator system |
+|PT-203 | Pressure Transmitter | Measures vacuum pressure in the evaporator system |
+|PV-106 | Pressure Valve | Controls pressure within the system |
+|TIC-201 | Temperature Controller | Maintains melt temperature setpoint in primary loop |
+|TT-103 | Temperature Transmitter | Measures melt temperature for TIC-201 input |
+|TT-104 | Temperature Transmitter | Measures steam temperature at evaporator inlet for FIC-102 input |
+|VS-206 | Vacuum Switch | Monitors vacuum conditions for system safety |
+|XV-101 | On-Off Valve | Provides isolation for system components during maintenance or emergency shutdown |
+
+### 3.1) Control Strategy Description
+
+The triple-effect forced-circulation evaporator system employs cascade control to maintain melt temperature (TIC-201) and vacuum pressure (PT-203) for optimal concentration of neutral liquor to 99 wt % ammonium nitrate. The primary loop is configured to regulate melt temperature using TIC-201 as the master controller. TIC-201 receives input from TT-103, which measures the melt temperature, and maintains a setpoint of 198 °C. The output of TIC-201, scaled linearly between 1% and 96%, serves as the remote setpoint (RSP) for the secondary loop.
+
+The secondary loop, controlled by FIC-102, adjusts steam flow via FV-102 to achieve the temperature setpoint provided by TIC-201. FIC-102 receives input from TT-104, which measures steam temperature at the evaporator inlet. The secondary loop is tuned for faster response with proportional gain (Kp) set to 3.5 and integral time (Ki) set to 0.3 minutes, ensuring rapid disturbance rejection. The primary loop is tuned for slower, stable control with Kp set to 1.2 and Ki set to 2.0 minutes. This tuning hierarchy ensures decoupling between loops, minimizing interaction and preventing hunting.
+
+Signal scaling between TIC-201 and FIC-102 ensures compatibility between the melt temperature range (190–210 °C) and the steam flow range (0–100%). Operator-entered setpoints for TIC-201 are clamped between 14% and 92% to maintain safe operation. Cascade mode allows TIC-201 to automatically adjust FIC-102's setpoint, while local/manual mode permits direct operator control of FV-102. Transition delays of 5 seconds are implemented during mode switching to prevent process instability.
+
+### 3.2) Interlocks and Permissives
+
+Steam flow control via FV-102 is interlocked with HS-204 to trip steam supply in the event of high melt temperature exceeding 210 °C. TIC-201 will hold its output at 0% if HS-204 trips, preventing further heating. Vacuum pressure control via PV-106 is permitted only when TIC-201 is in cascade mode and PT-203 indicates a vacuum level within the operating range of 0.2–0.5 bar. Permissive logic ensures that TIC-201 will not initiate cascade control until TT-103 and TT-104 are validated to be within calibrated ranges (±0.5 °C accuracy). Steam flow adjustments are inhibited if TT-104 indicates inlet steam temperature below 100 °C.
+
+The molten-salt jacketed pump P-205 will not start unless TIC-201 is in cascade mode and melt temperature exceeds 195 °C. Additionally, XV-101, the shut-off valve, must be open for steam flow to FV-102. Barometric condenser VS-206 operation is interlocked with PT-203 to ensure vacuum pressure remains below 0.5 bar before initiating condensate recovery.
+
+### 3.3) Alarm and Fault Handling
+
+High-temperature alarms are triggered if TT-103 detects melt temperature exceeding 210 °C. Upon alarm activation, TIC-201 output is forced to 0%, and HS-204 trips steam supply by closing XV-101. Low-temperature alarms are triggered if TT-103 detects melt temperature below 190 °C for more than 10 seconds, prompting an operator notification but allowing continued operation. Vacuum pressure alarms are activated if PT-203 detects pressure above 0.5 bar or below 0.2 bar. In such cases, TIC-201 will suspend cascade control and revert to manual mode.
+
+Secondary controller FIC-102 failure results in TIC-201 holding its output at the last valid setpoint and switching to manual mode. Operators are notified immediately, and FV-102 can be adjusted manually. Deadband logic prevents cascade hunting by suspending TIC-201 output adjustments for temperature deviations smaller than ±0.2 °C. Faults in TT-103 or TT-104 trigger an immediate shutdown of TIC-201 and FIC-102, with all control valves (FV-102, PV-106) forced to their fail-safe positions.

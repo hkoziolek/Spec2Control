@@ -1,0 +1,82 @@
+* Function Blocks *
+MOTOR_ON_OFF B-501A
+MOTOR_ON_OFF B-501B
+RATIO_CONTROL FFIC-102
+PID_BASIC FIC-101
+PID_BASIC FIC-103
+VALVE_ELECTRIC FV-102
+MOTOR_ON_OFF MX-501
+ANALOG_IN PT-501
+VALVE_ON_OFF XV-105
+
+* Variables *
+REAL FFIC-102_AirflowSP_for_FIC-103
+REAL PT-501_AirHeaderPressure_PV
+BOOL B-501A_Running_FB
+BOOL B-501B_Running_FB
+BOOL MX-501_Running_FB
+BOOL XV-105_Open_FB
+BOOL AirflowDeviationAlarm
+BOOL LowFlowAlarm
+
+* Functions *
+OR BlowersRunning_OR
+NOT NotBlowersRunning_NOT
+NOT MixerNotRunning_NOT
+OR RatioInhibit_OR
+NOT XV105NotOpen_NOT
+OR ValveInhibit_OR
+TON AirflowDevAlarmDelay_TON
+TON LowFlowAlarmDelay_TON
+
+* Data Connections *
+FIC-101.PV, FFIC-102.PrimaryPV
+FIC-103.PV, FFIC-102.SecondaryPV
+FFIC-102.SlaveSP, FIC-103.SP
+FIC-103.XOUT, FV-102.Control_Signal
+BlowersRunning_OR.IN1, B-501A.FB_Running
+BlowersRunning_OR.IN2, B-501B.FB_Running
+NotBlowersRunning_NOT.IN, BlowersRunning_OR.OUT
+MixerNotRunning_NOT.IN, MX-501.FB_Running
+RatioInhibit_OR.IN1, NotBlowersRunning_NOT.OUT
+RatioInhibit_OR.IN2, PT-501.Low_Alarm
+RatioInhibit_OR.IN3, MixerNotRunning_NOT.OUT
+RatioInhibit_OR.IN4, FIC-101.PV_Low_Alarm
+RatioInhibit_OR.IN5, B-501A.FB_Trip
+RatioInhibit_OR.IN6, B-501B.FB_Trip
+RatioInhibit_OR.IN7, PT-501.General_Fault
+RatioInhibit_OR.OUT, FFIC-102.Inhibit
+XV105NotOpen_NOT.IN, XV-105.FB_Opened
+ValveInhibit_OR.IN1, XV105NotOpen_NOT.OUT
+ValveInhibit_OR.IN2, FIC-101.PV_Low_Alarm
+ValveInhibit_OR.OUT, FV-102.Inhibit
+FIC-103.Deviation_Alarm, AirflowDevAlarmDelay_TON.IN
+AirflowDevAlarmDelay_TON.Q, AirflowDeviationAlarm
+FIC-101.PV_Low_Alarm, LowFlowAlarmDelay_TON.IN
+LowFlowAlarmDelay_TON.Q, LowFlowAlarm
+FFIC-102.SlaveSP, FFIC-102_AirflowSP_for_FIC-103
+PT-501.PV, PT-501_AirHeaderPressure_PV
+B-501A.FB_Running, B-501A_Running_FB
+B-501B.FB_Running, B-501B_Running_FB
+MX-501.FB_Running, MX-501_Running_FB
+XV-105.FB_Opened, XV-105_Open_FB
+
+* Parameter Data Connections *
+TRUE, FFIC-102.Auto
+2.0, FFIC-102.RatioSP
+0.0, FFIC-102.Bias
+0.0, FFIC-102.MV_MIN
+12500.0, FFIC-102.MV_MAX
+TRUE, FIC-103.AUTO
+0.0, FIC-103.MV_MIN
+100.0, FIC-103.MV_MAX
+10.0, FIC-103.Deviation_Limit
+5000.0, FIC-101.PV_High
+100.0, FIC-101.PV_Low
+3.0, PT-501.PV_Low
+TRUE, PT-501.Alarm_Enable
+0.0, FV-102.Close_Limit
+100.0, FV-102.Open_Limit
+T#30s, AirflowDevAlarmDelay_TON.PT
+T#5m, LowFlowAlarmDelay_TON.PT
+

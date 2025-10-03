@@ -1,0 +1,63 @@
+      <pou name="SPLIT_RANGE" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="IN">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Split_Point">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Output1_Start">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Output1_End">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Output2_Start">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Output2_End">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="OUT1">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="OUT2">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

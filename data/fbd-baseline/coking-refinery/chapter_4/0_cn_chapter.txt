@@ -1,0 +1,39 @@
+## 4 **Fluid Catalytic Cracking (FCC) Unit**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|P-301A | Pump | Lead pump for fluid circulation in the system |
+|PAH-301 | Pressure Alarm High | High-pressure alarm for regenerator safety |
+|PAL-301 | Pressure Alarm Low | Low-pressure alarm for regenerator safety |
+|PC-301 | Pressure Controller | Regulates regenerator pressure via control valve |
+|PT-301 | Pressure Transmitter | Measures regenerator pressure for control feedback |
+|PT-302 | Pressure Transmitter | Auxiliary pressure measurement for system monitoring |
+|PT-303 | Pressure Transmitter | Backup pressure measurement for redundancy |
+|PTF-301 | Pressure Transmitter | Measures filtered pressure in the system |
+|PV-105 | Pressure Valve | Controls regenerator pressure; fail-closed type |
+|PV-106 | Pressure Valve | Secondary pressure control valve for system regulation |
+|TT-301 | Temperature Transmitter | Measures temperature in the regenerator system |
+|XV-108 | On-Off Valve | Isolation valve for emergency or maintenance purposes |
+
+### 4.1) Control Strategy Description
+
+The primary control objective for the FCC unit reactor-regenerator system is to maintain the regenerator pressure at a stable setpoint of 2.5 barg, ensuring optimal catalyst circulation and reaction stability. This is achieved by implementing a PID control loop on the regenerator pressure control valve, PV-105.
+
+The PID controller, designated as PC-301, operates in reverse-acting mode to regulate the manipulated variable (MV), which is the position of PV-105. The process variable (PV) is the regenerator pressure, measured by PT-301, with a transmitter range of 0 to 5.0 barg and a 4-20 mA signal output. The setpoint (SP) is clamped between 2.0 and 3.0 barg to prevent unsafe pressure excursions.
+
+The PID tuning parameters for PC-301 are configured as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.1 minutes. The controller output is scaled to a range of 0% to 100%, corresponding to the fully closed and fully open positions of PV-105. The control valve PV-105 is a fail-closed type to ensure containment in the event of a system failure.
+
+To prevent control hunting, a deadband of ±0.05 barg is applied to the pressure signal. Bumpless transfer logic is implemented to ensure smooth transitions between automatic and manual modes. The expected control performance includes a response time of less than 10 seconds and a settling time of under 30 seconds for a step change in setpoint.
+
+### 4.2) Interlocks and Permissives
+
+The operation of PC-301 and PV-105 is subject to the following interlocks and permissives. The control valve PV-105 will not open unless the regenerator temperature, measured by TT-301, is above 650°C and the air blower, P-301A, is running with a discharge pressure above 3.5 barg as verified by PT-302. Additionally, the setpoint of PC-301 is locked at 2.5 barg during startup until the regenerator achieves stable operation, as determined by a steady-state condition on PT-301 for a continuous 60-second period.
+
+If the emergency shut-off valve XV-108 is closed, PC-301 will immediately force its output to 0%, driving PV-105 to the fully closed position. A permissive ensures that PV-105 cannot open if the fractionator overhead pressure, measured by PT-303, exceeds 0.8 barg, to avoid overpressurization of downstream equipment.
+
+### 4.3) Alarm and Fault Handling
+
+High and low-pressure alarms are configured on PT-301 to alert the operator of deviations from the normal operating range. A high-pressure alarm (PAH-301) is triggered at 2.8 barg, while a low-pressure alarm (PAL-301) is activated at 2.2 barg. If the regenerator pressure exceeds 3.0 barg, an emergency trip signal is sent to XV-108, closing the valve to isolate the regenerator.
+
+In the event of a transmitter fault on PT-301, the controller PC-301 will enter manual mode, and the operator will be required to manually adjust PV-105 until the transmitter fault is resolved. A fault alarm (PTF-301) will be displayed on the control interface, and the system will log the event for maintenance review. Anti-windup logic is implemented in PC-301 to freeze the integral term during transmitter faults, preventing output saturation.
+
+In the case of a power failure to PV-105, the valve will fail closed to isolate the regenerator. An auxiliary pressure relief valve, PV-106, is designed to open at 3.5 barg to protect the system from overpressure in such scenarios.

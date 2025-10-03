@@ -1,0 +1,42 @@
+## 7 **Secondary Clarification**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CL-601A | Clarifier | Primary duty clarifier for secondary clarification system in AUTO mode. |
+|CL-601B | Clarifier | Standby clarifier for secondary clarification system, activated upon failure of CL-601A. |
+|HM-601A | Hour Meter | Tracks runtime hours for CL-601A clarifier. |
+|HM-601B | Hour Meter | Tracks runtime hours for CL-601B clarifier. |
+|HM-602A | Hour Meter | Tracks runtime hours for PS-601A pump. |
+|HM-602B | Hour Meter | Tracks runtime hours for PS-601B pump. |
+|LS-601 | Level Switch | Monitors blanket level in clarifiers to ensure process stability. |
+|PS-601A | Pump | Primary duty pump for return sludge operation in AUTO mode. |
+|PS-601B | Pump | Standby pump for return sludge operation, activated upon failure of PS-601A. |
+|PT-601A | Pressure Transmitter | Measures discharge pressure of PS-601A pump. |
+|PT-601B | Pressure Transmitter | Measures discharge pressure of PS-601B pump. |
+|VS-601A | Valve | Controls flow associated with PS-601A pump operation. |
+|VS-601B | Valve | Controls flow associated with PS-601B pump operation. |
+
+### 7.1) Control Strategy Description
+
+The secondary clarification system employs redundant duty/standby control for the operation of the secondary clarifiers (CL-601A and CL-601B) and return sludge pumps (PS-601A and PS-601B). Under normal conditions, CL-601A and PS-601A are designated as duty (lead) equipment, while CL-601B and PS-601B are designated as standby (lag) equipment. The system operates in three distinct modes: AUTO, MANUAL, and TEST.
+
+In AUTO mode, CL-601A is the primary clarifier, and PS-601A operates to maintain blanket level setpoint as measured by LS-601. If CL-601A fails (e.g., LS-601 detects blanket level > 2.5 meters for 15 seconds or PS-601A discharge pressure PT-601A < 25 psig for 10 seconds), CL-601B and PS-601B automatically start after a switchover delay of 10 seconds. The failed equipment is stopped immediately upon switchover, and the standby equipment assumes lead operation. A minimum runtime of 30 minutes is enforced for both clarifiers and pumps to prevent hunting.
+
+In MANUAL mode, operators can select either CL-601A or CL-601B as the lead clarifier and PS-601A or PS-601B as the lead pump via HMI. Standby equipment remains idle unless manually started. In TEST mode, both clarifiers and pumps operate simultaneously for performance verification, with LS-601 providing blanket-level supervision to ensure process stability.
+
+Runtime management is implemented using hour meters HM-601A and HM-601B for the clarifiers and HM-602A and HM-602B for the pumps. Automatic rotation between duty and standby equipment occurs every 72 hours to equalize runtime and wear, ensuring long-term reliability.
+
+### 7.2) Interlocks and Permissives
+
+The operation of CL-601A and CL-601B is interlocked with LS-601 to ensure blanket level remains within acceptable limits. CL-601A cannot start unless LS-601 detects a blanket level < 2.0 meters, and CL-601B cannot start unless LS-601 detects a blanket level < 2.0 meters. Additionally, PS-601A and PS-601B are interlocked with PT-601A and PT-601B, respectively, requiring discharge pressure > 25 psig for continued operation.
+
+During switchover, permissives bypass interlocks for 10 seconds to allow standby equipment to ramp up without immediate shutdown due to transient conditions. A 5-second on-delay timer ensures proper sequencing of equipment startup, while a 57-second off-delay timer prevents premature shutdown during temporary process upsets. Both clarifiers and pumps are locked out if LS-601 detects blanket level > 3.0 meters, triggering a process halt to prevent overflow.
+
+Manual overrides are permitted only in MANUAL mode, with interlock bypasses requiring operator confirmation via HMI. TEST mode bypasses all interlocks and permissives, allowing unrestricted operation for system testing purposes.
+
+### 7.3) Alarm and Fault Handling
+
+Fault conditions for CL-601A and CL-601B are monitored using LS-601 and vibration sensors VS-601A and VS-601B. If LS-601 detects blanket level > 2.5 meters for 15 seconds or VS-601A/VS-601B detects vibration exceeding 5 mm/s for 10 seconds, an alarm is generated, and the affected equipment is stopped. Similarly, PS-601A and PS-601B are monitored using PT-601A and PT-601B; if discharge pressure falls below 25 psig for 10 seconds, an alarm is generated, and the affected pump is stopped.
+
+In AUTO mode, switchover to standby equipment occurs automatically upon fault detection. In MANUAL mode, operators must manually acknowledge alarms and initiate switchover. All alarms are displayed on the HMI and logged in the SCADA system for operator review.
+
+Critical faults, such as LS-601 detecting blanket level > 3.0 meters or PT-601A/PT-601B detecting discharge pressure < 15 psig, trigger a system-wide shutdown and lockout until the fault is resolved. Operators must reset alarms via HMI before restarting equipment.

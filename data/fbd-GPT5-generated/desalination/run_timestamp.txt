@@ -1,0 +1,9 @@
+Latest Complete Run Information
+=====================================
+
+Source Folder: desalination_0923_230953
+Run Timestamp: 2025-09-23 23:09:53
+Copied On: 2025-09-24 09:21:46
+
+This folder contains the latest complete run for this category.
+Files with _test{i}.txt suffixes have been renamed to remove the suffix.

@@ -1,0 +1,72 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_4\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LT-104
+ANALOG_IN FIT-103
+PID_BASIC LIC-101
+VALVE_ELECTRIC PV-102
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LT-104
+ANALOG_IN FIT-103
+PID_BASIC LIC-101
+VALVE_ELECTRIC PV-102
+
+ALL DATA CONNECTIONS:
+LT-104.PV, LIC-101.PV
+LIC-101.XOUT, PV-102.Control_Signal
+LT-104.Low_Alarm, PV102Inhibit_OR.IN1
+PV102Inhibit_OR.OUT, PV-102.Inhibit
+LT104Fault_NOT.OUT, LIC-101.AUTO
+FIT-103.High_Alarm, SetpointDelta_MULT.IN1
+SetpointDelta_MULT.OUT, SetpointOverride_ADD.IN2
+SetpointOverride_ADD.OUT, LIC-101.SP
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN = LT-104, PID_BASIC = LIC-101
+   Actual Connection: LT-104.PV, LIC-101.PV
+   Notes: FIT-103 exists but is not used as the PID PV; instead, FIT-103.High_Alarm feeds a chain (SetpointDelta_MULT → SetpointOverride_ADD) that ultimately adjusts LIC-101.SP. The chosen mapping (LT-104 to LIC-101) is consistent with a level controller using a level transmitter.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC = LIC-101, VALVE_ELECTRIC = PV-102
+   Actual Connection: LIC-101.XOUT, PV-102.Control_Signal
+   Notes: No indirect path via MOTOR_VSD.Speed_SP is present. Additional logic affects the valve: LT-104.Low_Alarm → PV102Inhibit_OR.IN1 and PV102Inhibit_OR.OUT → PV-102.Inhibit, which can block valve action. LT104Fault_NOT.OUT → LIC-101.AUTO influences PID mode. Despite these interlocks, the control signal path from PID output to valve is directly implemented.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct, correct mappings with appropriate interlocks and setpoint override logic; implementation appears coherent and robust.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

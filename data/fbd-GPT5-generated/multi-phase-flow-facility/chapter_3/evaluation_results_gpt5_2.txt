@@ -1,0 +1,78 @@
+Evaluation Results for multi-phase-flow-facility - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_3\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+VALVE_ELECTRIC FV-102
+ANALOG_IN PT-501
+ANALOG_IN LI-502
+PID_BASIC PIC-501
+
+FILTERED FUNCTION BLOCKS (only types from template):
+VALVE_ELECTRIC FV-102
+ANALOG_IN PT-501
+ANALOG_IN LI-502
+PID_BASIC PIC-501
+
+ALL DATA CONNECTIONS:
+PT-501.PV, PIC-501.PV
+PIC-501.XOUT, FV-102.Control_Signal
+FV-102.Feedback_Pos, PIC-501.X0
+PT-501.General_Fault, PIC501_Inhibit_OR.IN1
+PT-501.High_Alarm, PIC501_Inhibit_OR.IN2
+PT-501.Low_Alarm, PIC501_Inhibit_OR.IN3
+LI-502.Low_Alarm, PIC501_Inhibit_OR.IN4
+LI-502.High_Alarm, PIC501_Inhibit_OR.IN5
+PIC501_Inhibit_OR.OUT, PIC-501.Inhibit
+PT-501.General_Fault, ValveShutdown_OR.IN1
+PIC-501.PV_High_Alarm, ValveShutdown_OR.IN2
+ValveShutdown_OR.OUT, FV-102.Inhibit
+PT-501.General_Fault, PT501FaultAuto_NOT.IN
+PT501FaultAuto_NOT.OUT, PIC-501.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+For intended connection ANALOG_IN.PV → PID_BASIC.PV:
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN = PT-501, PID_BASIC = PIC-501
+   Actual Connection: PT-501.PV, PIC-501.PV
+   Notes: Direct mapping and connection are clear and correct. PT-501 is used as the PV source for PIC-501.
+
+For intended connection PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal:
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC = PIC-501, VALVE_ELECTRIC = FV-102
+   Actual Connection: PIC-501.XOUT, FV-102.Control_Signal
+   Notes: Direct output from PIC-501 drives the valve FV-102 control signal. Alternative indirect path via MOTOR_VSD.Speed_SP not needed here.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The implementation cleanly matches the intended connections. Additional interlocks and inhibit logic are present (faults and alarms gating PIC-501 and FV-102), and there is feedback from FV-102 to PIC-501.X0 suggesting output tracking, which is generally good practice for bumpless transfer and safety.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,68 @@
+* Function Blocks *
+ANALOG_IN TIT-103
+ANALOG_IN LT-105
+PID_BASIC TIC-101
+PID_BASIC LIC-106
+PID_BASIC FC-004
+VALVE_ELECTRIC LV-104
+VALVE_ON_OFF XV-102
+
+* Variables *
+REAL TIT-103_Temperature_C
+REAL LT-105_Level_Percent
+REAL TIC-101_Output_Percent
+REAL LIC-106_Output_Percent
+
+* Functions *
+OR TIC101_Inhibit_OR
+NOT SteamNotOpen_NOT
+OR LIC106_Inhibit_OR
+
+* Data Connections * 
+TIT-103.PV, TIC-101.PV
+LT-105.PV, LIC-106.PV
+LIC-106.XOUT, LV-104.Control_Signal
+TIT-103.High_Alarm, TIC101_Inhibit_OR.IN1
+XV-102.Alarm_Position_Error, TIC101_Inhibit_OR.IN2
+FC-004.PV_Low_Alarm, TIC101_Inhibit_OR.IN3
+TIT-103.General_Fault, TIC101_Inhibit_OR.IN4
+TIC101_Inhibit_OR.OUT, TIC-101.Inhibit
+XV-102.FB_Opened, SteamNotOpen_NOT.IN
+SteamNotOpen_NOT.OUT, LIC106_Inhibit_OR.IN1
+LV-104.Alarm, LIC106_Inhibit_OR.IN2 
+LT-105.General_Fault, LIC106_Inhibit_OR.IN3 
+LIC106_Inhibit_OR.OUT, LIC-106.Inhibit
+TIT-103.High_Alarm, XV-102.Inhibit 
+LT-105.High_Alarm, LV-104.Inhibit 
+TIT-103.PV, TIT-103_Temperature_C
+LT-105.PV, LT-105_Level_Percent
+TIC-101.XOUT, TIC-101_Output_Percent
+LIC-106.XOUT, LIC-106_Output_Percent
+
+* Parameter Data Connections *
+180.0, TIC-101.SP
+0.0, TIC-101.MV_MIN
+100.0, TIC-101.MV_MAX
+3.0, TIC-101.KP
+1.2, TIC-101.TR
+0.1, TIC-101.TD
+50.0, LIC-106.SP
+0.0, LIC-106.MV_MIN
+100.0, LIC-106.MV_MAX
+2.5, LIC-106.KP
+0.9, LIC-106.TR
+0.0, LIC-106.TD
+15.625, TIT-103.Scaling_Slope
+-62.5, TIT-103.Scaling_Offset
+200.0, TIT-103.PV_High
+160.0, TIT-103.PV_Low
+TRUE, TIT-103.Alarm_Enable
+6.25, LT-105.Scaling_Slope
+-25.0, LT-105.Scaling_Offset
+80.0, LT-105.PV_High
+20.0, LT-105.PV_Low
+TRUE, LT-105.Alarm_Enable
+T#5s, XV-102.Timeout
+100.0, LV-104.Open_Limit
+0.0, LV-104.Close_Limit
+

@@ -1,0 +1,104 @@
+* Function Blocks *
+ANALOG_IN LI-003
+ANALOG_IN TI-008
+PID_BASIC LIC-103
+PID_BASIC TIC-106
+VALVE_ELECTRIC XV-104
+VALVE_ELECTRIC XV-105
+BOOL_IN LIC-101-HI
+
+* Variables *
+REAL TI_008_Temp_PV
+REAL LI_003_Level_PV
+REAL TIC_106_MV_Pct
+REAL LIC_103_MV_Pct
+REAL XV_105_Valve_Position_Pct
+REAL XV_104_Valve_Position_Pct
+BOOL Column3_Start_CMD
+BOOL TIC106_DeviationFault
+BOOL LIC101_Condensate_High
+
+* Functions *
+GT TI8_GT_200
+OR InhibitFinal_OR
+GT LI3_Above30_GT
+TON StartDelay_TON
+AND SteamStartPermissive_AND
+NOT InhibitNot_NOT
+AND TIC106_Auto_AND
+TON TIC106_DevTON
+GT LI3_Below15_GT
+OR XV104_Close_OR
+NOT XV104_AutoNot_NOT
+
+* Data Connections * 
+TI-008.PV, TIC-106.PV
+LI-003.PV, LIC-103.PV
+TIC-106.XOUT, XV-105.Control_Signal
+LIC-103.XOUT, XV-104.Control_Signal
+TI-008.PV, TI8_GT_200.IN1
+TI8_GT_200.OUT, InhibitFinal_OR.IN1
+LIC-101-HI.Bool_Out, InhibitFinal_OR.IN2
+InhibitFinal_OR.OUT, XV-105.Inhibit
+InhibitFinal_OR.OUT, TIC-106.Inhibit
+LI-003.PV, LI3_Above30_GT.IN1
+Column3_Start_CMD, StartDelay_TON.IN
+StartDelay_TON.Q, SteamStartPermissive_AND.IN1
+LI3_Above30_GT.OUT, SteamStartPermissive_AND.IN2
+InhibitFinal_OR.OUT, InhibitNot_NOT.IN
+InhibitNot_NOT.OUT, TIC106_Auto_AND.IN2
+SteamStartPermissive_AND.OUT, TIC106_Auto_AND.IN1
+TIC106_Auto_AND.OUT, TIC-106.AUTO
+TIC-106.Deviation_Alarm, TIC106_DevTON.IN
+TIC106_DevTON.Q, TIC106_DeviationFault
+LI-003.PV, LI3_Below15_GT.IN2
+LI-003.Low_Alarm, XV104_Close_OR.IN1
+LI3_Below15_GT.OUT, XV104_Close_OR.IN2
+XV104_Close_OR.OUT, XV-104.Manual_Mode
+XV104_Close_OR.OUT, XV104_AutoNot_NOT.IN
+XV104_AutoNot_NOT.OUT, LIC-103.AUTO
+LIC101_Condensate_High, LIC-101-HI.Bool_In
+TI-008.PV, TI_008_Temp_PV
+LI-003.PV, LI_003_Level_PV
+TIC-106.XOUT, TIC_106_MV_Pct
+LIC-103.XOUT, LIC_103_MV_Pct
+XV-105.Valve_Position, XV_105_Valve_Position_Pct
+XV-104.Valve_Position, XV_104_Valve_Position_Pct
+
+* Parameter Data Connections *
+15.625, TI-008.Scaling_Slope
+-62.5, TI-008.Scaling_Offset
+195.0, TI-008.PV_High
+TRUE, TI-008.Alarm_Enable
+6.25, LI-003.Scaling_Slope
+-25.0, LI-003.Scaling_Offset
+10.0, LI-003.PV_Low
+TRUE, LI-003.Alarm_Enable
+180.0, TIC-106.SP
+-3.2, TIC-106.KP
+1.0, TIC-106.TR
+0.3, TIC-106.TD
+5.0, TIC-106.MV_MIN
+95.0, TIC-106.MV_MAX
+10.0, TIC-106.Deviation_Limit
+0.0, TIC-106.X0
+70.0, LIC-103.SP
+2.5, LIC-103.KP
+0.8, LIC-103.TR
+0.1, LIC-103.TD
+0.0, LIC-103.MV_MIN
+100.0, LIC-103.MV_MAX
+100.0, XV-105.Open_Limit
+0.0, XV-105.Close_Limit
+T#10s, XV-105.Timeout
+100.0, XV-104.Open_Limit
+0.0, XV-104.Close_Limit
+T#10s, XV-104.Timeout
+TRUE, LIC-101-HI.Alarm_OnTrue
+T#12s, StartDelay_TON.PT
+T#30s, TIC106_DevTON.PT
+200.0, TI8_GT_200.IN2
+30.0, LI3_Above30_GT.IN2
+15.0, LI3_Below15_GT.IN1
+0.0, XV-104.Manual_Position
+

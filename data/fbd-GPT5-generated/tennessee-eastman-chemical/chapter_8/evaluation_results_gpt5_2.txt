@@ -1,0 +1,109 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_8
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_8\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_8\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_8\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(4), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_8\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LT-102
+ANALOG_IN LT-103
+ANALOG_IN LT-107
+ANALOG_IN FIT-105
+PID_BASIC LIC-106
+PID_BASIC FC-008
+VALVE_ELECTRIC XV-101
+VALVE_ELECTRIC PV-104
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LT-102
+ANALOG_IN LT-103
+ANALOG_IN LT-107
+ANALOG_IN FIT-105
+PID_BASIC LIC-106
+PID_BASIC FC-008
+VALVE_ELECTRIC XV-101
+VALVE_ELECTRIC PV-104
+
+ALL DATA CONNECTIONS:
+LT-102.PV, LIC-106.PV
+FIT-105.PV, FC-008.PV
+LIC-106.XOUT, XV-101.Control_Signal
+FC-008.XOUT, PV-104.Control_Signal
+LT-102.General_Fault, LT102_Fault_NOT.IN
+StartupDelay_TON.Q, LIC106_Permissives_AND.IN1
+LT102_Fault_NOT.OUT, LIC106_Permissives_AND.IN2
+LT-103.PV, LIC106_Overflow_GT.IN1
+LT-102.General_Fault, LIC106_Fault_OR.IN1
+XV-101.Position_Error, LIC106_Fault_OR.IN2
+LIC106_Overflow_GT.OUT, LIC106_Disable_OR.IN1
+LIC106_Fault_OR.OUT, LIC106_Disable_OR.IN2
+LIC106_Disable_OR.OUT, LIC106_Disable_NOT.IN
+LIC106_Permissives_AND.OUT, LIC106_AUTO_AND.IN1
+LIC106_Disable_NOT.OUT, LIC106_AUTO_AND.IN2
+LIC106_AUTO_AND.OUT, LIC-106.AUTO
+FIT-105.General_Fault, FIT105_Fault_NOT.IN
+StartupDelay_TON.Q, FC8_Permissives_AND1.IN1
+FC8_Permissives_AND1.OUT, FC8_Permissives_AND2.IN1
+FIT105_Fault_NOT.OUT, FC8_Permissives_AND2.IN2
+PV-104.Position_Error, FC8_ValveFault_OR.IN1
+PV-104.Alarm, FC8_ValveFault_OR.IN2
+FIT-105.General_Fault, FC8_Fault_OR.IN1
+FC8_ValveFault_OR.OUT, FC8_Fault_OR.IN2
+FC8_Fault_OR.OUT, FC8_Interlocks_OR.IN1
+LT-107.PV, FC8_LowLevel_LT.IN1
+FC8_LowLevel_LT.OUT, FC8_Interlocks_OR.IN2
+FC8_Interlocks_OR.OUT, FC8_Fault_NOT.IN
+FC8_Permissives_AND2.OUT, FC8_AUTO_AND.IN1
+FC8_Fault_NOT.OUT, FC8_AUTO_AND.IN2
+FC8_AUTO_AND.OUT, FC-008.AUTO
+FC8_Fault_OR.OUT, FC8_FaultToX0_MULT.IN2
+FC8_FaultToX0_MULT.OUT, FC-008.X0
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: LT-102 -> LIC-106; FIT-105 -> FC-008
+- Actual Connection:
+  - LT-102.PV, LIC-106.PV
+  - FIT-105.PV, FC-008.PV
+- Notes: Other analog inputs (LT-103, LT-107) are used for interlocks/logic, not as PV sources, which is acceptable.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: LIC-106 -> XV-101; FC-008 -> PV-104
+- Actual Connection:
+  - LIC-106.XOUT, XV-101.Control_Signal
+  - FC-008.XOUT, PV-104.Control_Signal
+- Notes: Both PID outputs drive valves directly. No indirect MOTOR_VSD path is present or required.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Both PID loops have correct PV sourcing from appropriate analog inputs and correctly drive their respective control valves. Surrounding permissive, interlock, and fault logic is present and appears coherent.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

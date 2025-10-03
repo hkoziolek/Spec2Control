@@ -1,0 +1,74 @@
+Evaluation Results for benzene-distillation - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_3\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TI-106
+ANALOG_IN FIT-101
+ANALOG_IN PT-101
+PID_BASIC FIC-104
+VALVE_ELECTRIC TCV-106
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TI-106
+ANALOG_IN FIT-101
+ANALOG_IN PT-101
+PID_BASIC FIC-104
+VALVE_ELECTRIC TCV-106
+
+ALL DATA CONNECTIONS:
+TI-106.PV, FIC-104.PV
+FIC-104.XOUT, TCV-106.Control_Signal
+TCV-106.Feedback_Pos, FIC-104.X0
+TI-106.High_Alarm, ReboilerInhibit_OR.IN1
+TI-106.General_Fault, ReboilerInhibit_OR.IN3
+PT-101.Low_Alarm, ReboilerInhibit_OR.IN4
+ReboilerInhibit_OR.OUT, TCV-106.Inhibit
+ReboilerInhibit_OR.OUT, FIC-104.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN -> TI-106; PID_BASIC -> FIC-104
+   Actual Connection: TI-106.PV, FIC-104.PV
+   Notes: PV from TI-106 is directly wired to the PID process variable. Other available analog inputs (FIT-101, PT-101) are not used for this PID in the provided connections.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC -> FIC-104; VALVE_ELECTRIC -> TCV-106
+   Actual Connection: FIC-104.XOUT, TCV-106.Control_Signal
+   Notes: Direct actuation path from PID to valve is present. The allowed indirect alternative (PID_BASIC.XOUT -> MOTOR_VSD.Speed_SP) is not needed here. Additional related signals include TCV-106.Feedback_Pos tied to FIC-104.X0 and inhibit logic feeding both the valve and the PID, which suggests coordinated interlock behavior.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct, correct mappings with supportive interlock and feedback connections indicate a coherent implementation.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

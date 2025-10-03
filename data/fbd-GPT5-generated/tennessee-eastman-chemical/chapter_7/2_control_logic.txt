@@ -1,0 +1,100 @@
+* Function Blocks *
+ANALOG_IN LI-003
+ANALOG_IN TI-008
+PID_BASIC LIC-101
+PID_BASIC LIC-103
+PID_BASIC TIC-106
+VALVE_ELECTRIC XV-104
+VALVE_ELECTRIC XV-105
+TON StartDelay
+
+* Variables *
+REAL TIC106_SteamValveCmd_Pct
+REAL LIC103_OutflowValveCmd_Pct
+REAL LIC101_CondensateLevel_Pct
+BOOL StartCmd
+
+* Functions *
+OR XV105_Inhibit
+OR TIC106_Inhibit
+OR XV104_Inhibit
+OR LI003_Problems
+GT TempAbove200
+GT TempEmergency210
+GT LevelAbove30
+AND StartupPermissive
+NOT NotStartupPermissive
+NOT CondensateOK
+
+* Data Connections * 
+TI-008.PV, TIC-106.PV
+TIC-106.XOUT, XV-105.Control_Signal
+LI-003.PV, LIC-103.PV
+LIC-103.XOUT, XV-104.Control_Signal
+TIC-106.XOUT, TIC106_SteamValveCmd_Pct
+LIC-103.XOUT, LIC103_OutflowValveCmd_Pct
+LIC101_CondensateLevel_Pct, LIC-101.PV
+TI-008.General_Fault, XV105_Inhibit.IN1
+TIC-106.PV_High_Alarm, XV105_Inhibit.IN2
+LIC-101.PV_High_Alarm, XV105_Inhibit.IN3
+TempAbove200.OUT, XV105_Inhibit.IN4
+NotStartupPermissive.OUT, XV105_Inhibit.IN5
+XV105_Inhibit.OUT, XV-105.Inhibit
+LIC-101.PV_High_Alarm, TIC106_Inhibit.IN1
+TI-008.General_Fault, TIC106_Inhibit.IN2
+TIC-106.PV_High_Alarm, TIC106_Inhibit.IN3
+NotStartupPermissive.OUT, TIC106_Inhibit.IN4
+TIC106_Inhibit.OUT, TIC-106.Inhibit
+LIC-103.PV_Low_Alarm, XV104_Inhibit.IN1
+LI003_Problems.OUT, XV104_Inhibit.IN2
+XV104_Inhibit.OUT, XV-104.Inhibit
+LI-003.Low_Alarm, LI003_Problems.IN1
+LI-003.General_Fault, LI003_Problems.IN2
+LI003_Problems.OUT, LIC-103.Inhibit
+TI-008.PV, TempAbove200.IN1
+TI-008.PV, TempEmergency210.IN1
+LI-003.PV, LevelAbove30.IN1
+LevelAbove30.OUT, StartupPermissive.IN1
+StartDelay.Q, StartupPermissive.IN2
+StartupPermissive.OUT, NotStartupPermissive.IN
+TempEmergency210.OUT, XV-105.Manual_Mode
+LIC-101.PV_High_Alarm, CondensateOK.IN
+CondensateOK.OUT, TIC-106.AUTO
+StartCmd, StartDelay.IN
+
+* Parameter Data Connections *
+195, TI-008.PV_High
+15.625, TI-008.Scaling_Slope
+-62.5, TI-008.Scaling_Offset
+TRUE, TI-008.Alarm_Enable
+6.25, LI-003.Scaling_Slope
+-25, LI-003.Scaling_Offset
+10, LI-003.PV_Low
+TRUE, LI-003.Alarm_Enable
+180, TIC-106.SP
+3.2, TIC-106.KP
+1.0, TIC-106.TR
+0.3, TIC-106.TD
+5, TIC-106.MV_MIN
+95, TIC-106.MV_MAX
+10, TIC-106.Deviation_Limit
+210, TIC-106.PV_High
+70, LIC-103.SP
+2.5, LIC-103.KP
+0.8, LIC-103.TR
+0.1, LIC-103.TD
+0, LIC-103.MV_MIN
+100, LIC-103.MV_MAX
+TRUE, LIC-103.AUTO
+15, LIC-103.PV_Low
+85, LIC-101.PV_High
+100, XV-105.Open_Limit
+0, XV-105.Close_Limit
+100, XV-104.Open_Limit
+0, XV-104.Close_Limit
+T#12s, StartDelay.PT
+200, TempAbove200.IN2
+210, TempEmergency210.IN2
+30, LevelAbove30.IN2
+0, XV-105.Manual_Position
+

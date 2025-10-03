@@ -1,0 +1,98 @@
+Evaluation Results for waste_water_treatment_facility - chapter_11
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_11\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_11\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: Ratio Control
+EVAL-1 Result: PASS
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_11\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_11\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), MOTOR_VSD(1), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(1), MOTOR_VSD(1), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_11\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_11\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FIT-104
+RATIO_CONTROL FFIC-107
+PID_BASIC FIC-106
+MOTOR_VSD CD-1001
+VALVE_ELECTRIC PV-101
+VALVE_ON_OFF XV-102
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FIT-104
+RATIO_CONTROL FFIC-107
+PID_BASIC FIC-106
+VALVE_ELECTRIC PV-101
+
+ALL DATA CONNECTIONS:
+FIT-104.PV, FFIC-107.PrimaryPV
+CD-1001.FB_ActualSpeed, FFIC-107.SecondaryPV
+FFIC-107.SlaveSP, FIC-106.SP
+CD-1001.FB_ActualSpeed, FIC-106.PV
+FIC-106.XOUT, CD-1001.Speed_SP
+FIT-104.Low_Alarm, FFIC107_Inhibit.IN1
+FIT-104.General_Fault, FFIC107_Inhibit.IN2
+CD-1001.FB_Fault, FFIC107_Inhibit.IN3
+CD-1001.Alarm_Comm_Fail, FFIC107_Inhibit.IN4
+CD-1001.Alarm_Speed_Deviation, FFIC107_Inhibit.IN5
+FFIC107_Inhibit.OUT, FFIC-107.Inhibit
+XV-102.FB_Opened, XV102_NotOpen.IN
+XV102_NotOpen.OUT, CD1001_Inhibit.IN1
+PV-101.Alarm, CD1001_Inhibit.IN2
+PV-101.Position_Error, CD1001_Inhibit.IN5
+XV-102.Alarm_Position_Error, CD1001_Inhibit.IN3
+XV-102.Alarm_General, CD1001_Inhibit.IN4
+CD1001_Inhibit.OUT, CD-1001.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 -> FIT-104; RATIO_CONTROL -> FFIC-107
+- Actual Connection: FIT-104.PV -> FFIC-107.PrimaryPV
+- Notes: Exact match to template.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: MISSING
+- Mapping: ANALOG_IN2 -> [No available instance in provided list]; RATIO_CONTROL -> FFIC-107
+- Actual Connection: None
+- Notes: Observed alternative source CD-1001.FB_ActualSpeed -> FFIC-107.SecondaryPV, but this is not from an ANALOG_IN instance as per template intent.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: FOUND DIRECT
+- Mapping: RATIO_CONTROL -> FFIC-107; PID_BASIC -> FIC-106
+- Actual Connection: FFIC-107.SlaveSP -> FIC-106.SP
+- Notes: Direct and correct.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND INDIRECT
+- Mapping: PID_BASIC -> FIC-106; VALVE_ELECTRIC -> PV-101
+- Actual Connection: FIC-106.XOUT -> CD-1001.Speed_SP
+- Notes: No direct link to PV-101.Control_Signal found; accepted as valid indirect per allowance (PID output driving MOTOR_VSD Speed_SP).
+
+OVERALL ASSESSMENT:
+Coverage: 3/4
+Quality: Core control chain (primary PV, ratio to PID, PID output to drive) is implemented cleanly; secondary PV deviates from the template by using drive feedback instead of a second analog input. Output path uses a VSD rather than the valve, which is acceptable per the stated rule.
+Missing Connections: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+==================================================
+
+EVAL-3 Coverage: 75.00%

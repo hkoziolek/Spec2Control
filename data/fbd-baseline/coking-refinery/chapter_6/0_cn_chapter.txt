@@ -1,0 +1,40 @@
+## 6 **Hydrotreating Units**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|E-501 | Heat Exchanger | Transfers heat to process fluid for temperature control in reactor system |
+|ESD-501 | Emergency Stop | Shuts down the system during emergency conditions for safety |
+|FC-103 | Flow Controller | Regulates hydrogen feed flow to maintain setpoint within specified range |
+|FT-103 | Flow Transmitter | Measures hydrogen flow rate and provides signal to controller |
+|FV-103 | Flow Valve | Controls hydrogen flow to the reactor; fail-closed for safety |
+|PC-501 | Pressure Controller | Maintains reactor pressure within operational limits |
+|PT-501 | Pressure Transmitter | Measures reactor pressure for monitoring and control purposes |
+|PT-502 | Pressure Transmitter | Provides additional pressure measurement for redundancy or specific locations |
+|TC-501 | Temperature Controller | Regulates reactor outlet temperature by controlling heating medium flow |
+|TT-101 | Temperature Transmitter | Measures reactor outlet temperature for control and monitoring |
+|TV-501 | Temperature Valve | Adjusts heating medium flow to maintain desired reactor temperature |
+
+### 6.1) Control Strategy Description
+
+The hydrotreating unit employs PID control to regulate hydrogen feed flow, reactor pressure, and reactor outlet temperature to ensure optimal sulfur removal and fuel specification compliance. The primary control loop for hydrogen feed is configured on flow control valve FV-103, with the process variable (PV) measured by flow transmitter FT-103. The setpoint (SP) for hydrogen flow is operator-adjustable within the range of 500 to 1500 Nm³/h, constrained to prevent excessive hydrogen consumption or insufficient feed. The PID controller (FC-103) is configured as reverse-acting to decrease the valve opening when the measured flow exceeds the setpoint.
+
+The PID tuning parameters for FC-103 are set as follows: proportional gain (Kp) = 1.8, integral time (Ki) = 0.5 min, and derivative time (Kd) = 0.1 min. The controller output (MV) is clamped between 0% and 100% to match the stroke range of FV-103. FV-103 is a fail-closed valve to ensure hydrogen flow is automatically cut off during a fault condition. The transmitter FT-103 provides a 4-20 mA signal corresponding to a measurement span of 0 to 2000 Nm³/h.
+
+Reactor temperature control is implemented on temperature control valve TV-501, which regulates the flow of heating medium to heat exchanger E-501. The process variable is measured by temperature transmitter TT-101, with a control range of 300°C to 400°C. The temperature setpoint is fixed at 375°C. The PID controller (TC-501) is configured as direct-acting, with tuning parameters Kp = 2.5, Ki = 0.8 min, and Kd = 0.2 min. TV-501 is a fail-open valve to ensure reactor cooling in the event of a control failure.
+
+A bumpless transfer algorithm is implemented in both FC-103 and TC-501 to allow seamless switching between manual and automatic modes without introducing process disturbances. Additionally, a 1% deadband is applied to both loops to minimize wear on the control valves during steady-state operation.
+
+### 6.2) Interlocks and Permissives
+
+The hydrogen feed control loop (FC-103) is interlocked with the reactor pressure control loop (PC-501) to ensure safe operation. If the reactor pressure, as measured by PT-501, exceeds 50 bar, the hydrogen feed setpoint is automatically reduced to 50% of its current value. Similarly, if the reactor outlet temperature, measured by TT-101, exceeds 410°C, the hydrogen feed control loop is disabled, and FV-103 is forced to a fully closed position.
+
+The reactor temperature control loop (TC-501) includes a permissive that prevents heating medium flow unless the reactor inlet pressure, as measured by PT-502, is above 10 bar. Additionally, a 15-second delay is imposed on the opening of TV-501 after the permissive is satisfied to allow stabilization of upstream flow conditions.
+
+Both control loops are interlocked with the emergency shutdown system (ESD-501). Upon activation of ESD-501, FV-103 and TV-501 are forced to their respective fail-safe positions (closed and open, respectively), and all PID controllers are placed in manual mode to prevent unintended operation during shutdown.
+
+### 6.3) Alarm and Fault Handling
+
+High-priority alarms are configured for both hydrogen flow and reactor temperature control. For FC-103, a high alarm is triggered if the measured flow (FT-103) exceeds 1600 Nm³/h, and a low alarm is triggered if the flow falls below 400 Nm³/h. For TC-501, a high-high alarm is activated if the reactor outlet temperature (TT-101) exceeds 415°C, and a low-low alarm is activated if the temperature drops below 290°C.
+
+In the event of a transmitter fault, such as a loss of signal from FT-103 or TT-101, the associated PID controller is automatically placed in manual mode, and the final control element (FV-103 or TV-501) is driven to its fail-safe position. Diagnostic alarms are generated for failed transmitters, and operators are required to acknowledge these alarms before resetting the control loop.
+
+Anti-windup logic is implemented in both FC-103 and TC-501 to prevent integral term accumulation when the controller output is saturated. This ensures prompt recovery of control performance when the process variable returns to the controllable range.

@@ -1,0 +1,115 @@
+* Function Blocks *
+ANALOG_IN FT-401A
+VALVE_ELECTRIC FV-401
+MOTOR_ON_OFF P-401A
+MOTOR_ON_OFF P-401B
+PID_BASIC PC-401
+ANALOG_IN PT-402
+ANALOG_IN PT-403
+PID_BASIC TC-401
+ANALOG_IN TIT-101
+
+* Variables *
+REAL TIT_101_FurnaceOutletTemp_PV
+REAL TC_401_MV_To_FV_401
+REAL PT_402_FurnaceDraftPressure_PV
+REAL PT_403_DischargePressure_PV
+REAL FT_401A_FlowRate_PV
+REAL FuelGasPressure_PV
+BOOL Flame_OK
+BOOL TempHighAlarm_3s
+BOOL TempLowAlarm_3s
+BOOL TC401_AutoCmd
+REAL TC401_ManualBias
+BOOL Valve_ManualMode
+REAL Valve_ManualPos
+
+* Functions *
+OR FuelGasPressOutOfRange_OR
+NOT FuelGasPressOK_NOT
+OR DraftOutOfRange_OR
+NOT DraftOK_NOT
+OR PumpsRunning_OR
+AND FlowPermissive_AND
+AND ProcessPermissive_AND
+AND Permissive1_AND
+AND FinalPermissive_AND
+NOT PermissiveNot_NOT
+TON FuelFlowInterlockDelay_TON
+OR InhibitWithHighTrip_OR
+OR FinalInhibit_OR
+TON TempHighAlarmDelay_TON
+TON TempLowAlarmDelay_TON
+
+* Data Connections * 
+TIT-101.PV, TC-401.PV
+TC-401.XOUT, FV-401.Control_Signal
+PC-401.PV_High_Alarm, FuelGasPressOutOfRange_OR.IN1
+PC-401.PV_Low_Alarm, FuelGasPressOutOfRange_OR.IN2
+FuelGasPressOutOfRange_OR.OUT, FuelGasPressOK_NOT.IN
+PT-402.High_Alarm, DraftOutOfRange_OR.IN1
+PT-402.Low_Alarm, DraftOutOfRange_OR.IN2
+DraftOutOfRange_OR.OUT, DraftOK_NOT.IN
+P-401A.FB_Running, PumpsRunning_OR.IN1
+P-401B.FB_Running, PumpsRunning_OR.IN2
+PumpsRunning_OR.OUT, FlowPermissive_AND.IN1
+PT-403.High_Alarm, FlowPermissive_AND.IN2
+FuelGasPressOK_NOT.OUT, ProcessPermissive_AND.IN1
+DraftOK_NOT.OUT, ProcessPermissive_AND.IN2
+ProcessPermissive_AND.OUT, Permissive1_AND.IN1
+FlowPermissive_AND.OUT, Permissive1_AND.IN2
+Permissive1_AND.OUT, FinalPermissive_AND.IN1
+Flame_OK, FinalPermissive_AND.IN2
+FinalPermissive_AND.OUT, PermissiveNot_NOT.IN
+PermissiveNot_NOT.OUT, FuelFlowInterlockDelay_TON.IN
+FuelFlowInterlockDelay_TON.Q, InhibitWithHighTrip_OR.IN1
+TIT-101.High_Alarm, InhibitWithHighTrip_OR.IN2
+InhibitWithHighTrip_OR.OUT, FinalInhibit_OR.IN1
+TIT-101.General_Fault, FinalInhibit_OR.IN2
+FinalInhibit_OR.OUT, FV-401.Inhibit
+FinalInhibit_OR.OUT, TC-401.Inhibit
+TIT-101.High_Alarm, TempHighAlarmDelay_TON.IN
+TIT-101.Low_Alarm, TempLowAlarmDelay_TON.IN
+TempHighAlarmDelay_TON.Q, TempHighAlarm_3s
+TempLowAlarmDelay_TON.Q, TempLowAlarm_3s
+TIT-101.PV, TIT_101_FurnaceOutletTemp_PV
+TC-401.XOUT, TC_401_MV_To_FV_401
+PT-402.PV, PT_402_FurnaceDraftPressure_PV
+PT-403.PV, PT_403_DischargePressure_PV
+FT-401A.PV, FT_401A_FlowRate_PV
+FuelGasPressure_PV, PC-401.PV
+TC401_AutoCmd, TC-401.AUTO
+TC401_ManualBias, TC-401.X0
+Valve_ManualMode, FV-401.Manual_Mode
+Valve_ManualPos, FV-401.Manual_Position
+
+* Parameter Data Connections *
+495.0, TC-401.SP
+0.0, TC-401.MV_MIN
+100.0, TC-401.MV_MAX
+3.2, TC-401.KP
+0.9, TC-401.TR
+0.3, TC-401.TD
+2.0, TC-401.Deviation_Limit
+510.0, TC-401.PV_High
+480.0, TC-401.PV_Low
+TRUE, TIT-101.Alarm_Enable
+9.375, TIT-101.Scaling_Slope
+362.5, TIT-101.Scaling_Offset
+550.0, TIT-101.PV_High
+480.0, TIT-101.PV_Low
+TRUE, PT-402.Alarm_Enable
+-0.1, PT-402.PV_High
+-0.5, PT-402.PV_Low
+TRUE, PT-403.Alarm_Enable
+8.0, PT-403.PV_High
+0.0, PT-403.PV_Low
+4.0, PC-401.PV_High
+2.5, PC-401.PV_Low
+100.0, FV-401.Open_Limit
+0.0, FV-401.Close_Limit
+T#10s, FV-401.Timeout
+T#5s, FuelFlowInterlockDelay_TON.PT
+T#3s, TempHighAlarmDelay_TON.PT
+T#3s, TempLowAlarmDelay_TON.PT
+

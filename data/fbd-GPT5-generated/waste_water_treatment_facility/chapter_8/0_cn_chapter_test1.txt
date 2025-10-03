@@ -1,0 +1,33 @@
+## 8 **Tertiary/Advanced Treatment**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FFIC-703 | Flow Controller | Performs ratio control for backwash flow rate adjustment based on influent flow rate. |
+|FIC-702 | Flow Controller | Controls backwash flow rate setpoint for FV-702 based on ratio calculation. |
+|FT-701 | Flow Transmitter | Measures influent flow rate to the tertiary filtration system. |
+|FV-702 | Flow Valve | Regulates backwash flow rate as per FIC-702 setpoint. |
+|TF-701 | Temperature Transmitter | Measures temperature in the tertiary filtration system. |
+|TT-701 | Temperature Transmitter | Monitors temperature for process control and safety. |
+
+### 8.1) Control Strategy Description
+
+The tertiary filtration system utilizes a ratio control strategy to maintain a precise proportional relationship between the influent flow rate and the backwash flow rate to ensure consistent turbidity removal and filter bed integrity. The influent flow rate is measured by FT-701, which serves as the wild flow variable. The backwash flow rate is controlled by FIC-702, which adjusts the setpoint of FV-702 based on the ratio calculation performed by ratio controller FFIC-703.
+
+The ratio control is configured to maintain a backwash-to-influent flow ratio of 0.1:1 under normal operating conditions. The setpoint for the controlled backwash flow rate is calculated as:
+
+\[ \text{Backwash Flow SP (FIC-702)} = \text{Influent Flow (FT-701)} \times 0.1 \]
+
+The ratio setpoint is adjustable within a range of 0.05:1 to 0.2:1 to accommodate varying influent characteristics and operational requirements. Flow measurement ranges are 0–5000 m³/h for FT-701 and 0–500 m³/h for FIC-702. A 5% deadband is implemented in FFIC-703 to minimize control valve hunting during stable operation.
+
+### 8.2) Interlocks and Permissives
+
+The ratio control loop is enabled only when FT-701 confirms an influent flow rate above 50 m³/h. If the influent flow rate falls below this threshold, FFIC-703 will automatically disable the backwash flow control by setting FIC-702 to its minimum output of 0%. Additionally, the backwash flow control valve FV-702 will not open unless the tertiary filter TF-701 is in operation and the turbidity sensor TT-701 indicates a turbidity level below 5 NTU.
+
+A permissive ensures that the ratio control loop is overridden, and FV-702 is fully closed if a high-high turbidity alarm (10 NTU) is triggered by TT-701, indicating potential filter breakthrough. This condition requires operator intervention to assess and resolve the issue before resuming ratio control.
+
+### 8.3) Alarm and Fault Handling
+
+The ratio controller FFIC-703 generates a deviation alarm if the actual backwash-to-influent flow ratio deviates by more than ±0.02 from the setpoint for a duration exceeding 30 seconds. This alarm is logged as "Ratio Deviation Alarm" and prompts inspection of FT-701, FIC-702, and FV-702 for potential faults.
+
+A low flow alarm is triggered if FT-701 measures an influent flow rate below 50 m³/h, labeled as "Low Influent Flow Alarm." Under this condition, FFIC-703 transitions to manual mode, and FIC-702 is set to its fail-safe position of 0% output.
+
+In the event of a sensor fault in FT-701 or TT-701, FFIC-703 will generate a "Sensor Fault Alarm" and automatically switch to manual mode. Operators are required to manually adjust the backwash flow rate via FIC-702 until the fault is resolved.

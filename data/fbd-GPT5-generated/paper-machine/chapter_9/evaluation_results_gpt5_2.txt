@@ -1,0 +1,130 @@
+Evaluation Results for paper-machine - chapter_9
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_9\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_9\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_9\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), MOTOR_ON_OFF(1), MOTOR_VSD(1), PID_BASIC(4), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(5), MOTOR_VSD(2), PID_BASIC(4), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 0.92%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_9\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TT-801
+ANALOG_IN TT-802
+ANALOG_IN PT-801
+ANALOG_IN IR-801
+ANALOG_IN WT-801
+MOTOR_VSD F-801
+MOTOR_VSD M-801
+VALVE_ELECTRIC FV-801
+VALVE_ELECTRIC XV-802
+PID_BASIC TC-801
+PID_BASIC SC-801_LOOP
+PID_BASIC IR-801_LOOP
+PID_BASIC WT-801_LOOP
+BOOL_IN PT-801_Overpressure
+BOOL_IN IR-801_Available
+BOOL_IN XV-802_Open
+BOOL_IN TT-802_InRange
+BOOL_IN WT-801_InRange
+BOOL_IN M-801_Running
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TT-801
+ANALOG_IN TT-802
+ANALOG_IN PT-801
+ANALOG_IN IR-801
+ANALOG_IN WT-801
+VALVE_ELECTRIC FV-801
+VALVE_ELECTRIC XV-802
+PID_BASIC TC-801
+PID_BASIC SC-801_LOOP
+PID_BASIC IR-801_LOOP
+PID_BASIC WT-801_LOOP
+
+ALL DATA CONNECTIONS:
+TT-801.PV, SC-801_LOOP.PV
+SC-801_LOOP.XOUT, FV-801.Control_Signal
+TT-802.PV, TC-801.PV
+TC-801.XOUT, XV-802.Control_Signal
+IR-801.PV, IR-801_LOOP.PV
+IR-801_LOOP.XOUT, F-801.Speed_SP
+WT-801.PV, WT-801_LOOP.PV
+WT-801_LOOP.XOUT, M-801.Speed_SP
+PT-801.High_Alarm, PT-801_Overpressure.Bool_In
+PT-801_Overpressure.Bool_Out, SC-801_SteamInhibit_OR.IN1
+PT-801.Low_Alarm, SC-801_SteamInhibit_OR.IN2
+TT-801.High_Alarm, SC-801_SteamInhibit_OR.IN3
+SC-801_SteamInhibit_OR.OUT, FV-801.Inhibit
+SC-801_SteamInhibit_OR.OUT, SC-801_LOOP.Inhibit
+IR-801.General_Fault, IR-801_SignalFault_OR.IN1
+IR-801.Low_Alarm, IR-801_SignalFault_OR.IN2
+IR-801.High_Alarm, IR-801_SignalFault_OR.IN3
+IR-801_SignalFault_OR.OUT, IR-801_Available_NOT.IN
+IR-801_Available_NOT.OUT, IR-801_Available.Bool_In
+IR-801_SignalFault_OR.OUT, F-801.Inhibit
+IR-801_SignalFault_OR.OUT, IR-801_LOOP.Inhibit
+TT-802.High_Alarm, TT-802_OutOfRange_OR.IN1
+TT-802.Low_Alarm, TT-802_OutOfRange_OR.IN2
+TT-802_OutOfRange_OR.OUT, TT-802_InRange_NOT.IN
+TT-802_InRange_NOT.OUT, TT-802_InRange.Bool_In
+XV-802.Feedback_Pos, XV-802_Open_GT.IN1
+XV-802_Open_GT.OUT, XV-802_Open.Bool_In
+XV-802_Open.Bool_Out, HoodControlPermissive_AND.IN1
+TT-802_InRange.Bool_Out, HoodControlPermissive_AND.IN2
+HoodControlPermissive_AND.OUT, HoodControlNotPermissive_NOT.IN
+HoodControlNotPermissive_NOT.OUT, TC-801.Inhibit
+HoodControlNotPermissive_NOT.OUT, XV-802_Inhibit_OR.IN1
+TC-801.PV_High_Alarm, XV-802_Inhibit_OR.IN2
+XV-802_Inhibit_OR.OUT, XV-802.Inhibit
+WT-801.High_Alarm, WT-801_OutOfRange_OR.IN1
+WT-801.Low_Alarm, WT-801_OutOfRange_OR.IN2
+WT-801_OutOfRange_OR.OUT, WT-801_InRange_NOT.IN
+WT-801_InRange_NOT.OUT, WT-801_InRange.Bool_In
+M-801.FB_Running, M-801_Running.Bool_In
+M-801_Running.Bool_Out, TensionPermissive_AND.IN1
+WT-801_InRange.Bool_Out, TensionPermissive_AND.IN2
+TensionPermissive_AND.OUT, TensionNotPermissive_NOT.IN
+TensionNotPermissive_NOT.OUT, WT-801_LOOP.Inhibit
+WT-801_OutOfRange_OR.OUT, M-801.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+- Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+  Status: FOUND DIRECT
+  Mapping: ANALOG_IN=TT-801, PID_BASIC=SC-801_LOOP
+  Actual Connection: TT-801.PV, SC-801_LOOP.PV
+  Notes: Other direct PV pairings also present: TT-802.PV, TC-801.PV; IR-801.PV, IR-801_LOOP.PV; WT-801.PV, WT-801_LOOP.PV. PT-801 does not have its PV connected to any PID_BASIC.PV (only alarm paths are used).
+
+- Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+  Status: FOUND DIRECT
+  Mapping: PID_BASIC=SC-801_LOOP, VALVE_ELECTRIC=FV-801
+  Actual Connection: SC-801_LOOP.XOUT, FV-801.Control_Signal
+  Notes: Another direct valve connection exists: TC-801.XOUT, XV-802.Control_Signal. Valid indirect connections to motor speed setpoints (as allowed) are also present: IR-801_LOOP.XOUT, F-801.Speed_SP; WT-801_LOOP.XOUT, M-801.Speed_SP.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The implementation is solid. Multiple loops correctly map analog PVs to PID PVs and route PID outputs directly to valves or, where appropriate, indirectly to motor speed setpoints. Permissives and inhibits are consistently applied via alarm logic, which supports safe operation.
+Missing Connections: PT-801.PV to any PID_BASIC.PV (no control PV link found; only alarm/inhibit logic is wired).
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,94 @@
+* Function Blocks *
+ANALOG_IN PT-301
+ANALOG_IN PT-302
+ANALOG_IN PT-303
+ANALOG_IN TT-301
+PID_BASIC PC-301
+VALVE_ELECTRIC PV-105
+VALVE_ON_OFF PV-106
+VALVE_ON_OFF XV-108
+MOTOR_ON_OFF P-301A
+DIGITAL_IN PAH-301
+DIGITAL_IN PAL-301
+DIGITAL_IN PTF-301
+
+* Variables *
+REAL RegeneratorPressure_PT301_PV
+REAL AirBlowerDischargePressure_PT302_PV
+REAL FractionatorOverheadPressure_PT303_PV
+REAL RegeneratorTemperature_TT301_PV
+REAL PC301_MV_Output
+
+* Functions *
+MAX SP_LowClamp_MAX
+MIN SP_HighClamp_MIN
+SUB PV_Minus_SP_SUB
+ABS ErrorAbs_ABS
+GT DeadbandExceeded_GT
+SEL PV_Deadbanded_SEL
+OR PV105_Inhibit_OR
+OR PC301_Inhibit_OR
+NOT P301A_Running_NOT
+
+* Data Connections * 
+PT-301.PV, PV_Minus_SP_SUB.IN1
+SP_LowClamp_MAX.OUT, SP_HighClamp_MIN.IN1
+SP_HighClamp_MIN.OUT, PV_Minus_SP_SUB.IN2
+PV_Minus_SP_SUB.OUT, ErrorAbs_ABS.IN
+ErrorAbs_ABS.OUT, DeadbandExceeded_GT.IN1
+DeadbandExceeded_GT.OUT, PV_Deadbanded_SEL.G
+SP_HighClamp_MIN.OUT, PV_Deadbanded_SEL.IN0
+PT-301.PV, PV_Deadbanded_SEL.IN1
+PV_Deadbanded_SEL.OUT, PC-301.PV
+SP_HighClamp_MIN.OUT, PC-301.SP
+PC-301.XOUT, PV-105.Control_Signal
+PV-105.Feedback_Pos, PC-301.X0
+TT-301.Low_Alarm, PV105_Inhibit_OR.IN1
+XV-108.FB_Closed, PV105_Inhibit_OR.IN2
+PT-301.High_Alarm, PV105_Inhibit_OR.IN3
+PT-302.Low_Alarm, PV105_Inhibit_OR.IN4
+PT-303.High_Alarm, PV105_Inhibit_OR.IN5
+P-301A.FB_Running, P301A_Running_NOT.IN
+P301A_Running_NOT.OUT, PV105_Inhibit_OR.IN6
+PV105_Inhibit_OR.OUT, PV-105.Inhibit
+PT-301.General_Fault, PTF-301.DI_Raw
+PTF-301.DI_Out, PC301_Inhibit_OR.IN1
+XV-108.FB_Closed, PC301_Inhibit_OR.IN2
+PC301_Inhibit_OR.OUT, PC-301.Inhibit
+PC-301.PV_High_Alarm, PAH-301.DI_Raw
+PC-301.PV_Low_Alarm, PAL-301.DI_Raw
+PT-301.High_Alarm, XV-108.Inhibit
+PT-301.High_Alarm, XV-108.Close_Cmd
+PT-301.PV, RegeneratorPressure_PT301_PV
+PT-302.PV, AirBlowerDischargePressure_PT302_PV
+PT-303.PV, FractionatorOverheadPressure_PT303_PV
+TT-301.PV, RegeneratorTemperature_TT301_PV
+PC-301.XOUT, PC301_MV_Output
+
+* Parameter Data Connections *
+3.0, PT-301.PV_High
+2.2, PT-301.PV_Low
+TRUE, PT-301.Alarm_Enable
+0.3125, PT-301.Scaling_Slope
+-1.25, PT-301.Scaling_Offset
+650, TT-301.PV_Low
+TRUE, TT-301.Alarm_Enable
+3.5, PT-302.PV_Low
+TRUE, PT-302.Alarm_Enable
+0.8, PT-303.PV_High
+TRUE, PT-303.Alarm_Enable
+2.8, PC-301.PV_High
+2.2, PC-301.PV_Low
+3.0, PC-301.KP
+1.2, PC-301.TR
+0.1, PC-301.TD
+0.0, PC-301.MV_MIN
+100.0, PC-301.MV_MAX
+TRUE, PC-301.AUTO
+2.5, SP_LowClamp_MAX.IN1
+2.0, SP_LowClamp_MAX.IN2
+3.0, SP_HighClamp_MIN.IN2
+0.05, DeadbandExceeded_GT.IN2
+0.0, PV-105.Close_Limit
+100.0, PV-105.Open_Limit
+

@@ -1,0 +1,9 @@
+Latest Complete Run Information
+=====================================
+
+Source Folder: paper-machine_0924_020211
+Run Timestamp: 2025-09-24 02:02:11
+Copied On: 2025-09-24 09:21:46
+
+This folder contains the latest complete run for this category.
+Files with _test{i}.txt suffixes have been renamed to remove the suffix.

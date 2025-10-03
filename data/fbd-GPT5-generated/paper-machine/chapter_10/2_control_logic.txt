@@ -1,0 +1,65 @@
+* Function Blocks *
+ANALOG_IN FT-901
+ANALOG_IN FT-902
+ANALOG_IN CW-901
+RATIO_CONTROL FFIC-903
+PID_BASIC FIC-904
+VALVE_ELECTRIC FV-104
+VALVE_ON_OFF XV-105
+
+* Variables *
+REAL FFIC903_CoatingFlow_SP
+REAL FV104_ControlSignal_Pct
+REAL FFIC903_RatioSP
+REAL FFIC903_RatioBias
+
+* Functions *
+OR RatioLoopInhibit_OR
+NOT XV105Closed_NOT
+NOT RatioLoopEnable_NOT
+
+* Data Connections *
+XV-105.FB_Opened, XV105Closed_NOT.IN
+XV105Closed_NOT.OUT, RatioLoopInhibit_OR.IN1
+FT-901.Low_Alarm, RatioLoopInhibit_OR.IN2
+CW-901.High_Alarm, RatioLoopInhibit_OR.IN3
+CW-901.Low_Alarm, RatioLoopInhibit_OR.IN4
+FT-901.General_Fault, RatioLoopInhibit_OR.IN5
+FT-902.General_Fault, RatioLoopInhibit_OR.IN6
+CW-901.General_Fault, RatioLoopInhibit_OR.IN7
+RatioLoopInhibit_OR.OUT, FFIC-903.Inhibit
+RatioLoopInhibit_OR.OUT, FV-104.Inhibit
+RatioLoopInhibit_OR.OUT, RatioLoopEnable_NOT.IN
+RatioLoopEnable_NOT.OUT, FFIC-903.Auto
+RatioLoopEnable_NOT.OUT, FIC-904.AUTO
+FT-901.PV, FFIC-903.PrimaryPV
+FT-902.PV, FFIC-903.SecondaryPV
+FFIC903_RatioSP, FFIC-903.RatioSP
+FFIC903_RatioBias, FFIC-903.Bias
+FFIC-903.SlaveSP, FIC-904.SP
+FT-902.PV, FIC-904.PV
+FIC-904.XOUT, FV-104.Control_Signal
+FFIC-903.SlaveSP, FFIC903_CoatingFlow_SP
+FIC-904.XOUT, FV104_ControlSignal_Pct
+
+* Parameter Data Connections *
+6.25, FT-901.Scaling_Slope
+-25, FT-901.Scaling_Offset
+TRUE, FT-901.Alarm_Enable
+5.0, FT-901.PV_Low
+31.25, FT-902.Scaling_Slope
+-125, FT-902.Scaling_Offset
+TRUE, FT-902.Alarm_Enable
+TRUE, CW-901.Alarm_Enable
+10.0, CW-901.PV_High
+-10.0, CW-901.PV_Low
+0.0, FFIC-903.ManOut
+0, FFIC-903.MV_MIN
+500, FFIC-903.MV_MAX
+0, FIC-904.MV_MIN
+100, FIC-904.MV_MAX
+5.0, FIC-904.Deviation_Limit
+0.0, FIC-904.X0
+100, FV-104.Open_Limit
+0, FV-104.Close_Limit
+

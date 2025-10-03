@@ -1,0 +1,48 @@
+* Function Blocks *
+ANALOG_IN PIT-103
+PID_BASIC PIC-102
+VALVE_ELECTRIC PV-101
+BOOL_IN VDU_START_OK
+BOOL_IN MAINT_BYPASS_OK
+
+* Variables *
+REAL PIT_103_PV_mmHg
+REAL PIC_102_MV_Percent
+
+* Functions *
+OR PIC102Inhibit_OR
+OR PV101Inhibit_OR
+NOT VDUStartPermissive_NOT
+
+* Data Connections * 
+PIT-103.PV, PIC-102.PV
+PIC-102.XOUT, PV-101.Control_Signal
+VDU_START_OK.Bool_Out, VDUStartPermissive_NOT.IN
+VDUStartPermissive_NOT.OUT, PIC102Inhibit_OR.IN1
+MAINT_BYPASS_OK.Bool_Out, PIC102Inhibit_OR.IN2
+PIT-103.General_Fault, PIC102Inhibit_OR.IN3
+PIC-102.PV_Low_Alarm, PIC102Inhibit_OR.IN4
+PIC102Inhibit_OR.OUT, PIC-102.Inhibit
+PIC-102.PV_High_Alarm, PV101Inhibit_OR.IN1
+PV-101.Position_Error, PV101Inhibit_OR.IN2
+PV101Inhibit_OR.OUT, PV-101.Inhibit
+PIT-103.PV, PIT_103_PV_mmHg
+PIC-102.XOUT, PIC_102_MV_Percent
+
+* Parameter Data Connections *
+47.5, PIT-103.Scaling_Slope
+-190.0, PIT-103.Scaling_Offset
+80.0, PIT-103.PV_High
+20.0, PIT-103.PV_Low
+TRUE, PIT-103.Alarm_Enable
+50.0, PIC-102.SP
+0.0, PIC-102.MV_MIN
+100.0, PIC-102.MV_MAX
+1.8, PIC-102.KP
+2.0, PIC-102.TR
+0.5, PIC-102.TD
+5.0, PIC-102.Deviation_Limit
+TRUE, PIC-102.AUTO
+100.0, PV-101.Open_Limit
+0.0, PV-101.Close_Limit
+

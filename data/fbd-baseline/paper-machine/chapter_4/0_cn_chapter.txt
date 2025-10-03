@@ -1,0 +1,34 @@
+## 4 **Washing and Screening**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|DT-301 | Density Transmitter | Measures the density of the process fluid |
+|FV-106 | Flow Valve | Regulates flow rate through the pressure screen |
+|PIC-104 | Pressure Controller | Maintains pressure setpoint in the screening system |
+|PIT-103 | Pressure Transmitter | Measures pressure in the pressure screening system |
+|PT-101 | Pressure Transmitter | Monitors system pressure for control purposes |
+|XV-102 | On-Off Valve | Isolates flow in the process line |
+|XV-107 | On-Off Valve | Provides isolation for maintenance or emergency conditions |
+
+### 4.1) Control Strategy Description
+
+The washing and screening section employs a PID control loop to maintain optimal pressure in the pressure screening system, ensuring consistent removal of contaminants and protection of slot plates. The primary controlled variable (PV) is the pressure measured by PIT-103, with the setpoint (SP) configured at 250 kPa. The control output (MV) manipulates the position of flow control valve FV-106 to regulate the flow rate through the pressure screen.
+
+The PID controller, PIC-104, is configured as a reverse-acting controller with the following tuning parameters: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.1 minutes. The controller output is clamped between 0% and 100% to ensure the valve operates within its design limits. The control range of PIT-103 is 0–500 kPa, with a 4–20 mA signal scaled linearly to the controller.
+
+The final control element, FV-106, is a pneumatically actuated modulating valve with a fail-closed position to ensure system isolation during fault conditions. The valve's response time is 2 seconds, and it is equipped with position feedback to prevent hunting. Bumpless transfer logic is implemented in PIC-104 to allow smooth transitions between manual and automatic modes without disturbing the process.
+
+To prevent oscillations, a 5% deadband is applied around the setpoint, inhibiting control output changes when the pressure is within ±12.5 kPa of the target. Signal scaling logic ensures the raw transmitter signal is converted to calibrated engineering units before entering the PID algorithm.
+
+### 4.2) Interlocks and Permissives
+
+The operation of PIC-104 is subject to the following interlocks and permissives. The controller will not activate unless PT-101, the upstream pressure transmitter, indicates a pressure above 150 kPa to confirm sufficient feed pressure. Additionally, XV-102, the upstream shut-off valve, must be fully open, as verified by its limit switch, before FV-106 can operate. If PT-101 detects a pressure exceeding 400 kPa, PIC-104 will automatically drive FV-106 to 0% open to prevent overpressure in the screening system.
+
+A permissive from the slot plate protection system ensures that PIC-104 is enabled only when the density transmitter DT-301 confirms a pulp density below 3.5%. This prevents excessive wear on the slot plates. XV-107, the downstream shut-off valve, must also be fully open to allow proper flow through the system.
+
+### 4.3) Alarm and Fault Handling
+
+PIC-104 generates a high-pressure alarm if PIT-103 registers a pressure above 275 kPa for more than 5 seconds, alerting operators to potential flow restrictions or blockages. A low-pressure alarm is triggered if PIT-103 falls below 200 kPa, indicating insufficient flow through the pressure screen. Both alarms are latched and require operator acknowledgment.
+
+In the event of a transmitter fault or loss of signal from PIT-103, PIC-104 will enter a fail-safe mode, driving FV-106 to its fail-closed position. A fault alarm will be generated, and the system will inhibit the automatic mode until the fault is resolved. Anti-windup logic in PIC-104 prevents integral action from accumulating during fault conditions, ensuring stable operation upon signal restoration.
+
+A system-wide fault is triggered if PT-101 or DT-301 reports values outside their calibrated ranges, immediately closing XV-102 and XV-107 to isolate the system. Operators are required to verify and reset the interlocks before resuming normal operation.

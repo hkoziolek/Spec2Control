@@ -1,0 +1,103 @@
+Evaluation Results for multi-phase-flow-facility - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_5\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), MOTOR_VSD(1), PID_BASIC(2), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), MOTOR_VSD(1), PID_BASIC(2), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-102
+ANALOG_IN FT-104
+ANALOG_IN LI-101
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+VALVE_ELECTRIC FV-103
+MOTOR_VSD P-001
+TON FT102_Flow_Valid_TON
+TON FIC101_DevAlarm_TON
+TON FIC102_DevAlarm_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-102
+ANALOG_IN FT-104
+ANALOG_IN LI-101
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+VALVE_ELECTRIC FV-103
+
+ALL DATA CONNECTIONS:
+FT-102.PV, FIC-101.PV
+FIC-101.XOUT, FV-103.Control_Signal
+FT-104.PV, FIC-102.PV
+FIC-102.XOUT, P-001.Speed_SP
+LI-101.Low_Alarm, LevelTripOR.IN1
+LI-101.High_Alarm, LevelTripOR.IN2
+LevelTripNOT.OUT, FIC-101.AUTO
+LevelTripNOT.OUT, FIC-102.AUTO
+FT-102.General_Fault, FIC101InhibitOR.IN2
+FIC101InhibitOR.OUT, FIC-101.Inhibit
+FT-104.General_Fault, FIC102InhibitOR.IN2
+FIC102InhibitOR.OUT, FIC-102.Inhibit
+LI-101.PV, LI101_GE_25PCT.IN1
+LI101_GE_25PCT.OUT, PumpStartPermissiveAND.IN1
+FV-103.Feedback_Pos, FV103_FB_GE_90PCT.IN1
+FV103_FB_GE_90PCT.OUT, PumpStartPermissiveAND.IN2
+PumpStartPermissiveNOT.OUT, PumpInhibitOR.IN1
+LI-101.General_Fault, PumpInhibitOR.IN2
+PumpInhibitOR.OUT, P-001.Inhibit
+FT-102.PV, FT102_GT_10GPM.IN1
+FT102_GT_10GPM.OUT, FT102_Flow_Valid_TON.IN
+P-001.FB_Running, ValveOpenPermitAND.IN1
+ValveOpenPermitNOT.OUT, ValveInhibitOR1.IN1
+ValveInhibitOR1.OUT, ValveInhibitOR2.IN1
+LI-101.General_Fault, ValveInhibitOR2.IN2
+ValveInhibitOR2.OUT, FV-103.Inhibit
+FIC-101.Deviation_Alarm, FIC101_DevAlarm_TON.IN
+FIC-102.Deviation_Alarm, FIC102_DevAlarm_TON.IN
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN -> FT-102; PID_BASIC -> FIC-101; ANALOG_IN -> FT-104; PID_BASIC -> FIC-102
+- Actual Connection:
+  - FT-102.PV -> FIC-101.PV
+  - FT-104.PV -> FIC-102.PV
+- Notes: Multiple valid implementations exist. LI-101.PV does not feed a PID PV, but this does not affect satisfaction of the intended connection template.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC -> FIC-101; VALVE_ELECTRIC -> FV-103
+- Actual Connection:
+  - FIC-101.XOUT -> FV-103.Control_Signal
+- Notes: There is also a valid alternative actuation path per the allowance: FIC-102.XOUT -> P-001.Speed_SP (MOTOR_VSD), which is acceptable as an indirect fulfillment if needed. Inhibit and permissive logic around FV-103 and the PIDs appear well-integrated.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Clean, correct PV-to-PID wiring with at least one PID output directly driving the valve and another appropriately driving a VSD. Ancillary alarms, permissives, and inhibits enhance robustness without conflicting with intended connections.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

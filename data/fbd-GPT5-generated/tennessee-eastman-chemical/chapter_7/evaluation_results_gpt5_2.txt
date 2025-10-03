@@ -1,0 +1,101 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_7\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(2), PID_BASIC(3), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LI-003
+ANALOG_IN TI-008
+PID_BASIC LIC-101
+PID_BASIC LIC-103
+PID_BASIC TIC-106
+VALVE_ELECTRIC XV-104
+VALVE_ELECTRIC XV-105
+TON StartDelay
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LI-003
+ANALOG_IN TI-008
+PID_BASIC LIC-101
+PID_BASIC LIC-103
+PID_BASIC TIC-106
+VALVE_ELECTRIC XV-104
+VALVE_ELECTRIC XV-105
+
+ALL DATA CONNECTIONS:
+TI-008.PV, TIC-106.PV
+TIC-106.XOUT, XV-105.Control_Signal
+LI-003.PV, LIC-103.PV
+LIC-103.XOUT, XV-104.Control_Signal
+TI-008.General_Fault, XV105_Inhibit.IN1
+TIC-106.PV_High_Alarm, XV105_Inhibit.IN2
+LIC-101.PV_High_Alarm, XV105_Inhibit.IN3
+TempAbove200.OUT, XV105_Inhibit.IN4
+NotStartupPermissive.OUT, XV105_Inhibit.IN5
+XV105_Inhibit.OUT, XV-105.Inhibit
+LIC-101.PV_High_Alarm, TIC106_Inhibit.IN1
+TI-008.General_Fault, TIC106_Inhibit.IN2
+TIC-106.PV_High_Alarm, TIC106_Inhibit.IN3
+NotStartupPermissive.OUT, TIC106_Inhibit.IN4
+TIC106_Inhibit.OUT, TIC-106.Inhibit
+LIC-103.PV_Low_Alarm, XV104_Inhibit.IN1
+LI003_Problems.OUT, XV104_Inhibit.IN2
+XV104_Inhibit.OUT, XV-104.Inhibit
+LI-003.Low_Alarm, LI003_Problems.IN1
+LI-003.General_Fault, LI003_Problems.IN2
+LI003_Problems.OUT, LIC-103.Inhibit
+TI-008.PV, TempAbove200.IN1
+TI-008.PV, TempEmergency210.IN1
+LI-003.PV, LevelAbove30.IN1
+LevelAbove30.OUT, StartupPermissive.IN1
+StartDelay.Q, StartupPermissive.IN2
+StartupPermissive.OUT, NotStartupPermissive.IN
+TempEmergency210.OUT, XV-105.Manual_Mode
+LIC-101.PV_High_Alarm, CondensateOK.IN
+CondensateOK.OUT, TIC-106.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: TI-008 -> TIC-106; LI-003 -> LIC-103
+- Actual Connection: TI-008.PV, TIC-106.PV; LI-003.PV, LIC-103.PV
+- Notes: Both analog inputs are directly wired to corresponding PID PVs. LIC-101 is present but not wired to an analog PV; it appears to be used for alarms/permissives rather than as a control loop PV consumer.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: TIC-106 -> XV-105; LIC-103 -> XV-104
+- Actual Connection: TIC-106.XOUT, XV-105.Control_Signal; LIC-103.XOUT, XV-104.Control_Signal
+- Notes: Direct drive to valves is implemented for both loops. No indirect routing to MOTOR_VSD.Speed_SP is present, and none is needed here. Inhibit/permissive logic around the valves and PIDs is integrated (e.g., XV105_Inhibit and XV104_Inhibit, TIC106_Inhibit).
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: Solid implementation: both intended connection types are implemented directly for two control loops (temperature and level). Ancillary inhibit and permissive logic is well-structured. One PID (LIC-101) functions in alarm/permissive logic rather than a closed control loop, which aligns with the available blocks.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

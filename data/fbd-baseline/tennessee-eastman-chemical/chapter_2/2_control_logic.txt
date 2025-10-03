@@ -1,0 +1,63 @@
+* Function Blocks *
+ANALOG_IN FIT-101
+ANALOG_IN PI-001
+PID_BASIC FIC-104
+VALVE_ELECTRIC PV-103
+VALVE_ON_OFF XV-106
+BOOL_IN IAL-101
+DIGITAL_IN FAL-101
+DIGITAL_IN FAL-102
+DIGITAL_IN FAL-103
+
+* Variables *
+REAL FIT101_Flow_PV_GPM
+REAL PI001_Pressure_PV_psig
+REAL FIC104_MV_to_PV103_Pct
+
+* Functions *
+NOT XV106NotOpen
+OR XV106Interlock
+OR FIC104Inhibit
+
+* Data Connections * 
+FIT-101.PV, FIC-104.PV
+FIC-104.XOUT, PV-103.Control_Signal
+FIT-101.High_Alarm, FAL-101.DI_Raw
+FIT-101.Low_Alarm, FAL-102.DI_Raw
+FIT-101.General_Fault, FAL-103.DI_Raw
+XV-106.Alarm_Position_Error, XV106Interlock.IN2
+XV-106.Alarm_General, XV106Interlock.IN3
+XV-106.FB_Opened, XV106NotOpen.IN
+XV106NotOpen.OUT, XV106Interlock.IN1
+XV106Interlock.OUT, IAL-101.Bool_In
+IAL-101.Bool_Out, FIC104Inhibit.IN1
+FAL-103.DI_Out, FIC104Inhibit.IN2
+PI-001.High_Alarm, FIC104Inhibit.IN3
+PI-001.Low_Alarm, FIC104Inhibit.IN4
+FAL-101.DI_OUT, FIC104Inhibit.IN5
+FAL-102.DI_OUT, FIC104Inhibit.IN6
+FIC104Inhibit.OUT, FIC-104.Inhibit
+FAL-103.DI_Out, PV-103.Inhibit
+FIT-101.PV, FIT101_Flow_PV_GPM
+PI-001.PV, PI001_Pressure_PV_psig
+FIC-104.XOUT, FIC104_MV_to_PV103_Pct
+
+* Parameter Data Connections *
+12.5, FIT-101.Scaling_Slope
+-50.0, FIT-101.Scaling_Offset
+180.0, FIT-101.PV_High
+40.0, FIT-101.PV_Low
+TRUE, FIT-101.Alarm_Enable
+100.0, FIC-104.SP
+0.0, FIC-104.MV_MIN
+100.0, FIC-104.MV_MAX
+1.5, FIC-104.KP
+0.6, FIC-104.TR
+0.1, FIC-104.TD
+0.0, FIC-104.X0
+0.0, PV-103.Close_Limit
+100.0, PV-103.Open_Limit
+0.0, PV-103.Manual_Position
+TRUE, PI-001.Alarm_Enable
+TRUE, IAL-101.Alarm_OnTrue
+TRUE, IAL-101.Latch_Enable

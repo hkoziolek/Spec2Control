@@ -1,0 +1,30 @@
+## 7 **Column 3 and Reboiler**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|LI-003 | Level Transmitter | Measures liquid level in Column 3 with 0–100% range output. |
+|LIC-101 | Level Controller | Maintains liquid level in Column 1 at setpoint. |
+|LIC-103 | Level Controller | Controls liquid outlet flow to maintain Column 3 level. |
+|TI-008 | Temperature Transmitter | Measures Column 3 temperature with 0–250°C range. |
+|TIC-106 | Temperature Controller | Regulates steam flow to reboiler to control Column 3 temperature. |
+|XV-104 | On-Off Valve | Modulates liquid outlet flow from Column 3. |
+|XV-105 | On-Off Valve | Controls steam flow to reboiler for Column 3 temperature regulation. |
+
+### 7.1) Control Strategy Description
+
+The temperature within Column 3 is controlled by TIC-106, which regulates the steam flow to the associated reboiler via XV-105. TIC-106 operates as a reverse-acting PID controller to maintain the column temperature at the setpoint of 180°C. The process variable (PV) is provided by TI8, which measures the column temperature with a transmitter range of 0–250°C and outputs a 4–20mA signal. The manipulated variable (MV) from TIC-106 adjusts the position of XV-105, a fail-closed control valve, with an actuator range of 0–100% open.
+
+PID tuning parameters for TIC-106 are configured as follows: proportional gain (Kp) = 3.2, integral time (Ki) = 1.0 min, and derivative time (Kd) = 0.3 min. The controller output range is clamped between 5–95% to prevent overcorrection. Bumpless transfer is enabled to ensure seamless switching between manual and automatic modes. Signal scaling is applied to normalize the input from TI8 to match the controller input range.
+
+The level within Column 3 is maintained by LIC-103, which controls the liquid outlet flow via XV-104. LIC-103 is configured as a direct-acting PID controller with a setpoint of 70% level. The PV is derived from LI3, which has a measurement span of 0–100% and outputs a 4–20mA signal. The MV modulates XV-104, a fail-open valve, with a control range of 0–100% open. PID tuning parameters for LIC-103 are set as follows: Kp = 2.5, Ki = 0.8 min, and Kd = 0.1 min. Anti-windup logic is implemented to prevent integral accumulation during saturation events.
+
+### 7.2) Interlocks and Permissives
+
+Steam flow control through XV-105 is inhibited unless the column temperature, as measured by TI8, is below 200°C to prevent overheating. Additionally, TIC-106 output is locked at 0% if the reboiler condensate level, monitored by LIC-101, exceeds 85% to avoid flooding. The startup sequence for Column 3 requires a permissive signal from LIC-103 indicating the column level is above 30% and a delay of 12 seconds after the start command to ensure proper stabilization.
+
+XV-104 is interlocked to close if the column level, as measured by LI3, falls below 15% to prevent pump cavitation. The control logic includes a deadband of ±2% around the LIC-103 setpoint to minimize hunting. Both TIC-106 and LIC-103 are configured with mode selection logic to allow manual override during maintenance operations.
+
+### 7.3) Alarm and Fault Handling
+
+High-temperature alarms are triggered when TI8 exceeds 195°C, and an emergency shutdown signal is sent to close XV-105 if the temperature reaches 210°C. TIC-106 generates a fault alarm if the PV deviates from the SP by more than 10°C for over 30 seconds. Low-level alarms are activated when LI3 falls below 10%, with LIC-103 entering a fault mode that locks XV-104 at 0% open.
+
+In the event of transmitter failure for TI8 or LI3, TIC-106 and LIC-103 default to manual mode with their outputs frozen at the last known value. Diagnostic alarms are raised for signal loss or transmitter calibration errors. Alarm acknowledgment is required before resuming automatic control, and fault conditions are logged for maintenance review.

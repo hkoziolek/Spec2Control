@@ -1,0 +1,33 @@
+## 2 **Influent & Headworks**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|BS-101 | Interlock | Prevents pump operation under unsafe conditions |
+|FT-101 | Flow Transmitter | Measures influent flow rate |
+|LS-101 | Level Transmitter | Monitors wet well level |
+|P-101A | Pump | Primary influent pump for wet well level control |
+|P-101B | Pump | Standby influent pump activated upon P-101A failure |
+|PIC-101 | Level Controller | Regulates wet well level via pump speed control |
+|VG-101 | Vacuum Gauge | Measures vacuum pressure in associated equipment |
+|XV-101 | On-Off Valve | Controls flow isolation in the influent line |
+
+### 2.1) Control Strategy Description
+
+The influent wet well level is maintained using a PID control loop centered on LS-101 (Wet Well Level Transmitter) as the process variable (PV). LS-101 measures the wet well level in the range of 0 to 10 meters, transmitting a 4-20 mA signal to PIC-101 (Wet Well Level Controller). The target setpoint (SP) for the wet well level is 5.5 meters, ensuring optimal pump operation and preventing overflow or pump cavitation.
+
+PIC-101 is configured as a reverse-acting controller, where an increase in PV results in a decrease in the manipulated variable (MV) to maintain the SP. The PID tuning parameters are set as follows: proportional gain (Kp) = 2.0, integral time (Ki) = 1.5 minutes, and derivative time (Kd) = 0.3 minutes. The controller output (MV) ranges from 0% to 100%, corresponding to the speed control of P-101A/B (Influent Pumps). Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes.
+
+The final control element is the pump speed control for P-101A/B, which adjusts influent flow to maintain the wet well level. P-101A is the primary pump, and P-101B serves as the standby pump, automatically starting upon failure of P-101A. The pump speed is modulated based on the MV from PIC-101, with a minimum speed limit of 30% to prevent pump stalling and a maximum limit of 90% to avoid excessive wear.
+
+### 2.2) Interlocks and Permissives
+
+The operation of P-101A/B is governed by interlocks tied to LS-101 and FT-101 (Influent Flow Transmitter). P-101A/B will not start unless LS-101 indicates a level above 2.0 meters to prevent dry running. Similarly, if LS-101 exceeds 9.0 meters, both pumps will shut down to prevent overflow. FT-101 measures influent flow in the range of 0 to 500 m³/h, transmitting a 4-20 mA signal to the PLC. The PLC ensures that the combined flow rate from P-101A/B does not exceed 450 m³/h, clamping the MV from PIC-101 accordingly.
+
+Bar screens BS-101 and vortex grit unit VG-101 are interlocked with the wet well level logic. BS-101 will stop operation if LS-101 falls below 2.0 meters to prevent damage due to insufficient flow. VG-101 will not start unless FT-101 confirms a minimum influent flow rate of 50 m³/h to ensure proper grit removal functionality.
+
+### 2.3) Alarm and Fault Handling
+
+LS-101 provides high and low-level alarms at 8.5 meters and 1.5 meters, respectively. A high-level alarm triggers an immediate shutdown of P-101A/B and closes XV-101 (Shut-off Valve) to isolate the wet well. A low-level alarm disables BS-101 and VG-101 to prevent damage to equipment operating without sufficient flow.
+
+PIC-101 includes anti-windup logic to prevent integral accumulation during pump shutdown conditions. If LS-101 detects a level below 2.0 meters, the PID controller output is clamped at 0%, and the integral term is reset to avoid overshooting upon restart. Similarly, a deadband of ±0.1 meters around the SP is implemented to prevent control hunting when the level is stable.
+
+Fault conditions for LS-101, FT-101, or P-101A/B are monitored by the PLC. If LS-101 or FT-101 fails, the system switches to manual mode, allowing operators to control pump speed directly. If P-101A fails, P-101B automatically starts, and an alarm is sent to the SCADA system for operator intervention.

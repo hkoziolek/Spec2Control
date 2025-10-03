@@ -1,0 +1,130 @@
+* Function Blocks *
+ANALOG_IN CT-601
+ANALOG_IN FT-601
+ANALOG_IN PIT-601
+ANALOG_IN VT-601
+BOOL_IN FS-601
+BOOL_IN P-601_RUN
+VALVE_ELECTRIC FV-601
+PID_BASIC FIC-601
+RATIO_CONTROL FFIC-601
+TON ProcessUpset_Timer
+
+* Variables *
+REAL CT_601_PV
+REAL FT_601_PV
+REAL FT_601_SP
+REAL PIT_601_PV
+REAL VT_601_PV
+BOOL FS_601_MinFlow_OK
+BOOL P_601_Run_OK
+REAL FFIC601_Bias
+BOOL ALM_601
+BOOL ALM_601_High
+BOOL ALM_601_Low
+BOOL ALM_602
+BOOL ALM_603
+BOOL ALM_604
+BOOL Process_Permissives_OK
+BOOL MasterInhibit
+BOOL CT601_RateHigh
+
+* Functions *
+NOT PumpRun_Fault
+NOT MinFlow_Fault
+OR CT_Failure
+OR FT_Failure
+OR Inhibit_Any
+NOT Auto_Enable
+GT SlaveSP_TooHigh
+LT SlaveSP_TooLow
+OR SlaveSP_LimitAlarm
+
+* Data Connections * 
+CT-601.PV, FFIC-601.PrimaryPV
+FT-601.PV, FFIC-601.SecondaryPV
+FFIC-601.SlaveSP, FIC-601.SP
+FT-601.PV, FIC-601.PV
+FIC-601.XOUT, FV-601.Control_Signal
+
+P-601_RUN.Bool_Out, PumpRun_Fault.IN
+FS-601.Bool_Out, MinFlow_Fault.IN
+
+CT-601.High_Alarm, CT_Failure.IN1
+CT-601.Low_Alarm, CT_Failure.IN2
+CT-601.General_Fault, CT_Failure.IN3
+
+FT-601.High_Alarm, FT_Failure.IN1
+FT-601.Low_Alarm, FT_Failure.IN2
+FT-601.General_Fault, FT_Failure.IN3
+
+PumpRun_Fault.OUT, Inhibit_Any.IN1
+MinFlow_Fault.OUT, Inhibit_Any.IN2
+PIT-601.Low_Alarm, Inhibit_Any.IN3
+VT-601.Low_Alarm, Inhibit_Any.IN4
+CT_Failure.OUT, Inhibit_Any.IN5
+FT_Failure.OUT, Inhibit_Any.IN6
+
+Inhibit_Any.OUT, FFIC-601.Inhibit
+Inhibit_Any.OUT, FIC-601.Inhibit
+Inhibit_Any.OUT, FV-601.Inhibit
+Inhibit_Any.OUT, Auto_Enable.IN
+Auto_Enable.OUT, FFIC-601.Auto
+Auto_Enable.OUT, FIC-601.AUTO
+Inhibit_Any.OUT, FV-601.Manual_Mode
+
+FFIC-601.SlaveSP, SlaveSP_TooHigh.IN1
+FFIC-601.SlaveSP, SlaveSP_TooLow.IN1
+SlaveSP_TooHigh.OUT, SlaveSP_LimitAlarm.IN1
+SlaveSP_TooLow.OUT, SlaveSP_LimitAlarm.IN2
+SlaveSP_LimitAlarm.OUT, ALM_601
+
+CT_Failure.OUT, ALM_602
+FT_Failure.OUT, ALM_603
+CT601_RateHigh, ProcessUpset_Timer.IN
+ProcessUpset_Timer.Q, ALM_604
+
+CT-601.PV, CT_601_PV
+FT-601.PV, FT_601_PV
+FFIC-601.SlaveSP, FT_601_SP
+PIT-601.PV, PIT_601_PV
+VT-601.PV, VT_601_PV
+FS-601.Bool_Out, FS_601_MinFlow_OK
+P-601_RUN.Bool_Out, P_601_Run_OK
+Inhibit_Any.OUT, MasterInhibit
+Auto_Enable.OUT, Process_Permissives_OK
+FFIC601_Bias, FFIC-601.Bias
+
+* Parameter Data Connections *
+2.5, FFIC-601.RatioSP
+10.0, FFIC-601.MV_MIN
+500.0, FFIC-601.MV_MAX
+0.1, FFIC-601.TrimKp
+T#2s, FFIC-601.TrimTi
+
+TRUE, CT-601.Alarm_Enable
+
+10.0, FT-601.PV_Low
+500.0, FT-601.PV_High
+TRUE, FT-601.Alarm_Enable
+
+300.0, PIT-601.PV_Low
+TRUE, PIT-601.Alarm_Enable
+
+TRUE, VT-601.Alarm_Enable
+
+TRUE, P-601_RUN.Alarm_OnFalse
+TRUE, FS-601.Alarm_OnFalse
+
+20.0, FV-601.Manual_Position
+0.0, FV-601.Close_Limit
+100.0, FV-601.Open_Limit
+
+20.0, FIC-601.X0
+0.0, FIC-601.MV_MIN
+100.0, FIC-601.MV_MAX
+
+500.0, SlaveSP_TooHigh.IN2
+10.0, SlaveSP_TooLow.IN2
+T#10s, ProcessUpset_Timer.PT
+

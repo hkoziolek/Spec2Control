@@ -1,0 +1,33 @@
+## 3 **Continuous Digester**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-202 | Flow Controller | Adjusts liquor recirculation flow to maintain pressure setpoint. |
+|FC-203 | Flow Controller | Modulates steam flow to control digester temperature. |
+|FV-202 | Flow Valve | Regulates liquor flow for pressure control. |
+|PIC-101 | Pressure Controller | Maintains digester pressure at a setpoint of 800 kPa. |
+|PT-101 | Pressure Transmitter | Measures digester pressure for control purposes. |
+|SV-203 | Steam Valve | Controls steam flow to adjust digester temperature. |
+|TIC-104 | Temperature Controller | Regulates digester temperature at a setpoint of 170 °C. |
+|TT-103 | Temperature Transmitter | Measures digester temperature for control feedback. |
+
+### 3.1) Control Strategy Description
+
+The continuous digester operates with a cascade control system to regulate chip feed rate, white liquor ratio, digester temperature, pressure, and slurry consistency. The primary loop, configured as a temperature control loop, ensures stable digester temperature at a setpoint of 170 °C using TIC-104. TIC-104 receives temperature measurements from TT-103, which is scaled linearly to provide calibrated values between 20 °C and 200 °C. The output of TIC-104 serves as the remote setpoint (RSP) for the secondary loop, which controls steam flow via FC-203. FC-203 modulates the steam control valve (SV-203) to maintain rapid response to temperature disturbances. Secondary loop tuning parameters are set to Kp=3.5 and Ki=0.3 min to ensure a faster response time compared to the primary loop, which is tuned to Kp=1.2 and Ki=2.0 min.
+
+The pressure control loop operates similarly, with PT-101 measuring digester pressure and PIC-101 maintaining a setpoint of 800 kPa. PIC-101 outputs a remote setpoint to FC-202, which adjusts the liquor recirculation flow through valve FV-202. This configuration ensures stable pressure control while rejecting disturbances in the liquor flow. The secondary loop response time is configured to be 7 times faster than the primary loop to prevent cascade hunting and ensure smooth operation.
+
+Manual setpoint changes for TIC-104 and PIC-101 are clamped between 20 °C and 90 °C and 700 kPa to 900 kPa, respectively, to maintain operational safety. Deadband logic with a hysteresis of 3% is applied to prevent rapid switching between control states near the setpoints. Signal scaling between the primary and secondary controllers ensures proper interaction, with TIC-104 output scaled to match the input range of FC-203 (0–100% RSP).
+
+### 3.2) Interlocks and Permissives
+
+Steam flow control (FC-203) is interlocked with high-pressure permissives from PT-101. If PT-101 detects pressure exceeding 900 kPa, FC-203 output is overridden to close SV-203 fully, preventing overpressure conditions. Similarly, liquor recirculation control (FC-202) is interlocked with low-pressure permissives; if PT-101 detects pressure below 700 kPa, FC-202 output is overridden to fully open FV-202 to restore pressure. Temperature control via TIC-104 is interlocked with TT-103 signal validity; if TT-103 fails or provides erroneous data, TIC-104 enters manual mode, and steam flow is adjusted manually through FC-203.
+
+Cascade mode activation requires permissives confirming valid signals from TT-103 and PT-101, as well as confirmation that the secondary controllers (FC-203 and FC-202) are operational. Transition delays of 5 seconds are applied during mode switching to prevent abrupt changes in control action. If any permissive fails, the system defaults to local/manual control mode.
+
+### 3.3) Alarm and Fault Handling
+
+High-temperature alarms are triggered if TT-103 detects a temperature exceeding 180 °C. TIC-104 responds by reducing the RSP to FC-203, throttling steam flow through SV-203. If temperature exceeds 185 °C, an emergency shutdown sequence is initiated, closing SV-203 and isolating the digester. Low-temperature alarms activate if TT-103 detects a temperature below 160 °C, prompting TIC-104 to increase the RSP to FC-203 to restore temperature.
+
+Pressure alarms are similarly configured, with high-pressure alarms activating at 850 kPa and low-pressure alarms at 750 kPa. PIC-101 adjusts the RSP to FC-202 to mitigate pressure deviations. If PT-101 fails or provides invalid data, PIC-101 enters manual mode, and FV-202 is adjusted manually.
+
+Secondary loop failures, such as FC-203 or FC-202 malfunction, result in the primary controllers (TIC-104 and PIC-101) entering manual mode. Cascade mode is disabled, and operators are alerted through fault indicators. Alarm acknowledgment is required to reset the system to automatic control once faults are resolved.

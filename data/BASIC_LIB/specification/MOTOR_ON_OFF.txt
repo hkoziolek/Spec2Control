@@ -1,0 +1,13 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of motor's purpose.
+Input,Start_Cmd,BOOL,Command to start the motor.
+Input,Stop_Cmd,BOOL,Command to stop the motor.
+Input,Start_Delay,TIME,Delay before motor starts after command.
+Input,MinRunTime,TIME,Minimum time motor must run once started.
+Input,Inhibit,BOOL,Inhibits starting the motor and can receive alarm signals.
+Output,Motor_Start_Out,BOOL,Output to motor starter.
+Output,FB_Running,BOOL,Feedback indicating motor is running.
+Output,FB_Trip,BOOL,Feedback indicating motor has tripped (overload, fault).
+Output,Alarm_Start_Fail,BOOL,Indicates motor failed to start.
+Output,Alarm_Stop_Fail,BOOL,Indicates motor failed to stop.

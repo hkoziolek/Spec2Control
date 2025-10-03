@@ -1,0 +1,13 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the electric control valve. 
+Input,Description,STRING,Longer description of the valve's role. 
+Input,Open_Cmd,BOOL,Command to open the valve.
+Input,Close_Cmd,BOOL,Command to close the valve.
+Input,Timeout,TIME,Maximum time allowed for valve to reach position.
+Input,Inhibit,BOOL,Inhibits operating the valve and can receive alarm signals.
+Output,FB_Opened,BOOL,Feedback from 'Valve Open' limit switch.
+Output,FB_Closed,BOOL,Feedback from 'Valve Closed' limit switch.
+Output,Valve_Open_Out,BOOL,Output to open the valve.
+Output,Valve_Close_Out,BOOL,Output to close the valve.
+Output,Alarm_Position_Error,BOOL,Indicates position discrepancy or timeout.
+Output,Alarm_General,BOOL,General valve fault.

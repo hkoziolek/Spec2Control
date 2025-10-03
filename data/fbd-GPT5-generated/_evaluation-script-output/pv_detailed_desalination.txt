@@ -1,0 +1,77 @@
+PV Alarm Parameter Analysis - desalination
+Generated: 2025-09-24 16:37:22
+====================================================================================================
+
+Chapter      Required PVs Accuracy % Additional PVs
+-------------------------------------------------
+chapter_2    7/7          100.0      4            
+chapter_3    3/3          100.0      6            
+chapter_4    0/2          0.0        0            
+chapter_5    2/2          100.0      3            
+chapter_6    0/0          0.0        2            
+
+Plant Summary: Required PVs: 12/14 (85.7%), Additional PVs: 15
+
+====================================================================================================
+DETAILED PV ANALYSIS
+====================================================================================================
+
+chapter_2
+------------------------------------------------------------
+[OK] Found Required PVs (7):
+  [=] AT-101.PV_High: reviewed=50, output=50
+  [=] AT-103.PV_High: reviewed=35, output=35
+  [=] FT-101.PV_High: reviewed=5500, output=5500
+  [=] FT-101.PV_Low: reviewed=450, output=450
+  [=] FT-102.PV_High: reviewed=3300, output=3300
+  [=] FT-102.PV_Low: reviewed=270, output=270
+  [=] LT-104.PV_Low: reviewed=2.0, output=2.0
+
+[ADD] Additional PVs (4):
+  - AT-101.PV_Low: 0
+  - AT-103.PV_Low: 0
+  - LT-105.PV_High: 95
+  - LT-105.PV_Low: 0
+
+
+chapter_3
+------------------------------------------------------------
+[OK] Found Required PVs (3):
+  [=] FT-101.PV_Low: reviewed=50.0, output=50.0
+  [=] PT-108.PV_High: reviewed=9.0, output=9.0
+  [=] PT-108.PV_Low: reviewed=5.0, output=5.0
+
+[ADD] Additional PVs (6):
+  - PIT-105.PV_High: 8.0
+  - PIT-105.PV_Low: 4.0
+  - PIT-106.PV_High: 8.0
+  - PIT-106.PV_Low: 4.0
+  - PT-103.PV_Low: 6.0
+  - PT-104.PV_Low: 6.0
+
+
+chapter_4
+------------------------------------------------------------
+[FALSE] Found but Wrong Values (2):
+  [!=] LT-101.PV_High: reviewed=9.0, output=8.0
+  [!=] LT-101.PV_Low: reviewed=1.5, output=2.0
+
+
+chapter_5
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] FT-301.PV_High: reviewed=48.0, output=48.0
+  [=] FT-301.PV_Low: reviewed=8.0, output=8.0
+
+[ADD] Additional PVs (3):
+  - FIC-301.PV_High: 48.0
+  - FIC-301.PV_Low: 8.0
+  - LT-301.PV_Low: 20.0
+
+
+chapter_6
+------------------------------------------------------------
+[ADD] Additional PVs (2):
+  - FIT-101.PV_High: 1000.0
+  - FIT-101.PV_Low: 50.0
+

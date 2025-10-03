@@ -1,0 +1,26 @@
+## 7 **Air Compressor Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|PIC-105 | Pressure Controller | Maintains system pressure using PID control logic |
+|PIT-106 | Pressure Transmitter | Measures system pressure for feedback to controller |
+|V-010 | Control Valve | Modulates air flow to maintain pressure setpoint |
+
+### 7.1) Control Strategy Description
+
+The air compressor control system utilizes a PID feedback loop to maintain the pressure of compressed air within the system. The controlled variable (PV) is the pressure measured by PIT-106, with the target setpoint (SP) configured at 8.5 bar. The pressure indicator controller PIC-105 is configured as a reverse-acting controller to reduce the manipulated variable (MV) output when the process variable exceeds the setpoint.
+
+The PID tuning parameters for PIC-105 are defined as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.3 minutes. The output range of PIC-105 is clamped between 0% and 100% to ensure safe operation of the final control element. The final control element is a modulating valve V10, which is configured to fail-closed upon loss of signal to prevent over-pressurization.
+
+The pressure transmitter PIT-106 provides a 4-20 mA signal corresponding to a pressure range of 0 to 10 bar. Signal scaling is applied within PIC-105 to normalize the input for the PID algorithm. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes.
+
+### 7.2) Interlocks and Permissives
+
+The operation of PIC-105 is interlocked with the status of the air compressor. The compressor must be running, as indicated by a permissive signal from the compressor control system, before PIC-105 can adjust V10. Additionally, the pressure measured by PIT-106 must remain within the range of 0.5 bar to 10 bar; if the pressure falls outside this range, the controller output is disabled, and V10 is forced to its fail-closed position.
+
+A timer delay of 7 seconds is integrated into the control logic to filter transient pressure spikes upon compressor startup. This ensures that PIC-105 does not react to temporary fluctuations that could destabilize the system.
+
+### 7.3) Alarm and Fault Handling
+
+High-pressure and low-pressure alarms are configured based on the readings from PIT-106. A high-pressure alarm is triggered if the pressure exceeds 9.5 bar, while a low-pressure alarm is activated if the pressure drops below 0.5 bar. Both alarms are displayed on the operator interface and require acknowledgment.
+
+In the event of a transmitter fault or loss of signal from PIT-106, PIC-105 enters a fault state, and V10 is driven to its fail-closed position. The system also generates a fault alarm to notify operators of the issue. Diagnostic logic within PIC-105 monitors for controller output saturation and integral windup conditions, activating an anti-windup mechanism to prevent control instability.

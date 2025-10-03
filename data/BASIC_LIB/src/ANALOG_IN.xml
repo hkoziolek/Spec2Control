@@ -1,0 +1,73 @@
+      <pou name="ANALOG_IN" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Raw_Signal">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="PV_High">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="PV_Low">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Scaling_Slope">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Scaling_Offset">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Enable">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PV">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="High_Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Low_Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="General_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

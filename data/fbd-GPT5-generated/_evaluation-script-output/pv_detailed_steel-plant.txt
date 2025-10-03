@@ -1,0 +1,133 @@
+PV Alarm Parameter Analysis - steel-plant
+Generated: 2025-09-24 16:37:22
+====================================================================================================
+
+Chapter      Required PVs Accuracy % Additional PVs
+-------------------------------------------------
+chapter_2    2/2          100.0      1            
+chapter_3    3/3          100.0      6            
+chapter_4    4/4          100.0      3            
+chapter_5    0/0          0.0        10           
+chapter_6    2/4          50.0       4            
+chapter_7    1/2          50.0       2            
+chapter_8    1/1          100.0      7            
+chapter_9    0/0          0.0        8            
+
+Plant Summary: Required PVs: 13/16 (81.2%), Additional PVs: 41
+
+====================================================================================================
+DETAILED PV ANALYSIS
+====================================================================================================
+
+chapter_2
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] FT-101.PV_Low: reviewed=50.0, output=50.0
+  [=] TIT-101.PV_Low: reviewed=800.0, output=800.0
+
+[ADD] Additional PVs (1):
+  - FT-101.PV_High: 1000.0
+
+
+chapter_3
+------------------------------------------------------------
+[OK] Found Required PVs (3):
+  [=] PT-201A.PV_High: reviewed=100.0, output=100.0
+  [=] PT-201B.PV_High: reviewed=100.0, output=100.0
+  [=] PT-201C.PV_High: reviewed=100.0, output=100.0
+
+[ADD] Additional PVs (6):
+  - PT-201A.PV_Low: 21.0
+  - PT-201B.PV_Low: 21.0
+  - PT-201C.PV_Low: 21.0
+  - TT-201A.PV_High: 75.0
+  - TT-201B.PV_High: 75.0
+  - TT-201C.PV_High: 75.0
+
+
+chapter_4
+------------------------------------------------------------
+[OK] Found Required PVs (4):
+  [=] FIC-302.PV_High: reviewed=9000.0, output=9000.0
+  [=] FIC-302.PV_Low: reviewed=200.0, output=200.0
+  [=] FT-301.PV_High: reviewed=5000.0, output=5000.0
+  [=] FT-301.PV_Low: reviewed=100.0, output=100.0
+
+[ADD] Additional PVs (3):
+  - PT-301.PV_High: 2.5
+  - PT-301.PV_Low: 1.5
+  - TT-301.PV_Low: 900.0
+
+
+chapter_5
+------------------------------------------------------------
+[ADD] Additional PVs (10):
+  - FT-401.PV_Low: 500.0
+  - PT-401A.PV_High: 120.0
+  - PT-401A.PV_Low: 90.0
+  - PT-401B.PV_High: 120.0
+  - PT-401B.PV_Low: 90.0
+  - PT-401C.PV_High: 120.0
+  - PT-401C.PV_Low: 90.0
+  - TT-401A.PV_High: 1450.0
+  - TT-401B.PV_High: 1450.0
+  - TT-401C.PV_High: 1450.0
+
+
+chapter_6
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] TT-501.PV_High: reviewed=1650, output=1650
+  [=] TT-501.PV_Low: reviewed=1500, output=1500
+
+[MISS] Missed Required PVs (2):
+  - TT-501_CTRL.PV_High: 1650
+  - TT-501_CTRL.PV_Low: 1500
+
+[ADD] Additional PVs (4):
+  - PT-501.PV_Low: 0.8
+  - SM-501.EA_POS.PV_Low: 10
+  - TT-501_LOOP.PV_High: 1650
+  - TT-501_LOOP.PV_Low: 1500
+
+
+chapter_7
+------------------------------------------------------------
+[OK] Found Required PVs (1):
+  [=] TT-601.PV_High: reviewed=950, output=950
+
+[FALSE] Found but Wrong Values (1):
+  [!=] LIT-101.PV_High: reviewed=280, output=250
+
+[ADD] Additional PVs (2):
+  - FT-601.PV_Low: 37.5
+  - LIC-101.PV_High: 280
+
+
+chapter_8
+------------------------------------------------------------
+[OK] Found Required PVs (1):
+  [=] TT-701.PV_High: reviewed=1200.0, output=1200.0
+
+[ADD] Additional PVs (7):
+  - FIC-702.PV_High: 15000.0
+  - FIC-702.PV_Low: 0.0
+  - FT-701.PV_High: 5000.0
+  - FT-701.PV_Low: 200.0
+  - FT-702.PV_High: 15000.0
+  - FT-702.PV_Low: 0.0
+  - TT-701.PV_Low: 800.0
+
+
+chapter_9
+------------------------------------------------------------
+[ADD] Additional PVs (8):
+  - FIC-802.PV_High: 6000.0
+  - FIC-802.PV_Low: 0.0
+  - FT-801.PV_High: 5000.0
+  - FT-801.PV_Low: 100.0
+  - FT-802.PV_High: 6000.0
+  - FT-802.PV_Low: 0.0
+  - PT-801.PV_High: 2.0
+  - PT-801.PV_Low: 0.5
+

@@ -1,0 +1,70 @@
+* Function Blocks *
+ANALOG_IN PT-501
+ANALOG_IN TT-501
+VALVE_ELECTRIC SM-501
+PID_BASIC TT-501_CTRL
+DIGITAL_IN SM-501.LID_POS
+TON HeatingEnableDelay_TON
+
+* Variables *
+REAL PT_501_Pressure_PV
+REAL TT_501_Temperature_PV
+REAL TT_501_MV
+REAL SM_501_EA_POS
+REAL SM_501_EA_CMD
+
+* Functions *
+OR HeatingInhibit_OR
+NOT LidNotClosed_NOT
+LE EAposLE10_LE
+NOT HeatingEnableReq_NOT
+NOT AutoMode_NOT
+
+* Data Connections *
+TT-501.PV, TT-501_CTRL.PV
+TT-501_CTRL.XOUT, SM-501.Control_Signal
+SM-501.Feedback_Pos, TT-501_CTRL.X0
+SM-501.LID_POS.DI_Out, LidNotClosed_NOT.IN
+LidNotClosed_NOT.OUT, HeatingInhibit_OR.IN1
+TT-501.High_Alarm, HeatingInhibit_OR.IN2
+PT-501.Low_Alarm, HeatingInhibit_OR.IN3
+TT-501.General_Fault, HeatingInhibit_OR.IN4
+SM-501.Alarm, HeatingInhibit_OR.IN5
+SM-501.Feedback_Pos, EAposLE10_LE.IN1
+EAposLE10_LE.OUT, HeatingInhibit_OR.IN6
+HeatingInhibit_OR.OUT, TT-501_CTRL.Inhibit
+HeatingInhibit_OR.OUT, SM-501.Inhibit
+HeatingInhibit_OR.OUT, HeatingEnableReq_NOT.IN
+HeatingEnableReq_NOT.OUT, HeatingEnableDelay_TON.IN
+HeatingEnableDelay_TON.Q, TT-501_CTRL.AUTO
+HeatingEnableDelay_TON.Q, AutoMode_NOT.IN
+AutoMode_NOT.OUT, SM-501.Manual_Mode
+PT-501.PV, PT_501_Pressure_PV
+TT-501.PV, TT_501_Temperature_PV
+TT-501_CTRL.XOUT, TT_501_MV
+SM-501.Feedback_Pos, SM_501_EA_POS
+SM-501.Valve_Position, SM_501_EA_CMD
+
+* Parameter Data Connections *
+37.5, TT-501.Scaling_Slope
+1050, TT-501.Scaling_Offset
+TRUE, TT-501.Alarm_Enable
+1650, TT-501.PV_High
+1500, TT-501.PV_Low
+TRUE, PT-501.Alarm_Enable
+1620, TT-501_CTRL.SP
+0, TT-501_CTRL.MV_MIN
+100, TT-501_CTRL.MV_MAX
+3.2, TT-501_CTRL.KP
+1.5, TT-501_CTRL.TR
+0.3, TT-501_CTRL.TD
+1650, TT-501_CTRL.PV_High
+1500, TT-501_CTRL.PV_Low
+2, TT-501_CTRL.Deviation_Limit
+0, SM-501.Close_Limit
+100, SM-501.Open_Limit
+T#5s, SM-501.Timeout
+0, SM-501.Manual_Position
+T#10s, HeatingEnableDelay_TON.PT
+10, EAposLE10_LE.IN2
+

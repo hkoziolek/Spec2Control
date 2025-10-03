@@ -1,0 +1,76 @@
+Evaluation Results for coking-refinery - chapter_9
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_9\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_9\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_9\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_9\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PT-106
+PID_BASIC PIC-101
+VALVE_ELECTRIC FV-102
+BOOL_IN LC-801
+TON PressDev30s_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PT-106
+PID_BASIC PIC-101
+VALVE_ELECTRIC FV-102
+
+ALL DATA CONNECTIONS:
+PT-106.PV, PIC-101.PV
+PIC-101.XOUT, FV-102.Control_Signal
+PT-106.General_Fault, PIDInhibit_OR.IN1
+FV-102.Position_Error, PIDInhibit_OR.IN2
+PIDInhibit_OR.OUT, PIC-101.Inhibit
+LC-801.Bool_Out, FV-102.Inhibit
+PIC-101.PV_High_Alarm, PressAlarm_OR.IN1
+PIC-101.PV_Low_Alarm, PressAlarm_OR.IN2
+PressAlarm_OR.OUT, PressDev30s_TON.IN
+PressDev30s_TON.Q, FV-102.Manual_Mode
+PT-106.General_Fault, PIDAuto_NOT.IN
+PIDAuto_NOT.OUT, PIC-101.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+For intended connection ANALOG_IN.PV to PID_BASIC.PV:
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN PT-106 -> PID_BASIC PIC-101
+   Actual Connection: PT-106.PV, PIC-101.PV
+   Notes: Direct PV feed is present. Additional logic handles PT-106 fault (driving PIC-101.Inhibit via PIDInhibit_OR and influencing PIC-101.AUTO via PIDAuto_NOT). PV alarms (high/low) are integrated, feeding a timer that can force the valve to manual mode.
+
+For intended connection PID_BASIC.XOUT to VALVE_ELECTRIC.Control_Signal:
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC PIC-101 -> VALVE_ELECTRIC FV-102
+   Actual Connection: PIC-101.XOUT, FV-102.Control_Signal
+   Notes: Direct control signal from the PID to the valve is present. FV-102 has additional inhibits (LC-801.Bool_Out) and manual mode switching on pressure deviation alarms. The allowed indirect alternative to MOTOR_VSD.Speed_SP is not used, but a direct connection is correctly implemented.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Solid design with direct mappings and appropriate safety/interlock logic (inhibits, auto mode conditioning, alarm-driven manual mode). The implementation should be reliable and fault-aware.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

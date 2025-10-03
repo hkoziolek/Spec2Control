@@ -1,0 +1,102 @@
+Evaluation Results for paper-machine - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_4\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PIT-103
+ANALOG_IN PT-101
+ANALOG_IN DT-301
+PID_BASIC PIC-104
+VALVE_ELECTRIC FV-106
+VALVE_ON_OFF XV-102
+VALVE_ON_OFF XV-107
+DIGITAL_IN XV-102-OPEN-LS
+DIGITAL_IN XV-107-OPEN-LS
+BOOL_IN ILK-FEED-PRESSURE-OK
+BOOL_IN ILK-OVERPRESSURE-TRIP
+BOOL_IN ILK-DENSITY-OK
+BOOL_IN ILK-XV102-OPEN
+BOOL_IN ILK-XV107-OPEN
+BOOL_IN ILK-SYSTEM-FAULT
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PIT-103
+ANALOG_IN PT-101
+ANALOG_IN DT-301
+PID_BASIC PIC-104
+VALVE_ELECTRIC FV-106
+
+ALL DATA CONNECTIONS:
+PIT-103.PV, PIC-104.PV
+PIC-104.XOUT, FV-106.Control_Signal
+FV-106.Feedback_Pos, PIC-104.X0
+PIC-104.Deviation_Alarm, Deadband_Inverter_NOT.IN
+Deadband_Inverter_NOT.OUT, PIC104_Inhibit_OR.IN1
+PT-101.Low_Alarm, ILK-FEED-PRESSURE-OK.Bool_In
+ILK-FEED-PRESSURE-OK.Bool_Out, PIC104_Inhibit_OR.IN2
+DT-301.High_Alarm, ILK-DENSITY-OK.Bool_In
+ILK-DENSITY-OK.Bool_Out, PIC104_Inhibit_OR.IN3
+XV-107-OPEN-LS.DI_Out, ILK-XV107-OPEN.Bool_In
+ILK-XV107-OPEN.Bool_Out, XV107_OpenPermissive_NOT.IN
+XV107_OpenPermissive_NOT.OUT, PIC104_Inhibit_OR.IN4
+PIT-103.General_Fault, PIC104_Inhibit_OR.IN5
+PIC104_Inhibit_OR.OUT, PIC-104.Inhibit
+PT-101.High_Alarm, ILK-OVERPRESSURE-TRIP.Bool_In
+ILK-OVERPRESSURE-TRIP.Bool_Out, FV106_Inhibit_OR.IN1
+XV-102-OPEN-LS.DI_Out, ILK-XV102-OPEN.Bool_In
+ILK-XV102-OPEN.Bool_Out, XV102_OpenPermissive_NOT.IN
+XV102_OpenPermissive_NOT.OUT, FV106_Inhibit_OR.IN2
+PIT-103.General_Fault, FV106_Inhibit_OR.IN3
+FV106_Inhibit_OR.OUT, FV-106.Inhibit
+PT-101.General_Fault, SystemFault_OR.IN1
+DT-301.General_Fault, SystemFault_OR.IN2
+SystemFault_OR.OUT, ILK-SYSTEM-FAULT.Bool_In
+ILK-SYSTEM-FAULT.Bool_Out, XV-102.Inhibit
+ILK-SYSTEM-FAULT.Bool_Out, XV-107.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN -> PIT-103; PID_BASIC -> PIC-104
+- Actual Connection: PIT-103.PV, PIC-104.PV
+- Notes: Direct PV feed from PIT-103 to PIC-104. Other available analog inputs (PT-101, DT-301) are used for alarms/interlocks but not as the PID PV source.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC -> PIC-104; VALVE_ELECTRIC -> FV-106
+- Actual Connection: PIC-104.XOUT, FV-106.Control_Signal
+- Notes: Direct actuator command path is implemented. Additional logic includes valve position feedback wired to PIC-104.X0 and comprehensive inhibit/permissive logic for both the PID and valve. No MOTOR_VSD.Speed_SP indirect path is used (not needed here).
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The intended control paths are implemented cleanly and directly. Supplementary interlock and inhibit logic is thoughtfully integrated, and feedback from the valve to the PID is present, indicating a robust design.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

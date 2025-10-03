@@ -1,0 +1,9 @@
+Latest Complete Run Information
+=====================================
+
+Source Folder: waste_water_treatment_facility_0915_224043
+Run Timestamp: 2025-09-15 22:40:43
+Copied On: 2025-09-24 14:54:22
+
+This folder contains the latest complete run for this category.
+Files with _test{i}.txt suffixes have been renamed to remove the suffix.

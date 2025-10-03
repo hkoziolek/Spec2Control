@@ -1,0 +1,87 @@
+# Spec2Control Process Configuration
+# This file controls which control narratives and chapters are processed by spec2control-cli.py
+#
+# Usage:
+#   - Set 'enabled: true' for narratives you want to process
+#   - Specify chapter numbers explicitly (e.g., [2, 3, 4])
+#   - Use 'all' to process all available chapters
+#   - Chapter 1 is typically "Process Overview" and is often skipped
+#
+# Note: This config can be overridden by command-line arguments
+
+narratives:
+  # Ammonium Nitrate Production (6 chapters)
+  - name: ammonium-nitrates
+    enabled: true
+    chapters: [2, 3]  # Neutralization Reactor, Evaporation and Conditioning
+    description: "Ammonium nitrate production process control"
+
+  # Benzene Distillation (4 chapters)
+  - name: benzene-distillation
+    enabled: false
+    chapters: [2, 3, 4, 5, 6]
+    description: "Benzene distillation column control"
+
+  # Coking Refinery (9 chapters)
+  - name: coking-refinery
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7, 8, 9]
+    description: "Delayed coking refinery process"
+
+  # Desalination Plant (6 chapters)
+  - name: desalination
+    enabled: false
+    chapters: [2, 3, 4, 5, 6]
+    description: "Multi-stage flash desalination plant"
+
+  # LNG Production (7 chapters)
+  - name: lng-production
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7]
+    description: "Liquefied natural gas production facility"
+
+  # Multi-Phase Flow Facility (7 chapters)
+  - name: multi-phase-flow-facility
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7]
+    description: "Oil and gas multi-phase flow test facility"
+
+  # Paper Machine (7 chapters)
+  - name: paper-machine
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    description: "Industrial paper manufacturing machine"
+
+  # Steel Plant (9 chapters)
+  - name: steel-plant
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7, 8, 9]
+    description: "Integrated steel manufacturing plant"
+
+  # Tennessee Eastman Chemical (8 chapters)
+  - name: tennessee-eastman-chemical
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    description: "Tennessee Eastman benchmark chemical process"
+
+  # Wastewater Treatment (8 chapters)
+  - name: waste-water-treatment-facility
+    enabled: false
+    chapters: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    description: "Municipal wastewater treatment facility"
+
+# Output directory configuration
+output:
+  base_dir: data/fbd-llm-output
+  include_timestamp: true  # Append timestamp to output folder names
+
+# Processing options
+processing:
+  # Skip chapter 1 by default (usually overview/introduction)
+  skip_chapter_1: true
+
+  # Maximum retries for LLM API calls
+  max_retries: 3
+
+  # Delay between retries (seconds)
+  retry_delay: 2

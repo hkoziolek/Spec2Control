@@ -1,0 +1,105 @@
+Evaluation Results for lng-production - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_7\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), MOTOR_ON_OFF(1), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(4), MOTOR_ON_OFF(1), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-601A
+ANALOG_IN FT-601B
+ANALOG_IN LIT-601
+ANALOG_IN LT-601
+RATIO_CONTROL FFIC-601
+PID_BASIC FIC-601B
+VALVE_ELECTRIC FV-601B
+MOTOR_ON_OFF C-601
+DIGITAL_IN HS-601
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-601A
+ANALOG_IN FT-601B
+ANALOG_IN LIT-601
+ANALOG_IN LT-601
+RATIO_CONTROL FFIC-601
+PID_BASIC FIC-601B
+VALVE_ELECTRIC FV-601B
+
+ALL DATA CONNECTIONS:
+FT-601A.PV, FFIC-601.PrimaryPV
+FT-601B.PV, FFIC-601.SecondaryPV
+FT-601B.PV, FIC-601B.PV
+FFIC-601.SlaveSP, FIC-601B.SP
+FIC-601B.XOUT, FV-601B.Control_Signal
+LIT-601.High_Alarm, RatioControlInhibit.IN1
+HS-601.DI_Out, RatioControlInhibit.IN2
+FT-601A.Low_Alarm, RatioControlInhibit.IN3
+FT-601A.General_Fault, RatioControlInhibit.IN4
+FT-601B.General_Fault, RatioControlInhibit.IN5
+RatioControlInhibit.OUT, FFIC-601.Inhibit
+LIT-601.High_Alarm, FIC-601B.Inhibit
+LIT-601.High_Alarm, FV-601B.Inhibit
+LT-601.Low_Alarm, CompressorInhibit.IN1
+FV-601B.Position_Error, CompressorInhibit.IN2
+FV-601B.Alarm, CompressorInhibit.IN3
+FT601A_Below200.OUT, CompressorInhibit.IN4
+CompressorInhibit.OUT, C-601.Inhibit
+FT-601A.PV, FT601A_Below200.IN1
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV → RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 → FT-601A; RATIO_CONTROL → FFIC-601
+   Actual Connection: FT-601A.PV, FFIC-601.PrimaryPV
+   Notes: Direct mapping aligns with ratio control primary feed. No inconsistencies observed.
+
+Intended: ANALOG_IN2.PV → RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2 → FT-601B; RATIO_CONTROL → FFIC-601
+   Actual Connection: FT-601B.PV, FFIC-601.SecondaryPV
+   Notes: Direct mapping aligns with ratio control secondary feed. Also FT-601B.PV is fed to FIC-601B.PV, which is consistent with cascaded/monitoring use.
+
+Intended: RATIO_CONTROL.SlaveSP → PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL → FFIC-601; PID_BASIC → FIC-601B
+   Actual Connection: FFIC-601.SlaveSP, FIC-601B.SP
+   Notes: Correct cascade from ratio controller to downstream PID setpoint. Inhibit signals present elsewhere to protect operation.
+
+Intended: PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC → FIC-601B; VALVE_ELECTRIC → FV-601B
+   Actual Connection: FIC-601B.XOUT, FV-601B.Control_Signal
+   Notes: Direct actuator drive found. Indirect alternative to MOTOR_VSD.Speed_SP not needed here.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with clear, consistent tag mapping. Additional inhibit and alarm interlocks are present and appropriately target the ratio controller, PID, and valve, indicating a robust design.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

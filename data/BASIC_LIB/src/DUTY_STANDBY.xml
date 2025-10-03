@@ -1,0 +1,138 @@
+      <pou name="DUTY_STANDBY" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Enable">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="StartRequest">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="AlternateEnable">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="ForcePumpA">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="ForcePumpB">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="DutyElapsed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="MinRunElapsed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="SwitchoverDelayElapsed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="StartTimeoutElapsed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PumpA_RunFB">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PumpB_RunFB">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PumpA_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PumpB_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CmdPumpA">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="CmdPumpB">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="ActiveIsA">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="SwitchedDueToDuty">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="SwitchedDueToFailure">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_FailedStart_A">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_FailedStart_B">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_NoAvailablePump">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

@@ -1,0 +1,70 @@
+* Function Blocks *
+ANALOG_IN AI-302
+ANALOG_IN AI-303
+ANALOG_IN AI-304
+DIGITAL_IN DI-301
+ANALOG_IN DP-301
+PID_BASIC FIC-302
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-302
+RATIO_CONTROL FFIC-303
+
+* Variables *
+REAL FT301_FeedGasFlow_PV
+REAL AI302_Mercury_PV
+REAL AI303_Mercury_PV
+REAL AI304_OutletH2O_PV
+REAL DP301_BedDP_PV
+REAL FFIC303_RegenGasFlow_SP
+
+* Functions *
+OR TotalRegInhibit_OR
+
+* Data Connections * 
+FT-301.PV, FFIC-303.PrimaryPV
+FFIC-303.SlaveSP, FIC-302.SP
+FIC-302.XOUT, FV-302.Control_Signal
+AI-302.High_Alarm, TotalRegInhibit_OR.IN1
+AI-303.High_Alarm, TotalRegInhibit_OR.IN2
+AI-302.General_Fault, TotalRegInhibit_OR.IN3
+AI-303.General_Fault, TotalRegInhibit_OR.IN4
+FT-301.Low_Alarm, TotalRegInhibit_OR.IN5
+DP-301.High_Alarm, TotalRegInhibit_OR.IN6
+DI-301.DI_Out, TotalRegInhibit_OR.IN7
+TotalRegInhibit_OR.OUT, FFIC-303.Inhibit
+TotalRegInhibit_OR.OUT, FIC-302.Inhibit
+TotalRegInhibit_OR.OUT, FV-302.Inhibit
+FT-301.PV, FT301_FeedGasFlow_PV
+AI-302.PV, AI302_Mercury_PV
+AI-303.PV, AI303_Mercury_PV
+AI-304.PV, AI304_OutletH2O_PV
+DP-301.PV, DP301_BedDP_PV
+FFIC-303.SlaveSP, FFIC303_RegenGasFlow_SP
+
+* Parameter Data Connections *
+0.25, FFIC-303.RatioSP
+TRUE, FFIC-303.Auto
+0, FFIC-303.MV_MIN
+100, FFIC-303.MV_MAX
+0, FFIC-303.Bias
+0, FFIC-303.TrimKp
+T#0s, FFIC-303.TrimTi
+TRUE, FIC-302.AUTO
+0, FIC-302.MV_MIN
+100, FIC-302.MV_MAX
+0, FIC-302.X0
+6.25, FT-301.Scaling_Slope
+-25, FT-301.Scaling_Offset
+5, FT-301.PV_Low
+TRUE, FT-301.Alarm_Enable
+20, DP-301.PV_High
+TRUE, DP-301.Alarm_Enable
+10, AI-304.PV_High
+TRUE, AI-304.Alarm_Enable
+0.01, AI-302.PV_High
+TRUE, AI-302.Alarm_Enable
+0.01, AI-303.PV_High
+TRUE, AI-303.Alarm_Enable
+0, FV-302.Close_Limit
+100, FV-302.Open_Limit
+

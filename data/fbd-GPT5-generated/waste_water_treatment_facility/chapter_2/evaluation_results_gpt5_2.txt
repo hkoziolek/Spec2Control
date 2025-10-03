@@ -1,0 +1,102 @@
+Evaluation Results for waste_water_treatment_facility - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_2\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: PID Control
+EVAL-1 Result: PASS
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), MOTOR_ON_OFF(1), MOTOR_VSD(2), PID_BASIC(1)
+Output blocks: ANALOG_IN(3), MOTOR_VSD(2), PID_BASIC(1)
+EVAL-2 Coverage: 0.83%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\waste_water_treatment_facility\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\waste_water_treatment_facility\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-101
+ANALOG_IN LS-101
+ANALOG_IN VG-101
+PID_BASIC PIC-101
+MOTOR_VSD P-101A
+MOTOR_VSD P-101B
+VALVE_ON_OFF XV-101
+BOOL_IN BS-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-101
+ANALOG_IN LS-101
+ANALOG_IN VG-101
+PID_BASIC PIC-101
+
+ALL DATA CONNECTIONS:
+LS-101.PV, PIC-101.PV
+PIC-101.XOUT, P-101A.Speed_SP
+PIC-101.XOUT, P-101B.Speed_SP
+LS-101.High_Alarm, HighLevelTrip_OR.IN1
+PIC-101.PV_High_Alarm, HighLevelTrip_OR.IN2
+HighLevelTrip_OR.OUT, XV-101.Close_Cmd
+HighLevelTrip_OR.OUT, PumpInhibit_OR.IN1
+HighLevelTrip_OR.OUT, PumpStop_OR.IN1
+PIC-101.PV_Low_Alarm, FlowOrLow_OR.IN1
+FT-101.High_Alarm, FlowOrLow_OR.IN2
+FlowOrLow_OR.OUT, PumpInhibit_OR.IN2
+PumpInhibit_OR.OUT, P-101A.Inhibit
+PumpInhibit_OR.OUT, P-101B.Inhibit
+PumpInhibit_OR.OUT, XV-101.Inhibit
+PumpInhibit_OR.OUT, PIC-101.Inhibit
+HighLevelTrip_OR.OUT, HighLevelTrip_NOT.IN
+HighLevelTrip_NOT.OUT, XV-101.Open_Cmd
+LS-101.PV, LevelAboveMin_GT.IN1
+LevelAboveMin_GT.OUT, PumpStart_AND.IN1
+HighLevelTrip_NOT.OUT, PumpStart_AND.IN2
+LevelAboveMin_GT.OUT, LevelOK_NOT.IN
+LevelOK_NOT.OUT, PumpStop_OR.IN2
+PumpStart_AND.OUT, P-101A.Start_Cmd
+PumpStop_OR.OUT, P-101A.Stop_Cmd
+PumpStart_AND.OUT, PumpBStart_AND.IN1
+P-101A.FB_Fault, PumpBStart_AND.IN2
+PumpBStart_AND.OUT, P-101B.Start_Cmd
+PumpStop_OR.OUT, P-101B.Stop_Cmd
+LS-101.General_Fault, AI_Fault_OR.IN1
+FT-101.General_Fault, AI_Fault_OR.IN2
+LevelOK_NOT.OUT, PID_Manual_OR.IN1
+AI_Fault_OR.OUT, PID_Manual_OR.IN2
+PID_Manual_OR.OUT, PID_AUTO_NOT.IN
+PID_AUTO_NOT.OUT, PIC-101.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN -> LS-101; PID_BASIC -> PIC-101
+- Actual Connection: LS-101.PV, PIC-101.PV
+- Notes: LS-101 is used as the PID PV source. Other available analog inputs (FT-101, VG-101) are not used as the PID PV. PIC-101’s PV alarms are integrated into trip/interlock logic, which indicates sound alarm handling.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND INDIRECT
+- Mapping: PID_BASIC -> PIC-101; MOTOR_VSD -> P-101A, P-101B (accepted alternative to valve control)
+- Actual Connection: PIC-101.XOUT, P-101A.Speed_SP; PIC-101.XOUT, P-101B.Speed_SP
+- Notes: No direct continuous control signal from PIC-101 to a valve is present. The valve XV-101 receives discrete Open/Close commands driven by interlock logic (HighLevelTrip_OR/NOT), and is inhibited alongside pumps and the PID when trips occur. The PID output is instead used to modulate pump VSD speed setpoints, which matches the accepted indirect implementation.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The PID PV is correctly sourced from an analog level input, and PID output is effectively applied to VSD speed control with comprehensive interlocks (AUTO gating on faults/level, trips cascading to valve/pump inhibitions). The absence of a direct valve control signal appears intentional given the design’s use of discrete valve commands and VSD modulation.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,103 @@
+Evaluation Results for lng-production - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_2\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(5), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN DP-101
+ANALOG_IN DP-102
+ANALOG_IN FT-101
+ANALOG_IN IT-102
+ANALOG_IN LT-101
+RATIO_CONTROL IIC-101
+VALVE_ELECTRIC LCV-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN DP-101
+ANALOG_IN DP-102
+ANALOG_IN FT-101
+ANALOG_IN IT-102
+ANALOG_IN LT-101
+RATIO_CONTROL IIC-101
+VALVE_ELECTRIC LCV-101
+
+ALL DATA CONNECTIONS:
+FT-101.PV, IIC-101.PrimaryPV
+IT-102.PV, IIC-101.SecondaryPV
+IIC-101.SlaveSP, LCV-101.Control_Signal
+DP-101.High_Alarm, DP_Trip_OR.IN1
+DP-102.High_Alarm, DP_Trip_OR.IN2
+DP_Trip_OR.OUT, IIC_Permissive1_OR.IN1
+LT-101.High_Alarm, IIC_Permissive1_OR.IN2
+IIC_Permissive1_OR.OUT, IIC_Permissive_OR.IN1
+FT-101.Low_Alarm, IIC_Permissive_OR.IN2
+IIC_Permissive_OR.OUT, IIC-101.Inhibit
+IT-102.High_Alarm, IT_OutOfRange_OR.IN1
+IT-102.Low_Alarm, IT_OutOfRange_OR.IN2
+IT_OutOfRange_OR.OUT, LCV_Inhibit1_OR.IN1
+FT-101.Low_Alarm, LCV_Inhibit1_OR.IN2
+LCV_Inhibit1_OR.OUT, LCV_Inhibit_OR.IN1
+IT-102.General_Fault, LCV_Inhibit_OR.IN2
+LCV_Inhibit_OR.OUT, LCV-101.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=FT-101; RATIO_CONTROL=IIC-101
+   Actual Connection: FT-101.PV -> IIC-101.PrimaryPV
+   Notes: Primary process variable correctly wired to the ratio controller.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=IT-102; RATIO_CONTROL=IIC-101
+   Actual Connection: IT-102.PV -> IIC-101.SecondaryPV
+   Notes: Secondary process variable correctly wired to the ratio controller.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: MISSING
+   Mapping: RATIO_CONTROL=IIC-101; PID_BASIC=(no instance present)
+   Actual Connection: None to any PID SP. Observed IIC-101.SlaveSP -> LCV-101.Control_Signal
+   Notes: No PID_BASIC block exists in the available instances, and the ratio controller’s SlaveSP is fed directly to the valve control input, bypassing the intended PID.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: MISSING
+   Mapping: PID_BASIC=(no instance present); VALVE_ELECTRIC=LCV-101
+   Actual Connection: None. LCV-101.Control_Signal is driven by IIC-101.SlaveSP
+   Notes: No PID output is driving the valve. The allowed indirect alternative via MOTOR_VSD.Speed_SP is not applicable (no MOTOR_VSD present).
+
+OVERALL ASSESSMENT:
+Coverage: 2/4
+Quality: Primary and secondary PVs are correctly connected to the ratio controller, but the downstream control path deviates from the intended design. The absence of a PID_BASIC block and direct wiring of IIC-101.SlaveSP to the valve control signal indicates the loop is operating without the intended PID, reducing control quality and robustness.
+Missing Connections: 
+- RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+==================================================
+
+EVAL-3 Coverage: 50.00%

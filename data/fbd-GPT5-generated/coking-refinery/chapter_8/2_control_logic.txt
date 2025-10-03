@@ -1,0 +1,99 @@
+* Function Blocks *
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+ANALOG_IN PT-701
+DIGITAL_IN FD-701
+PID_BASIC FIC-702
+PID_BASIC LIC-101
+VALVE_ELECTRIC FV-701
+VALVE_ELECTRIC FV-702
+RATIO_CONTROL FFIC-701
+
+* Variables *
+REAL FT701_FuelGasFlow_PV
+REAL FT702_AirFlow_PV
+REAL FFIC701_AirFlow_SP
+REAL FFIC701_ActiveRatio
+REAL FIC702_Output_MV
+REAL PT701_CoolingWaterPressure_PV
+
+* Functions *
+LT LowFlowCheck_LT
+SEL AirSP_Select_SEL
+SEL AirSP_TxFaultFallback_SEL
+OR TxFaultOrRange_OR
+OR LevelOutOfRange_OR
+OR RatioControl_Inhibit_OR
+OR FIC702_Inhibit_OR
+OR FuelValve_Inhibit_OR
+OR AirValve_Inhibit_OR
+NOT FlameNotDetected_NOT
+NOT RatioControlAutoGate_NOT
+NOT FIC702AutoGate_NOT
+
+* Data Connections * 
+FT-701.PV, FFIC-701.PrimaryPV
+FT-702.PV, FFIC-701.SecondaryPV
+FT-701.PV, LowFlowCheck_LT.IN1
+LowFlowCheck_LT.OUT, AirSP_Select_SEL.G
+FFIC-701.SlaveSP, AirSP_Select_SEL.IN0
+AirSP_Select_SEL.OUT, AirSP_TxFaultFallback_SEL.IN0
+AirSP_TxFaultFallback_SEL.OUT, FIC-702.SP
+FT-702.PV, FIC-702.PV
+FIC-702.XOUT, FV-702.Control_Signal
+FD-701.DI_Out, FlameNotDetected_NOT.IN
+FT-701.General_Fault, TxFaultOrRange_OR.IN1
+FT-702.General_Fault, TxFaultOrRange_OR.IN2
+FT-701.High_Alarm, TxFaultOrRange_OR.IN3
+FT-701.Low_Alarm, TxFaultOrRange_OR.IN4
+FT-702.High_Alarm, TxFaultOrRange_OR.IN5
+FT-702.Low_Alarm, TxFaultOrRange_OR.IN6
+LIC-101.PV_High_Alarm, LevelOutOfRange_OR.IN1
+LIC-101.PV_Low_Alarm, LevelOutOfRange_OR.IN2
+FlameNotDetected_NOT.OUT, RatioControl_Inhibit_OR.IN1
+FIC702_Inhibit_OR.OUT, RatioControl_Inhibit_OR.IN2
+TxFaultOrRange_OR.OUT, FIC702_Inhibit_OR.IN1
+LevelOutOfRange_OR.OUT, FIC702_Inhibit_OR.IN2
+PT-701.Low_Alarm, FIC702_Inhibit_OR.IN3
+LevelOutOfRange_OR.OUT, FuelValve_Inhibit_OR.IN1
+PT-701.Low_Alarm, FuelValve_Inhibit_OR.IN2
+FuelValve_Inhibit_OR.OUT, AirValve_Inhibit_OR.IN1
+FT-701.Low_Alarm, AirValve_Inhibit_OR.IN2
+RatioControl_Inhibit_OR.OUT, FFIC-701.Inhibit
+FIC702_Inhibit_OR.OUT, FIC-702.Inhibit
+FuelValve_Inhibit_OR.OUT, FV-701.Inhibit
+AirValve_Inhibit_OR.OUT, FV-702.Inhibit
+RatioControl_Inhibit_OR.OUT, RatioControlAutoGate_NOT.IN
+RatioControlAutoGate_NOT.OUT, FFIC-701.Auto
+FIC702_Inhibit_OR.OUT, FIC702AutoGate_NOT.IN
+FIC702AutoGate_NOT.OUT, FIC-702.AUTO
+TxFaultOrRange_OR.OUT, AirSP_TxFaultFallback_SEL.G
+FT-701.PV, FT701_FuelGasFlow_PV
+FT-702.PV, FT702_AirFlow_PV
+FFIC-701.SlaveSP, FFIC701_AirFlow_SP
+FFIC-701.ActiveRatio, FFIC701_ActiveRatio
+FIC-702.XOUT, FIC702_Output_MV
+PT-701.PV, PT701_CoolingWaterPressure_PV
+
+* Parameter Data Connections *
+10.0, FFIC-701.RatioSP
+0.0, FFIC-701.MV_MIN
+5000.0, FFIC-701.MV_MAX
+0.0, FFIC-701.Bias
+50.0, LowFlowCheck_LT.IN2
+500.0, AirSP_Select_SEL.IN1
+2500.0, AirSP_TxFaultFallback_SEL.IN1
+TRUE, FT-701.Alarm_Enable
+50.0, FT-701.PV_Low
+450.0, FT-701.PV_High
+TRUE, FT-702.Alarm_Enable
+0.0, FT-702.PV_Low
+5000.0, FT-702.PV_High
+TRUE, PT-701.Alarm_Enable
+2.0, PT-701.PV_Low
+0.0, FIC-702.MV_MIN
+100.0, FIC-702.MV_MAX
+500.0, FIC-702.Deviation_Limit
+60.0, LIC-101.PV_High
+40.0, LIC-101.PV_Low
+

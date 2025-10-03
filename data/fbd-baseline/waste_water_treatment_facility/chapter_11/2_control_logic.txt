@@ -1,0 +1,61 @@
+* Function Blocks *
+ANALOG_IN FIT-104
+RATIO_CONTROL FFIC-107
+PID_BASIC FIC-106
+MOTOR_VSD CD-1001
+VALVE_ELECTRIC PV-101
+VALVE_ON_OFF XV-102
+
+* Variables *
+REAL FIT_104_InfluentFlow_PV
+REAL FIC_106_SP_From_FFIC_107
+
+* Functions *
+OR PumpInhibitAggregator
+OR RatioCtrlInhibitAggregator
+NOT PumpOpenedInverter
+
+* Data Connections * 
+FIT-104.PV, FFIC-107.PrimaryPV
+CD-1001.FB_ActualSpeed, FFIC-107.SecondaryPV
+FFIC-107.SlaveSP, FIC-106.SP
+CD-1001.FB_ActualSpeed, FIC-106.PV
+FIC-106.XOUT, CD-1001.Speed_SP
+XV-102.FB_Opened, PumpOpenedInverter.IN
+PumpOpenedInverter.OUT, PumpInhibitAggregator.IN1
+FIT-104.Low_Alarm, PumpInhibitAggregator.IN2
+FIT-104.General_Fault, PumpInhibitAggregator.IN3
+XV-102.Alarm_General, PumpInhibitAggregator.IN4
+XV-102.Alarm_Position_Error, PumpInhibitAggregator.IN5
+PV-101.Alarm, PumpInhibitAggregator.IN6
+PV-101.Position_Error, PumpInhibitAggregator.IN7
+CD-1001.Alarm_Comm_Fail, PumpInhibitAggregator.IN8
+CD-1001.FB_Fault, PumpInhibitAggregator.IN9
+CD-1001.Alarm_Speed_Deviation, PumpInhibitAggregator.IN10
+PumpInhibitAggregator.OUT, CD-1001.Inhibit
+FIT-104.Low_Alarm, RatioCtrlInhibitAggregator.IN1
+FIT-104.High_Alarm, RatioCtrlInhibitAggregator.IN2
+FIT-104.General_Fault, RatioCtrlInhibitAggregator.IN3
+CD-1001.FB_Fault, RatioCtrlInhibitAggregator.IN4
+CD-1001.Alarm_Comm_Fail, RatioCtrlInhibitAggregator.IN5
+CD-1001.Alarm_Speed_Deviation, RatioCtrlInhibitAggregator.IN6
+RatioCtrlInhibitAggregator.OUT, FFIC-107.Inhibit
+FIT-104.PV, FIT_104_InfluentFlow_PV
+FFIC-107.SlaveSP, FIC_106_SP_From_FFIC_107
+
+* Parameter Data Connections *
+6.25, FIT-104.Scaling_Slope
+-25.0, FIT-104.Scaling_Offset
+TRUE, FIT-104.Alarm_Enable
+TRUE, FFIC-107.Auto
+2.5, FFIC-107.RatioSP
+0.0, FFIC-107.Bias
+0.0, FFIC-107.MV_MIN
+100.0, FFIC-107.MV_MAX
+TRUE, FIC-106.AUTO
+0.0, FIC-106.MV_MIN
+100.0, FIC-106.MV_MAX
+3.0, FIC-106.Deviation_Limit
+100.0, PV-101.Open_Limit
+0.0, PV-101.Close_Limit
+

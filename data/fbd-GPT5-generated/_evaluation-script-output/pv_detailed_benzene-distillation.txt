@@ -1,0 +1,80 @@
+PV Alarm Parameter Analysis - benzene-distillation
+Generated: 2025-09-24 16:37:22
+====================================================================================================
+
+Chapter      Required PVs Accuracy % Additional PVs
+-------------------------------------------------
+chapter_2    4/4          100.0      4            
+chapter_3    2/3          66.7       3            
+chapter_4    3/3          100.0      7            
+chapter_6    1/1          100.0      7            
+
+Plant Summary: Required PVs: 10/11 (90.9%), Additional PVs: 21
+
+====================================================================================================
+DETAILED PV ANALYSIS
+====================================================================================================
+
+chapter_2
+------------------------------------------------------------
+[OK] Found Required PVs (4):
+  [=] LIT-101.PV_High: reviewed=80.0, output=80.0
+  [=] LIT-101.PV_Low: reviewed=20.0, output=20.0
+  [=] TIC-104.PV_High: reviewed=180.0, output=180.0
+  [=] TIC-104.PV_Low: reviewed=130.0, output=130.0
+
+[ADD] Additional PVs (4):
+  - PIT-102.PV_High: 150.0
+  - PIT-102.PV_Low: 90.0
+  - TE-101.PV_High: 200.0
+  - TE-101.PV_Low: 50.0
+
+
+chapter_3
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] FIT-101.PV_Low: reviewed=10.0, output=10
+  [=] TI-106.PV_Low: reviewed=170.0, output=170
+
+[FALSE] Found but Wrong Values (1):
+  [!=] TI-106.PV_High: reviewed=190.0, output=200
+
+[ADD] Additional PVs (3):
+  - FIC-104.PV_High: 190
+  - FIC-104.PV_Low: 170
+  - PT-101.PV_Low: 50
+
+** Manual Evaluation **
+
+
+chapter_4
+------------------------------------------------------------
+[OK] Found Required PVs (3):
+  [=] LIC-104.PV_High: reviewed=90.0, output=90.0
+  [=] LIC-104.PV_Low: reviewed=10.0, output=10.0
+  [=] PT-104.PV_High: reviewed=30.0, output=30.0
+
+[ADD] Additional PVs (7):
+  - FT-107.PV_High: 50.0
+  - FT-107.PV_Low: 0.0
+  - LT-105.PV_High: 90.0
+  - LT-105.PV_Low: 10.0
+  - PIC-104.PV_High: 30.0
+  - PIC-104.PV_Low: 15.0
+  - PT-104.PV_Low: 15.0
+
+
+chapter_6
+------------------------------------------------------------
+[OK] Found Required PVs (1):
+  [=] FT-105.PV_Low: reviewed=50.0, output=50.0
+
+[ADD] Additional PVs (7):
+  - FIC-106.PV_High: 1000.0
+  - FIC-106.PV_Low: 0.0
+  - FT-105.PV_High: 1000.0
+  - FT-106.PV_High: 1000.0
+  - FT-106.PV_Low: 0.0
+  - LIC-002.PV_High: 100.0
+  - LIC-002.PV_Low: 10.0
+

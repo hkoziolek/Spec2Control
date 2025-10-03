@@ -1,0 +1,84 @@
+Evaluation Results for benzene-distillation - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_2\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TE-101
+PID_BASIC TIC-104
+VALVE_ELECTRIC PV-103
+VALVE_ON_OFF XV-105
+ANALOG_IN LIT-101
+ANALOG_IN PIT-102
+DIGITAL_IN LAH-101
+DIGITAL_IN LAL-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TE-101
+PID_BASIC TIC-104
+VALVE_ELECTRIC PV-103
+ANALOG_IN LIT-101
+ANALOG_IN PIT-102
+
+ALL DATA CONNECTIONS:
+TE-101.PV, TIC-104.PV
+TIC-104.XOUT, PV-103.Control_Signal
+PIT-102.High_Alarm, TIC104AnyInhibit_OR.IN1
+TE-101.High_Alarm, TIC104AnyInhibit_OR.IN2
+LAH-101.DI_Out, LevelOutOfRange_OR.IN1
+LAL-101.DI_Out, LevelOutOfRange_OR.IN2
+XV-105.FB_Opened, XV105NotOpen_NOT.IN
+LevelOutOfRange_OR.OUT, TIC104AnyInhibit_OR.IN3
+XV105NotOpen_NOT.OUT, TIC104AnyInhibit_OR.IN4
+PV-103.Alarm, TIC104AnyInhibit_OR.IN5
+TE-101.Low_Alarm, TIC104AnyInhibit_OR.IN6
+TE-101.General_Fault, TIC104AnyInhibit_OR.IN7
+PIT-102.Low_Alarm, TIC104AnyInhibit_OR.IN8
+TIC104AnyInhibit_OR.OUT, TIC-104.Inhibit
+LevelOutOfRange_OR.OUT, XV-105.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN = TE-101; PID_BASIC = TIC-104
+- Actual Connection: TE-101.PV, TIC-104.PV
+- Notes: Correct process variable wiring. Other analog inputs (LIT-101, PIT-102) are present but not tied to TIC-104.PV. TE-101 alarms feed an inhibit OR, which does not interfere with the PV linkage.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC = TIC-104; VALVE_ELECTRIC = PV-103
+- Actual Connection: TIC-104.XOUT, PV-103.Control_Signal
+- Notes: Direct actuation path implemented. An allowable indirect alternative to MOTOR_VSD.Speed_SP is not used here (not applicable). Inhibit logic present (TIC-104.Inhibit driven by multiple alarm conditions, including PV-103.Alarm), indicating protective interlocks without breaking the control signal path.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Intended loop is fully realized with clear, correct mappings and prudent inhibit/interlock logic around the controller; no conflicts observed.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

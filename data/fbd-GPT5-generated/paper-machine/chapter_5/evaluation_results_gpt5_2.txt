@@ -1,0 +1,137 @@
+Evaluation Results for paper-machine - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_5\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(3), VALVE_ELECTRIC(3)
+Output blocks: ANALOG_IN(7), PID_BASIC(3), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 0.89%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AT-102
+ANALOG_IN AT-107
+ANALOG_IN TIT-106
+ANALOG_IN FIT-UPSTREAM
+ANALOG_IN DPIT-FLOW
+ANALOG_IN PIT-DOWNSTREAM
+ANALOG_IN LIT-TOWER
+PID_BASIC LIC-102
+PID_BASIC TIC-106
+PID_BASIC LIC-104
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-103
+VALVE_ON_OFF XV-104
+BOOL_IN INTERLOCK-FV101-UPSTREAM-FLOW-OK
+BOOL_IN INTERLOCK-LIC102-PH-SAFE
+BOOL_IN INTERLOCK-TIC106-TEMP-SAFE
+BOOL_IN INTERLOCK-LIC104-FLOW-OK
+BOOL_IN INTERLOCK-LIC104-PRESSURE-OK
+BOOL_IN PERMISSIVE-TOWER-LEVEL-OK
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AT-102
+ANALOG_IN AT-107
+ANALOG_IN TIT-106
+ANALOG_IN FIT-UPSTREAM
+ANALOG_IN DPIT-FLOW
+ANALOG_IN PIT-DOWNSTREAM
+ANALOG_IN LIT-TOWER
+PID_BASIC LIC-102
+PID_BASIC TIC-106
+PID_BASIC LIC-104
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-103
+
+ALL DATA CONNECTIONS:
+AT-102.PV, LIC-102.PV
+LIC-102.XOUT, FV-101.Control_Signal
+TIT-106.PV, TIC-106.PV
+TIC-106.XOUT, FV-103.Control_Signal
+DPIT-FLOW.PV, LIC-104.PV
+AT-102.High_Alarm, LIC102_PHSafe_OR.IN1
+AT-102.Low_Alarm, LIC102_PHSafe_OR.IN2
+LIC102_PHSafe_OR.OUT, INTERLOCK-LIC102-PH-SAFE.Bool_In
+LIT-TOWER.High_Alarm, TowerLevel_OutOfRange_OR.IN1
+LIT-TOWER.Low_Alarm, TowerLevel_OutOfRange_OR.IN2
+TowerLevel_OutOfRange_OR.OUT, PERMISSIVE-TOWER-LEVEL-OK.Bool_In
+INTERLOCK-LIC102-PH-SAFE.Bool_Out, LIC102_Inhibit_OR.IN2
+PERMISSIVE-TOWER-LEVEL-OK.Bool_Out, LIC102_Inhibit_OR.IN1
+LIC102_Inhibit_OR.OUT, LIC-102.Inhibit
+TIT-106.High_Alarm, INTERLOCK-TIC106-TEMP-SAFE.Bool_In
+INTERLOCK-TIC106-TEMP-SAFE.Bool_Out, TIC106_Inhibit_OR.IN2
+PERMISSIVE-TOWER-LEVEL-OK.Bool_Out, TIC106_Inhibit_OR.IN1
+TIC106_Inhibit_OR.OUT, TIC-106.Inhibit
+FIT-UPSTREAM.Low_Alarm, INTERLOCK-FV101-UPSTREAM-FLOW-OK.Bool_In
+INTERLOCK-FV101-UPSTREAM-FLOW-OK.Bool_Out, FV101_Isolate_OR.IN1
+AT-107.General_Fault, FV101_Isolate_OR.IN2
+FV101_Isolate_OR.OUT, FV-101.Inhibit
+DPIT-FLOW.Low_Alarm, INTERLOCK-LIC104-FLOW-OK.Bool_In
+PIT-DOWNSTREAM.High_Alarm, INTERLOCK-LIC104-PRESSURE-OK.Bool_In
+INTERLOCK-LIC104-FLOW-OK.Bool_Out, XV104_Interlock_OR.IN1
+INTERLOCK-LIC104-PRESSURE-OK.Bool_Out, XV104_Interlock_OR.IN2
+XV104_Interlock_OR.OUT, XV104_Final_OR.IN1
+LIC-104.Deviation_Alarm, XV104_Final_OR.IN2
+XV104_Final_OR.OUT, XV-104.Inhibit
+PERMISSIVE-TOWER-LEVEL-OK.Bool_Out, LIC-104.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV → PID_BASIC.PV
+- Status: FOUND DIRECT
+  Mapping: ANALOG_IN=AT-102; PID_BASIC=LIC-102
+  Actual Connection: AT-102.PV, LIC-102.PV
+  Notes: Direct PV feed from analog temperature to level controller.
+
+- Status: FOUND DIRECT
+  Mapping: ANALOG_IN=TIT-106; PID_BASIC=TIC-106
+  Actual Connection: TIT-106.PV, TIC-106.PV
+  Notes: Direct PV feed from temperature transmitter to temperature controller.
+
+- Status: FOUND DIRECT
+  Mapping: ANALOG_IN=DPIT-FLOW; PID_BASIC=LIC-104
+  Actual Connection: DPIT-FLOW.PV, LIC-104.PV
+  Notes: Direct PV feed from flow DP transmitter to level controller.
+
+Intended: PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal (or MOTOR_VSD.Speed_SP)
+- Status: FOUND DIRECT
+  Mapping: PID_BASIC=LIC-102; VALVE_ELECTRIC=FV-101
+  Actual Connection: LIC-102.XOUT, FV-101.Control_Signal
+  Notes: Proper controller output to control valve.
+
+- Status: FOUND DIRECT
+  Mapping: PID_BASIC=TIC-106; VALVE_ELECTRIC=FV-103
+  Actual Connection: TIC-106.XOUT, FV-103.Control_Signal
+  Notes: Proper controller output to control valve.
+
+- Status: MISSING
+  Mapping: PID_BASIC=LIC-104; VALVE_ELECTRIC=(none)
+  Actual Connection: (none)
+  Notes: No connection from LIC-104.XOUT to any VALVE_ELECTRIC.Control_Signal or MOTOR_VSD.Speed_SP. LIC-104 participates in interlocks/inhibits (e.g., XV-104 inhibit via deviation alarm), but there is no final control element receiving its XOUT.
+
+OVERALL ASSESSMENT:
+Coverage: 5/6
+Quality: PV wiring to all PIDs is complete and correct. Two PID loops properly drive control valves. One PID (LIC-104) lacks a final element control connection; only inhibit logic is present, which may indicate an incomplete loop or a design choice for on/off control outside this template.
+Missing Connections: LIC-104.XOUT → VALVE_ELECTRIC.Control_Signal (or MOTOR_VSD.Speed_SP)
+==================================================
+
+EVAL-3 Coverage: 83.33%

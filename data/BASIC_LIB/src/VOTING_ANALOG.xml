@@ -1,0 +1,88 @@
+      <pou name="VOTING_ANALOG" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Input1">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Input2">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Input3">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Deviation_Limit">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Voting_Scheme">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="EnableAlarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Voted_Output">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Sensor1_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Sensor2_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Sensor3_Fault">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Voting_Error">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Healthy_Sensors_Count">
+              <type>
+                <INT/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

@@ -1,0 +1,32 @@
+## 4 **Prilling Tower/Granulator**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AT-303 | Analyzer Transmitter | Monitors and analyzes process parameters for quality control |
+|FIC-301 | Flow Controller | Regulates melt flow to maintain bed temperature stability |
+|FT-301 | Flow Transmitter | Measures melt flow rate for feedback to FIC-301 |
+|FV-301 | Flow Valve | Adjusts melt flow based on FIC-301 output |
+|GR-306 | Granulator | Facilitates solidification of ammonium nitrate in the prilling process |
+|PR-305 | Pressure Transmitter | Monitors pressure within the prilling tower system |
+|RTD-302 | Temperature Transmitter | Provides bed temperature feedback to TIC-302 |
+|TIC-302 | Temperature Controller | Maintains bed temperature stability via cascade control |
+|VS-304 | Vibration Sensor | Detects vibration levels in equipment for operational safety |
+
+### 4.1) Control Strategy Description
+
+The cascade control system for the **Prilling Tower/Granulator** is designed to regulate melt flow and bed temperature to ensure consistent solidification of ammonium nitrate. The primary loop is configured to maintain bed temperature stability via TIC-302, while the secondary loop modulates melt flow using FIC-301. The primary controller, TIC-302, receives bed temperature feedback from RTD-302, compares it to the operator-defined setpoint of 185°C, and outputs a remote setpoint (RSP) to FIC-301. FIC-301, the secondary controller, adjusts melt flow based on FT-301 feedback to achieve the temperature stabilization demanded by TIC-302.
+
+TIC-302 is tuned with proportional gain (Kp=1.2) and integral time (Ki=2.0 min) to ensure stable bed temperature control. FIC-301 is tuned with faster dynamics (Kp=3.5, Ki=0.3 min) to reject disturbances in melt flow quickly. The secondary loop operates 5-10 times faster than the primary loop to decouple melt flow disturbances from the slower bed temperature response. The melt flow control valve, FV-301, responds to FIC-301 output within a range of 0-100% to maintain flow rates between 2.5–5.0 m³/h, scaled to match the engineering units of FT-301.
+
+The cascade configuration includes signal scaling between TIC-302 and FIC-301 to ensure RSP alignment with the secondary loop’s operating range. In cascade mode, TIC-302 dynamically adjusts FIC-301’s setpoint based on bed temperature deviations, while FIC-301 independently controls melt flow using FT-301 feedback. Mode selection allows operators to switch between cascade, local, and manual operation. In local mode, FIC-301 operates independently with a fixed setpoint, bypassing TIC-302. Setpoint clamping prevents TIC-302 from commanding melt flow rates outside the permissible range, ensuring FV-301 does not saturate.
+
+### 4.2) Interlocks and Permissives
+
+The cascade control system is interlocked to ensure safe operation. Melt flow control via FIC-301 is enabled only when FT-301 confirms flow within the range of 2.5–5.0 m³/h and FV-301 is responsive. TIC-302 will not output a remote setpoint to FIC-301 unless RTD-302 indicates a valid temperature reading within the operational range of 150–200°C. Additionally, the exhaust gas scrubber VS-304 must be operational and AT-303 must confirm air humidity below 15 g H₂O/kg before cascade control is permitted.
+
+Permissives include verification that PR-305 or GR-306 is actively collecting solidified product, ensuring that the melt flow and bed temperature control loops are functioning within the context of the solidification process. If FT-301 or RTD-302 signals are invalid, the system automatically transitions to manual mode, requiring operator intervention.
+
+### 4.3) Alarm and Fault Handling
+
+Alarm conditions are triggered if TIC-302 detects bed temperature deviations exceeding ±5°C from the setpoint or if FIC-301 fails to maintain melt flow within ±0.1 m³/h of its commanded setpoint. High-priority alarms include FV-301 saturation, FT-301 signal loss, or RTD-302 temperature readings outside the range of 150–200°C. In the event of a secondary loop failure, such as FT-301 signal loss or FV-301 malfunction, the system transitions to local mode, where FIC-301 operates independently with a fixed setpoint.
+
+If TIC-302 fails, the cascade control system will automatically disable RSP output to FIC-301, locking melt flow at the last known setpoint to prevent uncontrolled flow. Deadband logic is applied to TIC-302 to prevent hunting during minor bed temperature fluctuations, ensuring stable operation. Timer delays are implemented during cascade mode transitions to avoid abrupt changes that could destabilize the secondary loop. Operator alarms are displayed on the DCS, and fault conditions require manual acknowledgment before the system can resume cascade control.

@@ -1,0 +1,93 @@
+* Function Blocks *
+ANALOG_IN LT-105
+ANALOG_IN FT-107
+ANALOG_IN PT-104
+PID_BASIC LIC-104
+PID_BASIC FIC-107
+PID_BASIC PIC-104
+VALVE_ELECTRIC LV-107
+VALVE_ON_OFF XV-103
+DIGITAL_IN LAH-104
+DIGITAL_IN LAL-104
+TON StartupDelay
+
+* Variables *
+REAL LT105_V104_Level_PV
+REAL FT107_CondensateFlow_PV
+REAL PT104_AccumulatorPressure_PV
+REAL LIC104_RSP_to_FIC107
+REAL FIC107_ValveCmd_to_LV107
+BOOL XV103_Open_FB
+BOOL Cascade_Permissive_OK
+BOOL Startup_Delay_Done
+
+* Functions *
+MUL RSP_Scale
+NOT XV103_NotOpen
+OR CascadeInhibit
+NOT CascadePermissive
+
+* Data Connections * 
+LT-105.PV, LIC-104.PV
+LIC-104.XOUT, RSP_Scale.IN1
+RSP_Scale.OUT, FIC-107.SP
+FT-107.PV, FIC-107.PV
+FIC-107.XOUT, LV-107.Control_Signal
+XV-103.FB_Opened, XV103_NotOpen.IN
+PT-104.High_Alarm, CascadeInhibit.IN1
+PT-104.Low_Alarm, CascadeInhibit.IN2
+LT-105.Low_Alarm, CascadeInhibit.IN3
+XV103_NotOpen.OUT, CascadeInhibit.IN4
+FT-107.General_Fault, CascadeInhibit.IN5
+LV-107.Position_Error, CascadeInhibit.IN6
+CascadeInhibit.OUT, LIC-104.Inhibit
+CascadeInhibit.OUT, FIC-107.Inhibit
+PT-104.High_Alarm, LV-107.Inhibit
+PT-104.High_Alarm, LV-107.Manual_Mode
+CascadeInhibit.OUT, CascadePermissive.IN
+CascadePermissive.OUT, StartupDelay.IN
+CascadePermissive.OUT, FIC-107.AUTO
+StartupDelay.Q, LIC-104.AUTO
+PT-104.PV, PIC-104.PV
+LT-105.PV, LT105_V104_Level_PV
+FT-107.PV, FT107_CondensateFlow_PV
+PT-104.PV, PT104_AccumulatorPressure_PV
+LIC-104.XOUT, LIC104_RSP_to_FIC107
+FIC-107.XOUT, FIC107_ValveCmd_to_LV107
+XV-103.FB_Opened, XV103_Open_FB
+CascadePermissive.OUT, Cascade_Permissive_OK
+StartupDelay.Q, Startup_Delay_Done
+
+* Parameter Data Connections *
+65.0, LIC-104.SP
+1.5, LIC-104.KP
+2.5, LIC-104.TR
+40.0, LIC-104.X0
+0.0, LIC-104.MV_MIN
+100.0, LIC-104.MV_MAX
+90.0, LIC-104.PV_High
+10.0, LIC-104.PV_Low
+4.0, FIC-107.KP
+0.5, FIC-107.TR
+0.0, FIC-107.MV_MIN
+100.0, FIC-107.MV_MAX
+0.0, FIC-107.X0
+0.0, FT-107.PV_Low
+50.0, FT-107.PV_High
+TRUE, FT-107.Alarm_Enable
+90.0, LT-105.PV_High
+10.0, LT-105.PV_Low
+TRUE, LT-105.Alarm_Enable
+30.0, PT-104.PV_High
+15.0, PT-104.PV_Low
+TRUE, PT-104.Alarm_Enable
+30.0, PIC-104.PV_High
+15.0, PIC-104.PV_Low
+0.0, PIC-104.MV_MIN
+100.0, PIC-104.MV_MAX
+0.5, RSP_Scale.IN2
+T#30s, StartupDelay.PT
+0.0, LV-107.Manual_Position
+0.0, LV-107.Close_Limit
+100.0, LV-107.Open_Limit
+

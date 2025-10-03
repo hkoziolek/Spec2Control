@@ -1,0 +1,83 @@
+* Function Blocks *
+ANALOG_IN LT-105
+ANALOG_IN FT-107
+ANALOG_IN PT-104
+PID_BASIC LIC-104
+PID_BASIC FIC-107
+PID_BASIC PIC-104
+VALVE_ELECTRIC LV-107
+VALVE_ON_OFF XV-103
+
+* Variables *
+REAL LT_105_Level_PV
+REAL FT_107_Flow_PV
+REAL PT_104_Pressure_PV
+REAL LIC_104_RSP_to_FIC_107_GPM
+REAL FIC_107_Control_Signal_to_LV_107
+BOOL XV103_NotOpen
+BOOL Cascade_Inhibit
+BOOL Permissive_OK
+
+* Functions *
+OR CascadeInhibit_OR
+NOT XV103NotOpen_NOT
+NOT CascadePermissive_NOT
+TON CascadeStartDelay_TON
+MULT LIC_to_FIC_SP_MULT
+
+* Data Connections * 
+LT-105.PV, LT_105_Level_PV
+FT-107.PV, FT_107_Flow_PV
+PT-104.PV, PT_104_Pressure_PV
+LT-105.PV, LIC-104.PV
+LIC-104.XOUT, LIC_to_FIC_SP_MULT.IN1
+LIC_to_FIC_SP_MULT.OUT, FIC-107.SP
+LIC_to_FIC_SP_MULT.OUT, LIC_104_RSP_to_FIC_107_GPM
+FT-107.PV, FIC-107.PV
+FIC-107.XOUT, LV-107.Control_Signal
+FIC-107.XOUT, FIC_107_Control_Signal_to_LV_107
+XV-103.FB_Opened, XV103NotOpen_NOT.IN
+XV103NotOpen_NOT.OUT, XV103_NotOpen
+XV103NotOpen_NOT.OUT, CascadeInhibit_OR.IN1
+LT-105.Low_Alarm, CascadeInhibit_OR.IN2
+PT-104.Low_Alarm, CascadeInhibit_OR.IN3
+PT-104.High_Alarm, CascadeInhibit_OR.IN4
+FT-107.General_Fault, CascadeInhibit_OR.IN5
+LV-107.Alarm, CascadeInhibit_OR.IN6
+CascadeInhibit_OR.OUT, Cascade_Inhibit
+CascadeInhibit_OR.OUT, LIC-104.Inhibit
+CascadeInhibit_OR.OUT, FIC-107.Inhibit
+PT-104.High_Alarm, LV-107.Inhibit
+Cascade_Inhibit, CascadePermissive_NOT.IN
+CascadePermissive_NOT.OUT, Permissive_OK
+Permissive_OK, FIC-107.AUTO
+Permissive_OK, CascadeStartDelay_TON.IN
+CascadeStartDelay_TON.Q, LIC-104.AUTO
+PT-104.PV, PIC-104.PV
+PT-104.High_Alarm, LV-107.Manual_Mode
+
+* Parameter Data Connections *
+TRUE, LT-105.Alarm_Enable
+TRUE, FT-107.Alarm_Enable
+30.0, PT-104.PV_High
+TRUE, PT-104.Alarm_Enable
+65.0, LIC-104.SP
+1.5, LIC-104.KP
+2.5, LIC-104.TR
+0.0, LIC-104.TD
+0.0, LIC-104.MV_MIN
+100.0, LIC-104.MV_MAX
+40.0, LIC-104.X0
+90.0, LIC-104.PV_High
+10.0, LIC-104.PV_Low
+4.0, FIC-107.KP
+0.5, FIC-107.TR
+0.0, FIC-107.TD
+0.0, FIC-107.MV_MIN
+100.0, FIC-107.MV_MAX
+100.0, LV-107.Open_Limit
+0.0, LV-107.Close_Limit
+0.0, LV-107.Manual_Position
+T#30s, CascadeStartDelay_TON.PT
+0.5, LIC_to_FIC_SP_MULT.IN2
+

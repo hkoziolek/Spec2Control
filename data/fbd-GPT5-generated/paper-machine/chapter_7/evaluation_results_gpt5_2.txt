@@ -1,0 +1,125 @@
+Evaluation Results for paper-machine - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_7\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(4), MOTOR_ON_OFF(1), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\paper-machine\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\paper-machine\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN CT-601
+ANALOG_IN FT-601
+ANALOG_IN PIT-601
+ANALOG_IN VT-601
+PID_BASIC FIC-601
+RATIO_CONTROL FFIC-601
+VALVE_ELECTRIC FV-601
+MOTOR_ON_OFF P-601
+BOOL_IN FS-601
+BOOL_IN P-601-RUN
+BOOL_IN PIT-601-OK
+BOOL_IN VT-601-OK
+DIGITAL_IN ALM-601
+DIGITAL_IN ALM-602
+DIGITAL_IN ALM-603
+DIGITAL_IN ALM-604
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN CT-601
+ANALOG_IN FT-601
+ANALOG_IN PIT-601
+ANALOG_IN VT-601
+PID_BASIC FIC-601
+RATIO_CONTROL FFIC-601
+VALVE_ELECTRIC FV-601
+
+ALL DATA CONNECTIONS:
+CT-601.PV, FFIC-601.PrimaryPV
+FT-601.PV, FFIC-601.SecondaryPV
+FFIC-601.SlaveSP, FIC-601.SP
+FT-601.PV, FIC-601.PV
+FIC-601.XOUT, FV-601.Control_Signal
+PIT-601.Low_Alarm, PIT601_OK_NOT.IN
+PIT601_OK_NOT.OUT, PIT-601-OK.Bool_In
+VT-601.Low_Alarm, VT601_OK_NOT.IN
+VT601_OK_NOT.OUT, VT-601-OK.Bool_In
+P-601.FB_Running, P-601-RUN.Bool_In
+P-601-RUN.Bool_Out, RatioPermissive_AND.IN1
+FS-601.Bool_Out, RatioPermissive_AND.IN2
+PIT-601-OK.Bool_Out, RatioPermissive_AND.IN3
+VT-601-OK.Bool_Out, RatioPermissive_AND.IN4
+RatioPermissive_AND.OUT, RatioPermissive_NOT.IN
+RatioPermissive_NOT.OUT, RatioInhibit_OR.IN1
+ALM-602.DI_Out, RatioInhibit_OR.IN2
+RatioInhibit_OR.OUT, FFIC-601.Inhibit
+RatioInhibit_OR.OUT, FV-601.Manual_Mode
+RatioInhibit_OR.OUT, RatioAuto_NOT.IN
+RatioAuto_NOT.OUT, FFIC-601.Auto
+RatioAuto_NOT.OUT, FIC-601.AUTO
+RatioPermissive_NOT.OUT, FICInhibit_OR.IN1
+ALM-603.DI_Out, FICInhibit_OR.IN2
+FICInhibit_OR.OUT, FIC-601.Inhibit
+FICInhibit_OR.OUT, FV-601.Inhibit
+FIC-601.PV_High_Alarm, FlowRangeAlarm_OR.IN1
+FIC-601.PV_Low_Alarm, FlowRangeAlarm_OR.IN2
+FlowRangeAlarm_OR.OUT, ALM-601.DI_Raw
+CT-601.General_Fault, ALM-602.DI_Raw
+FT-601.General_Fault, ALM-603.DI_Raw
+FIC-601.Deviation_Alarm, ALM-604.DI_Raw
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV → RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = CT-601; RATIO_CONTROL = FFIC-601
+- Actual Connection: CT-601.PV, FFIC-601.PrimaryPV
+- Notes: Direct mapping matches intended ratio primary PV. Additional alarms/permissives exist but do not affect this PV linkage.
+
+Intended: ANALOG_IN2.PV → RATIO_CONTROL.SecondaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 = FT-601; RATIO_CONTROL = FFIC-601
+- Actual Connection: FT-601.PV, FFIC-601.SecondaryPV
+- Notes: Direct mapping matches intended ratio secondary PV.
+
+Intended: RATIO_CONTROL.SlaveSP → PID_BASIC.SP
+- Status: FOUND DIRECT
+- Mapping: RATIO_CONTROL = FFIC-601; PID_BASIC = FIC-601
+- Actual Connection: FFIC-601.SlaveSP, FIC-601.SP
+- Notes: Supporting logic manages Auto/Inhibit around both FFIC-601 and FIC-601, but the SP handoff is directly implemented as intended.
+
+Intended: PID_BASIC.XOUT → VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC = FIC-601; VALVE_ELECTRIC = FV-601
+- Actual Connection: FIC-601.XOUT, FV-601.Control_Signal
+- Notes: Alternative indirect path to MOTOR_VSD.Speed_SP is permitted by the task but not present here. Inhibit/Manual gating signals are wired to FV-601, aligning with typical safety/operations logic.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with appropriate auxiliary logic (permissives, inhibit, auto/manual) to protect and manage operation. Additional wiring (FT-601.PV to FIC-601.PV and alarm routing) suggests a well-integrated control strategy.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

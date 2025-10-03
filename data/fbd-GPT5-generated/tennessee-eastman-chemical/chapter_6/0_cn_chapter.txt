@@ -1,0 +1,33 @@
+## 6 **Separator**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-006 | Flow Controller | Regulates liquid flow to maintain separator level |
+|FV-103 | Flow Valve | Controls heat input to separator for temperature regulation |
+|LIC-102 | Level Controller | Maintains liquid level in separator at setpoint |
+|LT-102 | Level Transmitter | Measures liquid level in separator |
+|PIC-501 | Pressure Controller | Regulates separator pressure at setpoint |
+|PIT-104 | Pressure Transmitter | Measures separator pressure |
+|TI-006 | Temperature Transmitter | Provides temperature measurement for separator control |
+|TIC-101 | Temperature Controller | Controls separator temperature via heat input adjustment |
+
+### 6.1) Control Strategy Description
+
+The Separator section employs PID control to maintain stable temperature, pressure, and level conditions for effective phase separation. Temperature control is achieved using TIC-101, which regulates the heat input to the separator via FV-103. TIC-101 operates in direct-acting mode to increase heating when the temperature falls below the setpoint. The temperature setpoint (SP) is fixed at 145°C, with a proportional gain (Kp) of 2.0, integral time (Ki) of 0.5 minutes, and derivative time (Kd) of 0.1 minutes. The temperature transmitter (TI6) provides a 4-20mA signal corresponding to a measurement span of 100°C to 200°C. The control output (MV) drives FV-103, which is a fail-closed valve to ensure safety during system faults.
+
+Pressure control is managed by PIC-501, which maintains a setpoint of 1.5 bar using feedback from PIT-104. PIC-501 operates in reverse-acting mode, reducing pressure when the process variable exceeds the setpoint. The pressure transmitter (PIT-104) provides a 4-20mA signal over a range of 0 bar to 3 bar. The PID tuning parameters for PIC-501 are Kp=1.5, Ki=0.8 minutes, and Kd=0.2 minutes. The control output adjusts a vent valve (not shown in the diagram) with fail-open characteristics.
+
+Level control is implemented using LIC-102, which regulates the liquid level in the separator via FC-6. LIC-102 operates in direct-acting mode, increasing flow through FC-6 when the level drops below the setpoint of 60%. The level transmitter (LT-102) provides a 4-20mA signal corresponding to a span of 0% to 100%. The PID tuning parameters for LIC-102 are Kp=3.0, Ki=1.0 minutes, and Kd=0.0 minutes. FC-6 is a fail-closed control valve to prevent over-drainage during system failures.
+
+Bumpless transfer is enabled for all controllers to ensure smooth transitions between manual and automatic modes. A deadband of ±2% is applied to all control loops to prevent unnecessary control actions during steady-state operation.
+
+### 6.2) Interlocks and Permissives
+
+The Separator section includes interlocks to ensure safe operation. TIC-101 is interlocked with a high-temperature alarm from TI6, which trips the heating system if the temperature exceeds 160°C. Similarly, PIC-501 is interlocked with a high-pressure alarm from PIT-104, which activates a relief valve if the pressure exceeds 2.5 bar. LIC-102 is interlocked with a low-level alarm from LT-102, which shuts down FC-6 if the level drops below 20% to prevent pump cavitation.
+
+Permissives include a requirement for the separator feed valve to be open before any control loops are activated. Additionally, the heating system controlled by TIC-101 requires confirmation of flow through FC-6 to prevent overheating during stagnant conditions.
+
+### 6.3) Alarm and Fault Handling
+
+The Separator section includes alarm handling for critical faults. High-temperature alarms are triggered when TI6 exceeds 160°C, initiating a shutdown of FV-103 and alerting operators. High-pressure alarms from PIT-104 at 2.5 bar activate a relief valve and send a fault signal to the DCS. Low-level alarms from LT-102 at 20% disable FC-6 and initiate an emergency feed cutoff to prevent equipment damage.
+
+Fault handling includes automatic switching of controllers to manual mode during transmitter failures. For TIC-101, a transmitter fault in TI6 sets the controller output to a default bias of 50% to maintain approximate heating. Similarly, PIC-501 defaults to 25% vent opening during PIT-104 faults, and LIC-102 defaults FC-6 to 50% open during LT-102 faults. Operators are notified via the DCS for immediate corrective action.

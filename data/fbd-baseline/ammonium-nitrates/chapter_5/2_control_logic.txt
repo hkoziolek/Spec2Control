@@ -1,0 +1,95 @@
+* Function Blocks *
+PID_BASIC TIC-401
+ANALOG_IN TT-401
+PID_BASIC FIC-402
+ANALOG_IN FT-402
+VALVE_ELECTRIC FV-402
+MOTOR_ON_OFF MP-405
+BOOL_IN PS-403
+DIGITAL_IN PSA-404
+
+* Variables *
+REAL TT401_CoolerOutletTemp_PV
+REAL FT402_AntiCakingFlow_PV
+REAL TIC401_RSP_to_FIC402
+REAL FIC402_MV_to_FV402
+REAL FIC402_SP_Manual
+
+* Functions *
+SUB TempError_SUB
+ABS ErrorAbs_ABS
+GT Deadband_GT
+MUL RSP_Scale_MUL
+SEL RSP_Select_SEL
+OR TT401_OutOfRange_OR
+OR TT401_Bad_OR
+OR FT402_OutOfRange_OR
+OR FT402_Bad_OR
+OR PermissiveFaults_OR1
+OR PermissiveFaults_OR2
+OR CascadeInhibit_OR
+
+* Data Connections * 
+TT-401.PV, TIC-401.PV
+FT-402.PV, FIC-402.PV
+FIC-402.XOUT, FV-402.Control_Signal
+TIC-401.XOUT, RSP_Scale_MUL.IN1
+RSP_Scale_MUL.OUT, RSP_Select_SEL.IN1
+Deadband_GT.OUT, RSP_Select_SEL.G
+FIC402_SP_Manual, RSP_Select_SEL.IN0
+RSP_Select_SEL.OUT, FIC-402.SP
+TT-401.PV, TempError_SUB.IN2
+TempError_SUB.OUT, ErrorAbs_ABS.IN
+ErrorAbs_ABS.OUT, Deadband_GT.IN1
+TT-401.High_Alarm, TT401_OutOfRange_OR.IN1
+TT-401.Low_Alarm, TT401_OutOfRange_OR.IN2
+TT401_OutOfRange_OR.OUT, TT401_Bad_OR.IN1
+TT-401.General_Fault, TT401_Bad_OR.IN2
+FT-402.High_Alarm, FT402_OutOfRange_OR.IN1
+FT-402.Low_Alarm, FT402_OutOfRange_OR.IN2
+FT402_OutOfRange_OR.OUT, FT402_Bad_OR.IN1
+FT-402.General_Fault, FT402_Bad_OR.IN2
+TT401_Bad_OR.OUT, PermissiveFaults_OR1.IN1
+FT402_Bad_OR.OUT, PermissiveFaults_OR1.IN2
+PS-403.Bool_Out, PermissiveFaults_OR2.IN1
+PSA-404.DI_Out, PermissiveFaults_OR2.IN2
+PermissiveFaults_OR1.OUT, CascadeInhibit_OR.IN1
+PermissiveFaults_OR2.OUT, CascadeInhibit_OR.IN2
+CascadeInhibit_OR.OUT, TIC-401.Inhibit
+CascadeInhibit_OR.OUT, FIC-402.Inhibit
+CascadeInhibit_OR.OUT, FV-402.Inhibit
+CascadeInhibit_OR.OUT, MP-405.Inhibit
+TT-401.PV, TT401_CoolerOutletTemp_PV
+FT-402.PV, FT402_AntiCakingFlow_PV
+TIC-401.XOUT, TIC401_RSP_to_FIC402
+FIC-402.XOUT, FIC402_MV_to_FV402
+
+* Parameter Data Connections *
+45.0, TIC-401.SP
+TRUE, TIC-401.AUTO
+1.2, TIC-401.KP
+2.0, TIC-401.TR
+0.0, TIC-401.MV_MIN
+100.0, TIC-401.MV_MAX
+50.0, TIC-401.PV_High
+40.0, TIC-401.PV_Low
+2.0, TIC-401.Deviation_Limit
+TRUE, FIC-402.AUTO
+3.5, FIC-402.KP
+0.3, FIC-402.TR
+0.0, FIC-402.MV_MIN
+100.0, FIC-402.MV_MAX
+10.0, FIC-402.PV_High
+0.5, FIC-402.PV_Low
+TRUE, TT-401.Alarm_Enable
+1.0, TT-401.Scaling_Slope
+0.0, TT-401.Scaling_Offset
+TRUE, FT-402.Alarm_Enable
+1.0, FT-402.Scaling_Slope
+0.0, FT-402.Scaling_Offset
+100.0, FV-402.Open_Limit
+0.0, FV-402.Close_Limit
+0.1, RSP_Scale_MUL.IN2
+0.5, Deadband_GT.IN2
+45.0, TempError_SUB.IN1
+

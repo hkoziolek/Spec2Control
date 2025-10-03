@@ -1,0 +1,82 @@
+PV Alarm Parameter Analysis - ammonium-nitrates
+Generated: 2025-09-24 16:37:22
+====================================================================================================
+
+Chapter      Required PVs Accuracy % Additional PVs
+-------------------------------------------------
+chapter_2    7/7          100.0      1            
+chapter_3    4/4          100.0      3            
+chapter_4    2/2          100.0      4            
+chapter_5    4/4          100.0      4            
+chapter_6    3/3          100.0      0            
+
+Plant Summary: Required PVs: 20/20 (100.0%), Additional PVs: 12
+
+====================================================================================================
+DETAILED PV ANALYSIS
+====================================================================================================
+
+chapter_2
+------------------------------------------------------------
+[OK] Found Required PVs (7):
+  [=] FIC-102.PV_Low: reviewed=10, output=10
+  [=] FT-101.PV_Low: reviewed=10, output=10
+  [=] LT-104.PV_High: reviewed=90, output=90
+  [=] LT-104.PV_Low: reviewed=20, output=20
+  [=] PH-105.PV_High: reviewed=7.3, output=7.3
+  [=] PH-105.PV_Low: reviewed=6.7, output=6.7
+  [=] TIC-103.PV_High: reviewed=190, output=190
+
+[ADD] Additional PVs (1):
+  - FT-101.PV_High: 500
+
+
+chapter_3
+------------------------------------------------------------
+[OK] Found Required PVs (4):
+  [=] PT-203.PV_High: reviewed=0.5, output=0.5
+  [=] PT-203.PV_Low: reviewed=0.2, output=0.2
+  [=] TT-103.PV_High: reviewed=210.0, output=210
+  [=] TT-103.PV_Low: reviewed=190.0, output=190
+
+[ADD] Additional PVs (3):
+  - TIC-201.PV_High: 210
+  - TIC-201.PV_Low: 190
+  - TT-104.PV_Low: 100
+
+
+chapter_4
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] RTD-302.PV_High: reviewed=200.0, output=200.0
+  [=] RTD-302.PV_Low: reviewed=150.0, output=150.0
+
+[ADD] Additional PVs (4):
+  - AT-303.PV_High: 15.0
+  - AT-303.PV_Low: 0.0
+  - FT-301.PV_High: 5.0
+  - FT-301.PV_Low: 2.5
+
+
+chapter_5
+------------------------------------------------------------
+[OK] Found Required PVs (4):
+  [=] FIC-402.PV_High: reviewed=10.0, output=10.0
+  [=] FIC-402.PV_Low: reviewed=0.5, output=0.5
+  [=] TIC-401.PV_High: reviewed=50.0, output=50.0
+  [=] TIC-401.PV_Low: reviewed=40.0, output=40.0
+
+[ADD] Additional PVs (4):
+  - FT-402.PV_High: 10.0
+  - FT-402.PV_Low: 0.5
+  - TT-401.PV_High: 100.0
+  - TT-401.PV_Low: 0.0
+
+
+chapter_6
+------------------------------------------------------------
+[OK] Found Required PVs (3):
+  [=] LT-501.PV_High: reviewed=90.0, output=90.0
+  [=] LT-501.PV_Low: reviewed=10.0, output=10.0
+  [=] WB-505.PV_Low: reviewed=100.0, output=100.0
+

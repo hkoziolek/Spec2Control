@@ -1,0 +1,76 @@
+Evaluation Results for multi-phase-flow-facility - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_7\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\multi-phase-flow-facility\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\multi-phase-flow-facility\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PIT-106
+PID_BASIC PIC-105
+VALVE_ELECTRIC V-010
+BOOL_IN COMPRESSOR_RUN_PERMISSIVE
+TON StartupDelay_TON
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PIT-106
+PID_BASIC PIC-105
+VALVE_ELECTRIC V-010
+
+ALL DATA CONNECTIONS:
+PIT-106.PV, PIC-105.PV
+PIC-105.XOUT, V-010.Control_Signal
+COMPRESSOR_RUN_PERMISSIVE.Bool_Out, CompressorNotRunning_NOT.IN
+COMPRESSOR_RUN_PERMISSIVE.Bool_Out, StartupDelay_TON.IN
+StartupDelay_TON.Q, StartupDelayNot_NOT.IN
+CompressorNotRunning_NOT.OUT, AllInhibits_OR.IN1
+PIC-105.PV_High_Alarm, AllInhibits_OR.IN2
+PIC-105.PV_Low_Alarm, AllInhibits_OR.IN3
+PIT-106.General_Fault, AllInhibits_OR.IN4
+StartupDelayNot_NOT.OUT, AllInhibits_OR.IN5
+AllInhibits_OR.OUT, PIC-105.Inhibit
+AllInhibits_OR.OUT, V-010.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN PIT-106; PID_BASIC PIC-105
+- Actual Connection: PIT-106.PV, PIC-105.PV
+- Notes: Direct PV feed is implemented. Additional alarm signals (PIC-105.PV_High_Alarm and PV_Low_Alarm) participate in inhibit logic, indicating robust interlock design.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC PIC-105; VALVE_ELECTRIC V-010
+- Actual Connection: PIC-105.XOUT, V-010.Control_Signal
+- Notes: Direct control signal path is implemented. An indirect alternative via MOTOR_VSD.Speed_SP would also be valid but is not present or needed here. Shared inhibit (AllInhibits_OR.OUT) applied to both PIC-105 and V-010 adds coordinated interlocking.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct mappings match the intended design; the presence of coordinated inhibit logic and a startup delay suggests careful and robust implementation.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

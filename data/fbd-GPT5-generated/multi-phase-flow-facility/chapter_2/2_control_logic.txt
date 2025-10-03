@@ -1,0 +1,84 @@
+* Function Blocks *
+ANALOG_IN FT-404
+ANALOG_IN FT-406
+ANALOG_IN PT-403
+ANALOG_IN PT-408
+RATIO_CONTROL FFIC-402
+PID_BASIC FIC-406
+VALVE_ELECTRIC CV-406
+PID_BASIC PIC-401
+VALVE_ELECTRIC CV-401
+
+* Variables *
+REAL FT404_GasFlow_PV
+REAL FT406_LiquidFlow_PV
+REAL FFIC402_LiquidFlow_SP
+REAL FIC406_MV_ToCV406
+REAL PT403_SeparatorPressure_PV
+REAL PT408_AuxPressure_PV
+REAL PIC401_MV_ToCV401
+
+* Functions *
+OR RatioDisable_OR
+OR ValveInhibit_OR
+
+* Data Connections * 
+FT-404.PV, FFIC-402.PrimaryPV
+FT-406.PV, FFIC-402.SecondaryPV
+FFIC-402.SlaveSP, FIC-406.SP
+FT-406.PV, FIC-406.PV
+FIC-406.XOUT, CV-406.Control_Signal
+PT-403.PV, PIC-401.PV
+PIC-401.XOUT, CV-401.Control_Signal
+FT-404.Low_Alarm, RatioDisable_OR.IN1
+FT-404.General_Fault, RatioDisable_OR.IN2
+FT-406.General_Fault, RatioDisable_OR.IN3
+PT-408.Low_Alarm, RatioDisable_OR.IN4
+PT-403.High_Alarm, RatioDisable_OR.IN5
+PT-403.Low_Alarm, RatioDisable_OR.IN6
+FT-404.Low_Alarm, ValveInhibit_OR.IN1
+FT-406.Low_Alarm, ValveInhibit_OR.IN2
+PT-403.High_Alarm, ValveInhibit_OR.IN3
+PT-403.Low_Alarm, ValveInhibit_OR.IN4
+RatioDisable_OR.OUT, FFIC-402.Inhibit
+RatioDisable_OR.OUT, FIC-406.Inhibit
+ValveInhibit_OR.OUT, CV-406.Inhibit
+FT-404.PV, FT404_GasFlow_PV
+FT-406.PV, FT406_LiquidFlow_PV
+FFIC-402.SlaveSP, FFIC402_LiquidFlow_SP
+FIC-406.XOUT, FIC406_MV_ToCV406
+PT-403.PV, PT403_SeparatorPressure_PV
+PT-408.PV, PT408_AuxPressure_PV
+PIC-401.XOUT, PIC401_MV_ToCV401
+
+* Parameter Data Connections *
+2.5, FFIC-402.RatioSP
+TRUE, FFIC-402.Auto
+0, FFIC-402.MV_MIN
+500, FFIC-402.MV_MAX
+TRUE, FT-404.Alarm_Enable
+50, FT-404.PV_Low
+1000, FT-404.PV_High
+TRUE, FT-406.Alarm_Enable
+20, FT-406.PV_Low
+500, FT-406.PV_High
+TRUE, PT-403.Alarm_Enable
+5.5, PT-403.PV_High
+4.5, PT-403.PV_Low
+TRUE, PT-408.Alarm_Enable
+1.0, PT-408.PV_Low
+6.0, PT-408.PV_High
+5.0, PIC-401.SP
+TRUE, PIC-401.AUTO
+6.0, PIC-401.PV_High
+4.0, PIC-401.PV_Low
+0, PIC-401.MV_MIN
+100, PIC-401.MV_MAX
+TRUE, FIC-406.AUTO
+0, FIC-406.MV_MIN
+100, FIC-406.MV_MAX
+0, CV-406.Close_Limit
+100, CV-406.Open_Limit
+0, CV-401.Close_Limit
+100, CV-401.Open_Limit
+

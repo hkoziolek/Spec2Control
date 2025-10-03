@@ -1,0 +1,78 @@
+      <pou name="MOTOR_2SPD" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Start_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Stop_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Speed_High_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Speed_Low_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Motor_Start_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_Running">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_Trip">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_HighSpeed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_LowSpeed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Speed_Error">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

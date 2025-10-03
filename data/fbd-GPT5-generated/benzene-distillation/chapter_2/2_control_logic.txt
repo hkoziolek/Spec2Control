@@ -1,0 +1,72 @@
+* Function Blocks *
+ANALOG_IN TE-101
+PID_BASIC TIC-104
+VALVE_ELECTRIC PV-103
+VALVE_ON_OFF XV-105
+ANALOG_IN LIT-101
+ANALOG_IN PIT-102
+DIGITAL_IN LAH-101
+DIGITAL_IN LAL-101
+
+* Variables *
+REAL TE101_BaseTemp_PV
+REAL PV103_MV_Command
+REAL PV103_Position_Feedback
+BOOL XV105_Open_Feedback
+REAL LIT101_ColumnLevel_PV
+REAL PIT102_Pressure_PV
+
+* Functions *
+OR LevelOutOfRange_OR
+NOT XV105NotOpen_NOT
+OR TIC104AnyInhibit_OR
+
+* Data Connections *
+TE-101.PV, TIC-104.PV
+TIC-104.XOUT, PV-103.Control_Signal
+PIT-102.High_Alarm, TIC104AnyInhibit_OR.IN1
+TE-101.High_Alarm, TIC104AnyInhibit_OR.IN2
+LAH-101.DI_Out, LevelOutOfRange_OR.IN1
+LAL-101.DI_Out, LevelOutOfRange_OR.IN2
+XV-105.FB_Opened, XV105NotOpen_NOT.IN
+LevelOutOfRange_OR.OUT, TIC104AnyInhibit_OR.IN3
+XV105NotOpen_NOT.OUT, TIC104AnyInhibit_OR.IN4
+PV-103.Alarm, TIC104AnyInhibit_OR.IN5
+TE-101.Low_Alarm, TIC104AnyInhibit_OR.IN6
+TE-101.General_Fault, TIC104AnyInhibit_OR.IN7
+PIT-102.Low_Alarm, TIC104AnyInhibit_OR.IN8
+TIC104AnyInhibit_OR.OUT, TIC-104.Inhibit
+LevelOutOfRange_OR.OUT, XV-105.Inhibit
+TE-101.PV, TE101_BaseTemp_PV
+TIC-104.XOUT, PV103_MV_Command
+PV-103.Feedback_Pos, PV103_Position_Feedback
+XV-105.FB_Opened, XV105_Open_Feedback
+LIT-101.PV, LIT101_ColumnLevel_PV
+PIT-102.PV, PIT102_Pressure_PV
+
+* Parameter Data Connections *
+9.375, TE-101.Scaling_Slope
+12.5, TE-101.Scaling_Offset
+200.0, TE-101.PV_High
+50.0, TE-101.PV_Low
+TRUE, TE-101.Alarm_Enable
+150.0, TIC-104.SP
+10.0, TIC-104.MV_MIN
+90.0, TIC-104.MV_MAX
+3.0, TIC-104.KP
+0.5, TIC-104.TR
+0.1, TIC-104.TD
+180.0, TIC-104.PV_High
+130.0, TIC-104.PV_Low
+2.0, TIC-104.Deviation_Limit
+TRUE, TIC-104.AUTO
+100.0, PV-103.Open_Limit
+0.0, PV-103.Close_Limit
+FALSE, PV-103.Manual_Mode
+80.0, LIT-101.PV_High
+20.0, LIT-101.PV_Low
+TRUE, LIT-101.Alarm_Enable
+150.0, PIT-102.PV_High
+90.0, PIT-102.PV_Low
+TRUE, PIT-102.Alarm_Enable
+

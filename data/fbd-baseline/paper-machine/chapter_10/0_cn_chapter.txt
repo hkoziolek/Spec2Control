@@ -1,0 +1,33 @@
+## 10 **Finishing and Winding**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AL-901 | Analyzer | Monitors process parameter for quality control |
+|AL-903 | Analyzer | Provides additional process analysis data |
+|CW-901 | Cooling Water System | Supplies cooling water to the process |
+|FIC-904 | Flow Controller | Regulates coating flow rate to maintain setpoint |
+|FT-901 | Force Transmitter | Measures calender stack nip load (0–100 kN) |
+|FT-902 | Flow Transmitter | Measures coating flow rate (0–500 L/min) |
+|FV-104 | Flow Valve | Modulates coating flow rate based on control signal |
+|XV-105 | On-Off Valve | Isolates or permits flow in the process line |
+
+### 10.1) Control Strategy Description
+
+In the **Finishing and Winding** section, ratio control is implemented to maintain a precise proportional relationship between the coating application rate and the calender stack nip load. The wild variable is the calender stack nip load, measured by force transmitter FT-901, with a range of 0–100 kN. The controlled variable is the coating flow rate, regulated by flow control valve FV-104, with flow transmitter FT-902 measuring a range of 0–500 L/min. The ratio controller, designated as FFIC-903, calculates the setpoint for the coating flow rate based on the measured nip load and a configurable ratio setpoint.
+
+The ratio setpoint, entered by the operator via the human-machine interface (HMI), is adjustable between 1.5:1 and 3.0:1. For example, if the nip load is measured at 60 kN and the ratio setpoint is 2.0:1, FFIC-903 calculates the coating flow setpoint as 120 L/min. This setpoint is sent to the flow controller FIC-904, which modulates FV-104 to maintain the desired flow rate. The ratio controller includes a manual bias adjustment feature, allowing operators to fine-tune the ratio within ±0.2 of the setpoint for quality optimization.
+
+To ensure stable operation, the ratio controller is equipped with low-flow cutoff logic. If the nip load falls below 5 kN, FFIC-903 outputs a zero setpoint to FIC-904, closing FV-104 to prevent under-coating. Additionally, signal scaling ensures that all measurements are normalized to engineering units before ratio calculations. Transition ramping logic is employed during startup or ratio setpoint changes, limiting the rate of change to 0.1 ratio units per second to avoid process disturbances.
+
+### 10.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with the calender stack and coating station to ensure safe operation. XV-105, the upstream shut-off valve for the coating station, must be open, and the calender stack must be running at a minimum nip load of 5 kN (verified by FT-901) before FFIC-903 is enabled. If either permissive condition is not met, FFIC-903 outputs a zero setpoint to FIC-904, forcing FV-104 to close.
+
+An additional interlock ensures that the LASER coat-weight sensor CW-901 is operational and transmitting valid data. If CW-901 detects a coat-weight deviation exceeding ±10% from the target, FFIC-903 is automatically disabled, and the system reverts to manual control. The operator is alerted to investigate and resolve the issue before re-enabling the ratio control loop.
+
+### 10.3) Alarm and Fault Handling
+
+The system generates alarms for deviations and faults within the ratio control loop. A high-ratio deviation alarm (AL-903-H) is triggered if the actual coating flow rate deviates by more than 5% from the setpoint calculated by FFIC-903 for more than 10 seconds. This alarm prompts the operator to check FV-104 and associated instrumentation for potential issues.
+
+A low-nip-load alarm (AL-901-L) is activated if FT-901 measures a nip load below 5 kN, indicating that the calender stack is not operating within the required range for coating application. This condition forces FFIC-903 to output a zero setpoint to FIC-904, preventing coating flow.
+
+Instrumentation faults, such as signal loss from FT-901, FT-902, or CW-901, trigger a system fault alarm (AL-903-F) and disable FFIC-903. The system transitions to manual control, and FV-104 is closed to prevent uncontrolled coating application. The operator must address the fault and confirm resolution before reactivating the ratio control loop.

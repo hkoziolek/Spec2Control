@@ -1,0 +1,61 @@
+* Function Blocks *
+ANALOG_IN PT-106
+PID_BASIC PIC-101
+VALVE_ELECTRIC FV-102
+BOOL_IN LC-801_LEVEL_OK
+BOOL_IN FLARE_IGNITION_OK
+BOOL_IN PT-106_VALID
+
+* Variables *
+REAL PT106_PV_Pct
+REAL PIC101_MV_Pct
+REAL FV102_Feedback_Pos_Pct
+
+* Functions *
+NOT FlareIgnitionFail_NOT
+NOT PT106_Invalid_NOT
+OR PIC101_Inhibit_OR
+NOT LevelNotOK_NOT
+OR FV102_Inhibit_OR
+SEL DeadbandHold_SEL
+
+* Data Connections * 
+PT-106.PV, PIC-101.PV
+PIC-101.XOUT, DeadbandHold_SEL.IN1
+FV-102.Feedback_Pos, DeadbandHold_SEL.IN0
+PIC-101.Deviation_Alarm, DeadbandHold_SEL.G
+DeadbandHold_SEL.OUT, FV-102.Control_Signal
+FV-102.Feedback_Pos, PIC-101.X0
+FLARE_IGNITION_OK.Bool_Out, FlareIgnitionFail_NOT.IN
+FlareIgnitionFail_NOT.OUT, PIC101_Inhibit_OR.IN1
+FV-102.Position_Error, PIC101_Inhibit_OR.IN2
+PT-106_VALID.Bool_Out, PT106_Invalid_NOT.IN
+PT106_Invalid_NOT.OUT, PIC101_Inhibit_OR.IN3
+PT-106.General_Fault, PIC101_Inhibit_OR.IN4
+PIC101_Inhibit_OR.OUT, PIC-101.Inhibit
+LC-801_LEVEL_OK.Bool_Out, LevelNotOK_NOT.IN
+LevelNotOK_NOT.OUT, FV102_Inhibit_OR.IN1
+PIC-101.PV_High_Alarm, FV102_Inhibit_OR.IN2
+PIC-101.PV_Low_Alarm, FV102_Inhibit_OR.IN3
+FV102_Inhibit_OR.OUT, FV-102.Inhibit
+PT-106.PV, PT106_PV_Pct
+PIC-101.XOUT, PIC101_MV_Pct
+FV-102.Feedback_Pos, FV102_Feedback_Pos_Pct
+
+* Parameter Data Connections *
+1.5, PIC-101.SP
+-3.2, PIC-101.KP
+0.5, PIC-101.TR
+0.1, PIC-101.TD
+0, PIC-101.MV_MIN
+100, PIC-101.MV_MAX
+1.8, PIC-101.PV_High
+1.2, PIC-101.PV_Low
+0.15, PIC-101.Deviation_Limit
+TRUE, PIC-101.AUTO
+0.3125, PT-106.Scaling_Slope
+-1.25, PT-106.Scaling_Offset
+TRUE, PT-106.Alarm_Enable
+100, FV-102.Open_Limit
+0, FV-102.Close_Limit
+

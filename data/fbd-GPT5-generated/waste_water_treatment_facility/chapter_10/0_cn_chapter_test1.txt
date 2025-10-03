@@ -1,0 +1,26 @@
+## 10 **Influent Lift Station**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FT-901 | Flow Transmitter | Measures discharge flow rate for pump operation validation |
+|LS-901 | Level Transmitter | Monitors wet well level for pump control logic |
+|P-901A | Pump | Lead pump for influent lift station operation |
+|P-901B | Pump | Standby pump for redundancy in influent lift station |
+|XV-102 | On-Off Valve | Isolation valve for system maintenance or emergency shutdown |
+
+### 10.1) Control Strategy Description
+
+The Influent Lift Station employs a redundant duty/standby pump configuration with automatic switchover and failover integrated into level-based control logic. Pump P-901A is designated as the duty (lead) pump, while pump P-901B is the standby (lag) pump. The control system operates primarily in AUTO mode, with manual and test modes available for operator intervention and maintenance activities. In AUTO mode, P-901A starts when LS-901 indicates a wet well level above 60% and stops when the level falls below 40%. If P-901A fails, as determined by discharge flow FT-901 reading less than 15 GPM for 10 consecutive seconds, P-901B will auto-start after a 5-second delay. Both pumps will operate simultaneously if LS-901 exceeds 85%, ensuring sufficient capacity during high inflow conditions.
+
+Runtime equalization is achieved through automatic rotation of the duty pump based on cumulative runtime. The rotation interval is set to 48 hours, ensuring balanced wear and utilization of both pumps. A minimum runtime of 30 minutes is enforced for each pump to prevent hunting during transient conditions.
+
+### 10.2) Interlocks and Permissives
+
+Pump P-901A and P-901B are interlocked with LS-901 to prevent operation when the wet well level is below 40%, ensuring dry-run protection. Additionally, each pump is interlocked with FT-901 to confirm discharge flow within the acceptable range. If FT-901 detects flow below 15 GPM for more than 10 seconds, the corresponding pump is considered failed, triggering switchover logic.
+
+Startup permissives for both pumps include verified motor availability and absence of high vibration alarms. A 5-second on-delay timer ensures transient signals do not prematurely initiate switchover. During switchover, interlocks bypass the failed pump’s shutdown sequence to allow immediate activation of the standby pump. In TEST mode, both pumps operate simultaneously, bypassing level-based interlocks for diagnostic purposes.
+
+### 10.3) Alarm and Fault Handling
+
+Alarm conditions are monitored continuously for both pumps. A failure alarm is triggered if FT-901 detects flow below 15 GPM for 10 seconds while the pump is running. High vibration detected by motor sensors will result in a fault alarm and immediate shutdown of the affected pump. LS-901 high-level alarms are activated when the wet well level exceeds 90%, prompting simultaneous operation of P-901A and P-901B.
+
+In the event of a fault or failure, the control system logs the alarm and initiates switchover logic to activate the standby pump. Operators are notified via SCADA with detailed alarm messages, including the failed pump’s tagname and fault condition. If both pumps fail, a critical alarm is raised, and the system enters a fail-safe mode, shutting off XV-102 to isolate the wet well and prevent overflow.

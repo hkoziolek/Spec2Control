@@ -1,0 +1,31 @@
+## 4 **Intake Pumps and Sump Pumps**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-101 | Flow Controller | Regulates feedwater flow rate using PID logic |
+|FT-101 | Flow Transmitter | Measures real-time feedwater flow rate in m³/h |
+|LT-101 | Level Transmitter | Monitors liquid level in associated tank or vessel |
+|VFD-101A | Variable Frequency Drive | Modulates pump motor speed to control flow rate |
+
+### 4.1) Control Strategy Description
+
+The intake pump control system utilizes PID feedback loops to regulate feedwater flow rate based on real-time demand, measured by flow transmitter FT-101. The controlled variable (PV) is the flow rate, measured in m³/h, with a transmitter range of 0–500 m³/h and a 4–20mA signal output. The setpoint (SP) for flow rate is dynamically adjustable between 100–450 m³/h, constrained by operational limits to ensure pump integrity and process stability. The final control element is the variable frequency drive (VFD) associated with each intake pump (VFD-101A/B/C/D), which modulates motor speed to achieve the desired flow rate.
+
+The PID controller, designated as FIC-101, is configured as reverse-acting to decrease motor speed when flow exceeds the setpoint. Tuning parameters are set as follows: proportional gain (Kp) = 2.5, integral time (Ki) = 0.8 min, derivative time (Kd) = 0.2 min. The output signal (MV) to the VFD is normalized between 0–100% speed, with anti-windup logic implemented to prevent integral accumulation during saturation. Bumpless transfer logic ensures smooth transitions between manual and automatic modes, preserving control stability during operator interventions.
+
+Raw flow signals from FT-101 are scaled linearly within the controller to provide calibrated flow values in engineering units (m³/h). A deadband of ±2 m³/h is applied to the control logic to prevent hunting during steady-state operation. The control loop achieves a typical response time of 5 seconds and a settling time of 15 seconds under nominal conditions.
+
+### 4.2) Interlocks and Permissives
+
+Pump operation is governed by interlocks and permissives to ensure safe and reliable performance. Each intake pump (P101A/B/C/D) is interlocked with level transmitter LT-101, which monitors sump water level with a range of 0–10 meters and a 4–20mA signal. Pumps are permitted to start only if the sump level is above 2.0 meters (low-level permissive) and below 8.0 meters (high-level permissive). If LT-101 detects a level outside this range, the controller FIC-101 inhibits pump operation by setting the VFD output (MV) to 0%.
+
+Automatic pump changeover logic is implemented to alternate between duty and standby pumps (P101A/B/C/D) based on runtime hours. If a duty pump trips or exceeds 500 runtime hours, the standby pump is activated, and the tripped pump is locked out until manually reset. Leak detection sensors on each pump casing provide additional permissives; a detected leak disables the corresponding VFD and triggers an alarm.
+
+Sump pumps SPUMP-201A/B are interlocked with LT-101 to maintain sump level within acceptable limits. If the sump level exceeds 8.5 meters, SPUMP-201A/B are activated to prevent flooding, overriding normal intake pump operation by shutting down P101A/B/C/D.
+
+### 4.3) Alarm and Fault Handling
+
+The control system generates alarms for deviations in process variables and equipment faults. If the flow rate measured by FT-101 deviates from the setpoint by more than ±10 m³/h for over 30 seconds, a "Flow Deviation" alarm is triggered, prompting operator intervention. If the sump level measured by LT-101 falls below 1.5 meters or exceeds 9.0 meters, a "Sump Level Critical" alarm is raised, and all intake pumps (P101A/B/C/D) are shut down to prevent damage.
+
+Pump motor faults, such as overcurrent or overheating detected by motor protection relays (M103A/B/C/D), immediately stop the affected pump and trigger a "Pump Motor Fault" alarm. Leak detection sensors on pump casings activate a "Pump Leak Detected" alarm and disable the corresponding VFD output.
+
+In the event of a controller failure or communication loss between FIC-101 and FT-101, the system defaults to manual mode, with operator control of VFD speed via HMI. A "Controller Fault" alarm is displayed, and bumpless transfer logic ensures smooth transition to manual operation without disrupting flow rate.

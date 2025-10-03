@@ -1,0 +1,108 @@
+      <pou name="PID_BASIC" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="AUTO">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PV">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="SP">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="MV_MIN">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="MV_MAX">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="X0">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="KP">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="TR">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="TD">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="PV_High">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="PV_Low">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Deviation_Limit">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="PV_High_Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PV_Low_Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Deviation_Alarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="XOUT">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

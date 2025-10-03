@@ -1,0 +1,26 @@
+## 6 **Sampling and Bypass Flow Systems**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AT-105 | Interlock | Ensures system operation within safe parameters. |
+|FIC-104 | Flow Controller | Calculates sampling flow setpoint for ratio control. |
+|FIT-101 | Flow Transmitter | Measures bypass flow rate for ratio control logic. |
+|FV-102 | Flow Control Valve | Modulates sampling flow to achieve setpoint. |
+|LV-103 | Level Valve | Regulates level in associated system or tank. |
+
+### 6.1) Control Strategy Description
+
+The Sampling and Bypass Flow System is designed to maintain a precise ratio between the bypass flow (wild flow) and the sampling flow (controlled flow) to ensure consistent water quality monitoring and pipeline flushing. Flow Indicator Transmitter FIT-101 measures the bypass flow rate, which serves as the wild flow input to the ratio control logic. The desired sampling-to-bypass flow ratio is maintained at a setpoint of 1:10 (sampling flow to bypass flow). This ratio is implemented using Flow Indicator Controller FIC-104, which calculates the sampling flow setpoint as 10% of the real-time bypass flow measured by FIT-101.
+
+The calculated sampling flow setpoint is transmitted to Flow Control Valve FV-102, which modulates to achieve the required sampling flow. The sampling flow is measured by a dedicated flow transmitter (not shown in the current tagname list) and fed back to FIC-104 for closed-loop control. The ratio setpoint is adjustable within a range of 1:5 to 1:20 to accommodate varying operational requirements. Signal scaling is applied to FIT-101 to ensure accurate flow measurement within a range of 0-1000 m³/hr, and the calculated sampling flow setpoint is clamped between 0-200 m³/hr to prevent overdriving FV-102.
+
+### 6.2) Interlocks and Permissives
+
+The ratio control loop is enabled only when the bypass flow rate, as measured by FIT-101, exceeds a minimum threshold of 50 m³/hr to ensure stable operation. If the bypass flow falls below this threshold, the control loop is automatically disabled, and FV-102 is commanded to a fully closed position. A permissive signal from Analyzer Transmitter AT-105 ensures that water quality monitoring equipment is operational before enabling the sampling flow. Additionally, a permissive from Level Control Valve LV-103 ensures that adequate upstream water level is maintained before bypass flow is initiated.
+
+In the event of a manual override, the ratio control loop is bypassed, and FV-102 can be directly manipulated by the operator. The system reverts to automatic ratio control only after the manual mode is disengaged, the bypass flow exceeds the minimum threshold, and all permissives are satisfied.
+
+### 6.3) Alarm and Fault Handling
+
+An alarm is triggered if the actual sampling-to-bypass flow ratio deviates by more than ±10% from the setpoint for a duration exceeding 30 seconds. This deviation alarm is displayed as "RATIO DEVIATION HIGH" or "RATIO DEVIATION LOW" on the operator interface. A fault in FIT-101, such as a loss of signal or an out-of-range condition, triggers a "FIT-101 FAULT" alarm and forces FV-102 to a fail-safe position (fully closed). Similarly, a fault in FIC-104 triggers a "FIC-104 FAULT" alarm, and the system transitions to manual mode with FV-102 held at its last valid position.
+
+If AT-105 detects a water quality issue, a "QUALITY FAULT" alarm is raised, and the ratio control loop is disabled. In this condition, FV-102 is closed to prevent potentially contaminated water from entering the sampling system. All alarms are latched and require operator acknowledgment before the system can return to normal operation.

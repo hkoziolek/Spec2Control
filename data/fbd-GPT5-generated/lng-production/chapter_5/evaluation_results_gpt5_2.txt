@@ -1,0 +1,172 @@
+Evaluation Results for lng-production - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_5\1_categorization.txt
+Ground truth strategy: VOTING
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(6), PID_BASIC(2), VALVE_ELECTRIC(2), VOTING_ANALOG(2)
+Output blocks: ANALOG_IN(11), PID_BASIC(1), VALVE_ELECTRIC(2), VOTING_ANALOG(2)
+EVAL-2 Coverage: 0.92%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, VOTING_ANALOG.Input1
+ANALOG_IN2.PV, VOTING_ANALOG.Input2
+ANALOG_IN3.PV, VOTING_ANALOG.Input3
+"Median", VOTING_ANALOG.Voting_Scheme
+VOTING_ANALOG.Voted_Output, PID_BASIC.PV
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PT-401
+ANALOG_IN PT-401A
+ANALOG_IN PT-401B
+ANALOG_IN PT-401C
+ANALOG_IN TT-105
+ANALOG_IN TT-106
+ANALOG_IN TT-107
+ANALOG_IN FA-401
+ANALOG_IN FA-402A
+ANALOG_IN FA-402B
+ANALOG_IN FA-402C
+VOTING_ANALOG PVT-401
+VOTING_ANALOG TVT-402
+PID_BASIC PV-102_Control
+VALVE_ELECTRIC PV-102
+VALVE_ELECTRIC FV-107
+VALVE_ON_OFF XV-104
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PT-401
+ANALOG_IN PT-401A
+ANALOG_IN PT-401B
+ANALOG_IN PT-401C
+ANALOG_IN TT-105
+ANALOG_IN TT-106
+ANALOG_IN TT-107
+ANALOG_IN FA-401
+ANALOG_IN FA-402A
+ANALOG_IN FA-402B
+ANALOG_IN FA-402C
+VOTING_ANALOG PVT-401
+VOTING_ANALOG TVT-402
+PID_BASIC PV-102_Control
+
+ALL DATA CONNECTIONS:
+PT-401A.PV, PVT-401.Input1
+PT-401B.PV, PVT-401.Input2
+PT-401C.PV, PVT-401.Input3
+TT-105.PV, TVT-402.Input1
+TT-106.PV, TVT-402.Input2
+TT-107.PV, TVT-402.Input3
+PVT-401.Voted_Output, PV-102_Control.PV
+PV-102_Control.XOUT, PV-102.Control_Signal
+PV-102_Control.PV_High_Alarm, I401_InhibitCombined_OR.IN1
+PV-102_Control.PV_Low_Alarm, I401_InhibitCombined_OR.IN2
+PVT-401.Alarm_Voting_Error, I401_InhibitCombined_OR.IN3
+I401_InhibitCombined_OR.OUT, PV-102.Inhibit
+PT-401A.General_Fault, AllPTFault_AND.IN1
+PT-401B.General_Fault, AllPTFault_AND.IN2
+PT-401C.General_Fault, AllPTFault_AND.IN3
+AllPTFault_AND.OUT, XV-104.Close_Cmd
+AllPTFault_AND.OUT, NotAllPTFault_NOT.IN
+NotAllPTFault_NOT.OUT, XV-104.Open_Cmd
+TT-105.High_Alarm, I402_InhibitCombined_OR.IN1
+TT-105.Low_Alarm, I402_InhibitCombined_OR.IN2
+TT-106.High_Alarm, I402_InhibitCombined_OR.IN3
+TT-106.Low_Alarm, I402_InhibitCombined_OR.IN4
+TT-107.High_Alarm, I402_InhibitCombined_OR.IN5
+TT-107.Low_Alarm, I402_InhibitCombined_OR.IN6
+TVT-402.Alarm_Voting_Error, I402_InhibitCombined_OR.IN7
+I402_InhibitCombined_OR.OUT, FV-107.Inhibit
+PVT-401.Voted_Output, Voted5Pct_MULT.IN1
+PT-401A.PV, PT401A_Diff_SUB.IN1
+PVT-401.Voted_Output, PT401A_Diff_SUB.IN2
+PT401A_Diff_SUB.OUT, PT401A_Diff_ABS.IN
+PT401A_Diff_ABS.OUT, PT401A_Dev_GT.IN1
+Voted5Pct_MULT.OUT, PT401A_Dev_GT.IN2
+PT-401B.PV, PT401B_Diff_SUB.IN1
+PVT-401.Voted_Output, PT401B_Diff_SUB.IN2
+PT401B_Diff_SUB.OUT, PT401B_Diff_ABS.IN
+PT401B_Diff_ABS.OUT, PT401B_Dev_GT.IN1
+Voted5Pct_MULT.OUT, PT401B_Dev_GT.IN2
+PT-401C.PV, PT401C_Diff_SUB.IN1
+PVT-401.Voted_Output, PT401C_Diff_SUB.IN2
+PT401C_Diff_SUB.OUT, PT401C_Diff_ABS.IN
+PT401C_Diff_ABS.OUT, PT401C_Dev_GT.IN1
+Voted5Pct_MULT.OUT, PT401C_Dev_GT.IN2
+TT-105.PV, TT105_Diff_SUB.IN1
+TVT-402.Voted_Output, TT105_Diff_SUB.IN2
+TT105_Diff_SUB.OUT, TT105_Diff_ABS.IN
+TT105_Diff_ABS.OUT, TT105_Dev_GT.IN1
+TT-106.PV, TT106_Diff_SUB.IN1
+TVT-402.Voted_Output, TT106_Diff_SUB.IN2
+TT106_Diff_SUB.OUT, TT106_Diff_ABS.IN
+TT106_Diff_ABS.OUT, TT106_Dev_GT.IN1
+TT-107.PV, TT107_Diff_SUB.IN1
+TVT-402.Voted_Output, TT107_Diff_SUB.IN2
+TT107_Diff_SUB.OUT, TT107_Diff_ABS.IN
+TT107_Diff_ABS.OUT, TT107_Dev_GT.IN1
+PVT-401.Healthy_Sensors_Count, PVT401_Degraded_NE.IN1
+I401_InhibitCombined_OR.OUT, MA401_Alarm_OR.IN1
+AllPTFault_AND.OUT, MA401_Alarm_OR.IN2
+I402_InhibitCombined_OR.OUT, MA401_Alarm_OR.IN3
+PV-102.Alarm, MA401_Alarm_OR.IN4
+XV-104.Alarm_General, MA401_Alarm_OR.IN5
+XV-104.Alarm_Position_Error, MA401_Alarm_OR.IN6
+FV-107.Alarm, MA401_Alarm_OR.IN7
+"Median", TVT-402.Voting_Scheme
+"2oo3", PVT-401.Voting_Scheme
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> VOTING_ANALOG.Input1
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=PT-401A, VOTING_ANALOG=PVT-401
+   Actual Connection: PT-401A.PV, PVT-401.Input1
+   Notes: Direct match to intended topology.
+
+Intended: ANALOG_IN2.PV -> VOTING_ANALOG.Input2
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=PT-401B, VOTING_ANALOG=PVT-401
+   Actual Connection: PT-401B.PV, PVT-401.Input2
+   Notes: Direct match to intended topology.
+
+Intended: ANALOG_IN3.PV -> VOTING_ANALOG.Input3
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN3=PT-401C, VOTING_ANALOG=PVT-401
+   Actual Connection: PT-401C.PV, PVT-401.Input3
+   Notes: Direct match to intended topology.
+
+Intended: "Median" -> VOTING_ANALOG.Voting_Scheme
+   Status: MISSING
+   Mapping: VOTING_ANALOG=PVT-401
+   Actual Connection: "2oo3", PVT-401.Voting_Scheme
+   Notes: The voting scheme for the pressure voting block PVT-401 is set to 2oo3, not Median. A separate voting block (TVT-402) has "Median" configured, but it is not the block feeding the PID.
+
+Intended: VOTING_ANALOG.Voted_Output -> PID_BASIC.PV
+   Status: FOUND DIRECT
+   Mapping: VOTING_ANALOG=PVT-401, PID_BASIC=PV-102_Control
+   Actual Connection: PVT-401.Voted_Output, PV-102_Control.PV
+   Notes: Direct connection from the pressure voter to the PID PV input is correctly implemented.
+
+OVERALL ASSESSMENT:
+Coverage: 4/5
+Quality: Sensor inputs and voted output to PID are correctly wired for the pressure loop; however, the voting scheme does not match the intended "Median" (configured as 2oo3 instead). Overall implementation is solid aside from the scheme mismatch.
+Missing Connections: "Median" -> PVT-401.Voting_Scheme
+==================================================
+
+EVAL-3 Coverage: 80.00%

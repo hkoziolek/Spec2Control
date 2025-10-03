@@ -1,0 +1,102 @@
+Evaluation Results for benzene-distillation - chapter_6
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_6\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_6\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_6\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(2), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(2), PID_BASIC(2), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\benzene-distillation\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\benzene-distillation\chapter_6\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-105
+ANALOG_IN FT-106
+VALVE_ELECTRIC FV-101
+RATIO_CONTROL IIC-104
+PID_BASIC FIC-106
+PID_BASIC LIC-002
+DIGITAL_IN FEED_PUMP_RUN
+DIGITAL_IN BOTTOMS_PUMP_RUN
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-105
+ANALOG_IN FT-106
+VALVE_ELECTRIC FV-101
+RATIO_CONTROL IIC-104
+PID_BASIC FIC-106
+PID_BASIC LIC-002
+
+ALL DATA CONNECTIONS:
+FT-105.PV, IIC-104.PrimaryPV
+FT-106.PV, IIC-104.SecondaryPV
+IIC-104.SlaveSP, FIC-106.SP
+FT-106.PV, FIC-106.PV
+FIC-106.XOUT, FV-101.Control_Signal
+FT-105.PV, FeedAboveCutoff_GT.IN1
+FeedAboveCutoff_GT.OUT, IIC-104.Auto
+FEED_PUMP_RUN.DI_Out, BothPumpsRunning_AND.IN1
+BOTTOMS_PUMP_RUN.DI_Out, BothPumpsRunning_AND.IN2
+BothPumpsRunning_AND.OUT, PumpsNotRunning_NOT.IN
+FT-105.General_Fault, RatioLoopInhibits_OR.IN1
+FT-106.General_Fault, RatioLoopInhibits_OR.IN2
+PumpsNotRunning_NOT.OUT, RatioLoopInhibits_OR.IN3
+LIC-002.PV_Low_Alarm, RatioLoopInhibits_OR.IN4
+FT-105.Low_Alarm, RatioLoopInhibits_OR.IN5
+RatioLoopInhibits_OR.OUT, IIC-104.Inhibit
+RatioLoopInhibits_OR.OUT, FIC-106.Inhibit
+RatioLoopInhibits_OR.OUT, FV-101.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1 -> FT-105; RATIO_CONTROL -> IIC-104
+   Actual Connection: FT-105.PV, IIC-104.PrimaryPV
+   Notes: Direct feed-forward of FT-105 into ratio controller primary PV.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2 -> FT-106; RATIO_CONTROL -> IIC-104
+   Actual Connection: FT-106.PV, IIC-104.SecondaryPV
+   Notes: Secondary PV supplied directly from FT-106.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL -> IIC-104; PID_BASIC -> FIC-106
+   Actual Connection: IIC-104.SlaveSP, FIC-106.SP
+   Notes: Slave SP handoff from ratio controller to flow PID is direct and well aligned.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC -> FIC-106; VALVE_ELECTRIC -> FV-101
+   Actual Connection: FIC-106.XOUT, FV-101.Control_Signal
+   Notes: Direct actuation path to the control valve is present. The alternate indirect path to MOTOR_VSD.Speed_SP is not applicable here (no MOTOR_VSD instance present).
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are directly implemented with consistent instance mapping (FT-105/FT-106 → IIC-104 → FIC-106 → FV-101). Additional protective logic (inhibit signals from faults/alarms and pump status, plus an Auto enable via FeedAboveCutoff_GT) indicates a robust implementation.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

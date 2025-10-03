@@ -1,0 +1,38 @@
+## 9 **Dryer Section**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|F-801 | Exhaust Fan | Regulates exhaust fan speed for dryer section airflow control. |
+|FV-801 | Flow Valve | Controls steam flow to maintain cylinder temperature. |
+|IR-801 | Infrared Scanner | Provides moisture feedback for drying process optimization. |
+|M-801 | Motor | Drives mechanical components in the dryer section. |
+|PT-801 | Pressure Transmitter | Measures steam pressure in the cylinder system. |
+|SC-801 | Steam Cylinder | Provides heat for drying via steam-heated surface. |
+|TC-801 | Temperature Controller | Regulates hood air temperature using PID control. |
+|TT-801 | Temperature Transmitter | Measures cylinder temperature for process control. |
+|TT-802 | Temperature Transmitter | Measures hood air temperature for control feedback. |
+|WT-801 | Web Tension Sensor | Monitors web tension to ensure stable drying. |
+|XV-802 | On-Off Valve | Controls hot air damper for hood temperature regulation. |
+
+### 9.1) Control Strategy Description
+
+The dryer section utilizes PID control to regulate the steam-heated cylinder temperature (SC-801), hood air temperature (TC-801), exhaust fan speed (F-801), infra-red moisture scanner feedback (IR-801), and web tension (WT-801). The primary control objective is to maintain the final sheet moisture content at 4.5% ± 0.2% while ensuring stable web tension and uniform drying.
+
+For SC-801, the temperature control loop uses TT-801 as the process variable (PV) with a setpoint (SP) of 115°C. The PID controller (TC-801) is configured for reverse-acting control to reduce steam flow when the cylinder temperature exceeds the SP. Tuning parameters are set as Kp=3.0, Ki=0.5 min, and Kd=0.1 min. The controller output (MV) drives FV-801, a steam control valve, with an output range of 0–100% corresponding to 4–20 mA. TT-801 has a measurement span of 0–150°C and signal type 4–20 mA. FV-801 is configured to fail-closed to prevent overheating during loss of control signal.
+
+For TC-801, hood air temperature is controlled using TT-802 as PV with an SP of 85°C. The PID controller is configured for direct-acting control, increasing hot air flow when the temperature falls below the SP. Tuning parameters are Kp=2.5, Ki=0.8 min, and Kd=0.2 min. The controller output drives XV-802, a hot air damper actuator, with an output range of 10–90% scaled linearly to 4–20 mA. TT-802 has a measurement span of 50–120°C. XV-802 is configured to fail-open for safety during signal loss.
+
+Infra-red moisture scanner IR-801 provides real-time feedback to a moisture control loop. The PV is the sheet moisture content, measured in % with a span of 0–10%. The SP is set to 4.5%. The PID controller adjusts exhaust fan speed (F-801) via a variable frequency drive (VFD) to control drying intensity. Tuning parameters are Kp=1.8, Ki=0.6 min, and Kd=0.05 min. The VFD signal output range is 0–100%, scaled to 4–20 mA. The VFD is configured for bumpless transfer between manual and automatic modes.
+
+Web tension control uses WT-801 load cells to measure tension in N/m with a span of 0–500 N/m. The SP is set to 250 N/m. The PID controller adjusts the torque on the downstream drive roll to maintain tension. Tuning parameters are Kp=4.0, Ki=1.0 min, and Kd=0.3 min. The controller output drives the motor torque control signal, scaled 0–100% to 4–20 mA. Anti-windup logic is implemented to prevent integral saturation during sudden load changes.
+
+### 9.2) Interlocks and Permissives
+
+Steam flow to SC-801 is interlocked with the cylinder pressure transmitter (PT-801). Steam flow is inhibited if PT-801 indicates pressure above 900 kPa. Hood air temperature control via TC-801 is permissive on XV-802 being in the open position and TT-802 reading within the range of 50–120°C. Exhaust fan speed control via F-801 is interlocked with IR-801 availability; fan speed adjustment is disabled if IR-801 signal is lost or out of range.
+
+Web tension control via WT-801 is permissive on the upstream drive roll motor (M-801) being operational. Tension control is inhibited if WT-801 signal falls below 10% of span or exceeds 90% of span, triggering a drive roll stop command. All control loops include a permissive for manual override, allowing operators to disable automatic control for maintenance purposes.
+
+### 9.3) Alarm and Fault Handling
+
+High-temperature alarms are configured for SC-801 and TC-801. If TT-801 exceeds 125°C or TT-802 exceeds 95°C, an alarm is triggered, and FV-801 and XV-802 are forced to their fail-safe positions (fail-closed and fail-open, respectively). A low-pressure alarm is set for PT-801; if pressure drops below 600 kPa, steam flow is inhibited, and an operator notification is issued.
+
+Moisture scanner IR-801 triggers a high-moisture alarm if the sheet moisture exceeds 5.0%. The exhaust fan speed is ramped to maximum, and an operator notification is issued. WT-801 triggers a high-tension alarm if tension exceeds 400 N/m, initiating a controlled stop of the drive roll to prevent web damage. All PID controllers are equipped with fault detection logic to identify signal loss or out-of-range conditions. Upon fault detection, controllers revert to manual mode, and a fault notification is logged in the control system.

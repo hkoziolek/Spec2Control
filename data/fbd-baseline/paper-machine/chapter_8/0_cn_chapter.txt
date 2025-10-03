@@ -1,0 +1,31 @@
+## 8 **Press Section**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CS-701 | Control Switch | Enables or disables control system operation. |
+|HS-701 | Hand Switch | Manual override for system control. |
+|LIC-701 | Level Controller | Regulates hydraulic pressure to maintain sheet moisture setpoint. |
+|MM-701 | Moisture Sensor | Measures sheet moisture content exiting the press section. |
+|PT-701 | Pressure Transmitter | Monitors hydraulic pressure applied to the shoe press. |
+|PV-101 | Pressure Valve | Adjusts hydraulic pressure to control sheet moisture. |
+|SB-701 | Signal Booster | Amplifies control signals for reliable transmission. |
+|TT-102 | Temperature Transmitter | Measures temperature in the press section. |
+
+### 8.1) Control Strategy Description
+
+The press section PID control logic is implemented to regulate the moisture content of the sheet exiting the two-nip shoe-press train using feedback from microwave moisture sensor MM-701. The control objective is to maintain the sheet moisture at a setpoint of 52.0% (SP) within an allowable deadband of ±0.5%. The measured variable (PV) is the moisture content signal from MM-701, which outputs a 4-20 mA signal corresponding to a range of 40.0% to 60.0% moisture. The manipulated variable (MV) is the hydraulic pressure applied to the shoe press via control valve PV-101.
+
+The PID controller (LIC-701) is configured for reverse-acting control, where an increase in PV results in a decrease in MV. The controller tuning parameters are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 min, and derivative time (Kd) = 0.2 min. The output of the controller is clamped between 0% and 100% to ensure the hydraulic pressure remains within the operational limits of the press system. The controller includes anti-windup logic to prevent integral accumulation when the output is saturated.
+
+The signal from MM-701 is scaled from 4-20 mA to engineering units (40.0% to 60.0%) before entering the PID controller. Bumpless transfer logic is implemented to ensure a smooth transition between manual and automatic modes. Manual setpoint adjustments are clamped between 50.0% and 54.0% moisture to maintain safe operating conditions. A deadband of 0.5% is applied to the control output to prevent hunting and excessive wear on PV-101.
+
+### 8.2) Interlocks and Permissives
+
+The PID control loop is enabled only when the following permissives are satisfied: the shoe press hydraulic system is operational (HS-701 = ON), the press section conveyor is running (CS-701 = ON), and the sheet is present as detected by the sheet break sensor (SB-701 = OFF). If any of these conditions are not met, LIC-701 is forced to manual mode, and the output is held at its last value.
+
+An interlock is configured such that if the shower water temperature exceeds 75.0°C as measured by TT-102, or if the press fabric moisture exceeds 65.0% as measured by MM-701, PV-101 is commanded to its fail-safe position (fail-closed) to protect the equipment. Additionally, if the hydraulic pressure exceeds 1200 kPa as measured by PT-701, the control loop is disabled, and an emergency shutdown (ESD) signal is initiated.
+
+### 8.3) Alarm and Fault Handling
+
+High and low alarms are configured for the moisture content measured by MM-701. A high alarm (MM-701.HI) is triggered at 58.0%, and a low alarm (MM-701.LO) is triggered at 46.0%. These alarms are latched and require operator acknowledgment. A deviation alarm (LIC-701.DEV) is activated if the difference between the setpoint and the process variable exceeds 2.0% for more than 30 seconds.
+
+In the event of a transmitter fault (MM-701.FLT), the PID controller LIC-701 is automatically switched to manual mode, and the control output is held at its last value. A fault alarm is raised, and the operator is required to investigate and resolve the issue before the loop can be returned to automatic control. Similarly, if PV-101 fails to respond to control signals, as indicated by the valve position feedback, an alarm (PV-101.FLT) is generated, and the valve is commanded to its fail-closed position.

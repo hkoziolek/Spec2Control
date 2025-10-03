@@ -1,0 +1,101 @@
+Evaluation Results for ammonium-nitrates - chapter_6
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_6\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_6\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_6\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), MOTOR_VSD(1), PID_BASIC(1), RATIO_CONTROL(1)
+Output blocks: ANALOG_IN(2), MOTOR_VSD(1), PID_BASIC(1), RATIO_CONTROL(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_6\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_6\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LT-501
+ANALOG_IN WB-505
+RATIO_CONTROL RIC-506
+PID_BASIC FIC-507
+MOTOR_VSD SC-504
+BOOL_IN AP-503
+BOOL_IN PRV-502
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LT-501
+ANALOG_IN WB-505
+RATIO_CONTROL RIC-506
+PID_BASIC FIC-507
+
+ALL DATA CONNECTIONS:
+WB-505.PV, RIC-506.PrimaryPV
+SC504SpeedToFlow.OUT, RIC-506.SecondaryPV
+RIC-506.SlaveSP, FIC-507.SP
+SC504SpeedToFlow.OUT, FIC-507.PV
+FIC-507.XOUT, SC-504.Speed_SP
+AP-503.Bool_Out, AerationPadInactive.IN
+AerationPadInactive.OUT, SC504_Inhibit.IN3
+PRV-502.Bool_Out, PressureReliefNotClosed.IN
+PressureReliefNotClosed.OUT, SC504_Inhibit.IN4
+LT-501.Low_Alarm, SC504_Inhibit.IN1
+WB-505.Low_Alarm, SC504_Inhibit.IN2
+SC504_Inhibit.OUT, SC-504.Inhibit
+SC504_Inhibit.OUT, RIC-506.Inhibit
+SC-504.FB_ActualSpeed, SC504SpeedToFlow.IN1
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1=WB-505; RATIO_CONTROL=RIC-506
+- Actual Connection: WB-505.PV, RIC-506.PrimaryPV
+- Notes: Direct match; correct wiring of primary PV to the ratio controller.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+- Status: MISSING
+- Mapping: ANALOG_IN2=LT-501; RATIO_CONTROL=RIC-506
+- Actual Connection: None. Actual SecondaryPV is SC504SpeedToFlow.OUT, RIC-506.SecondaryPV
+- Notes: Secondary PV is sourced from SC504SpeedToFlow (derived from SC-504 actual speed), not from an analog input. LT-501.PV is not used for RIC-506.SecondaryPV.
+
+### manual ###
+MULT SC504SpeedToFlow
+SC-504.FB_ActualSpeed, SC504SpeedToFlow.IN1
+20.0, SC504SpeedToFlow.IN2
+SC504SpeedToFlow.OUT, RIC-506.SecondaryPV
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+- Status: FOUND DIRECT
+- Mapping: RATIO_CONTROL=RIC-506; PID_BASIC=FIC-507
+- Actual Connection: RIC-506.SlaveSP, FIC-507.SP
+- Notes: Direct cascade setpoint handoff as intended.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal (allow alternate to MOTOR_VSD.Speed_SP)
+- Status: FOUND INDIRECT
+- Mapping: PID_BASIC=FIC-507; using allowed alternate MOTOR_VSD=SC-504
+- Actual Connection: FIC-507.XOUT, SC-504.Speed_SP
+- Notes: No VALVE_ELECTRIC instance present. Output drives a VSD speed setpoint, which is an allowed alternate.
+
+OVERALL ASSESSMENT:
+Coverage: 3/4
+Quality: Generally solid implementation: primary PV and cascade link are correct; final control output correctly targets a VSD as allowed. Deviation from the template is that the ratio secondary PV is derived from speed-to-flow conversion rather than an analog input, which may be intentional but does not meet the stated template.
+Missing Connections: LT-501.PV -> RIC-506.SecondaryPV
+==================================================
+
+EVAL-3 Coverage: 75.00%

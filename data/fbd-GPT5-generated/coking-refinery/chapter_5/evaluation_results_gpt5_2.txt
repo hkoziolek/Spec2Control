@@ -1,0 +1,99 @@
+Evaluation Results for coking-refinery - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_5\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(2), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(4), MOTOR_ON_OFF(2), PID_BASIC(2), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-401A
+VALVE_ELECTRIC FV-401
+MOTOR_ON_OFF P-401A
+MOTOR_ON_OFF P-401B
+PID_BASIC PC-401
+ANALOG_IN PT-402
+ANALOG_IN PT-403
+PID_BASIC TC-401
+ANALOG_IN TIT-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-401A
+VALVE_ELECTRIC FV-401
+PID_BASIC PC-401
+ANALOG_IN PT-402
+ANALOG_IN PT-403
+PID_BASIC TC-401
+ANALOG_IN TIT-101
+
+ALL DATA CONNECTIONS:
+TIT-101.PV, TC-401.PV
+TC-401.XOUT, FV-401.Control_Signal
+PC-401.PV_High_Alarm, FuelGasPressOutOfRange_OR.IN1
+PC-401.PV_Low_Alarm, FuelGasPressOutOfRange_OR.IN2
+FuelGasPressOutOfRange_OR.OUT, FuelGasPressOK_NOT.IN
+PT-402.High_Alarm, DraftOutOfRange_OR.IN1
+PT-402.Low_Alarm, DraftOutOfRange_OR.IN2
+DraftOutOfRange_OR.OUT, DraftOK_NOT.IN
+P-401A.FB_Running, PumpsRunning_OR.IN1
+P-401B.FB_Running, PumpsRunning_OR.IN2
+PumpsRunning_OR.OUT, FlowPermissive_AND.IN1
+PT-403.High_Alarm, FlowPermissive_AND.IN2
+FuelGasPressOK_NOT.OUT, ProcessPermissive_AND.IN1
+DraftOK_NOT.OUT, ProcessPermissive_AND.IN2
+ProcessPermissive_AND.OUT, Permissive1_AND.IN1
+FlowPermissive_AND.OUT, Permissive1_AND.IN2
+Permissive1_AND.OUT, FinalPermissive_AND.IN1
+FinalPermissive_AND.OUT, PermissiveNot_NOT.IN
+PermissiveNot_NOT.OUT, FuelFlowInterlockDelay_TON.IN
+FuelFlowInterlockDelay_TON.Q, InhibitWithHighTrip_OR.IN1
+TIT-101.High_Alarm, InhibitWithHighTrip_OR.IN2
+InhibitWithHighTrip_OR.OUT, FinalInhibit_OR.IN1
+TIT-101.General_Fault, FinalInhibit_OR.IN2
+FinalInhibit_OR.OUT, FV-401.Inhibit
+FinalInhibit_OR.OUT, TC-401.Inhibit
+TIT-101.High_Alarm, TempHighAlarmDelay_TON.IN
+TIT-101.Low_Alarm, TempLowAlarmDelay_TON.IN
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = TIT-101; PID_BASIC1 = TC-401
+- Actual Connection: TIT-101.PV, TC-401.PV
+- Notes: Direct PV-to-PV wiring is present and unambiguous.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1 = TC-401; VALVE_ELECTRIC1 = FV-401
+- Actual Connection: TC-401.XOUT, FV-401.Control_Signal
+- Notes: Direct actuator command path is implemented. Alternative indirect path to MOTOR_VSD.Speed_SP not applicable here. Interlock/inhibit logic is in place upstream (FinalInhibit_OR) for both TC-401 and FV-401.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Solid implementation for the TIT-101 → TC-401 → FV-401 loop, with permissives/inhibits integrated. Note that PC-401 appears used only for alarm logic and is not part of the control chain analyzed.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

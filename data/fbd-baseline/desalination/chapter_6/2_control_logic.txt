@@ -1,0 +1,64 @@
+* Function Blocks *
+ANALOG_IN FIT-101
+ANALOG_IN FIT-102
+RATIO_CONTROL FIC-104
+PID_BASIC FIC-104_SLAVE
+VALVE_ELECTRIC FV-102
+BOOL_IN AT-105
+
+* Variables *
+REAL FIT101_BypassFlow_PV
+REAL FIT102_SamplingFlow_PV
+REAL FIC104_SamplingFlow_SP
+REAL FIC104_ActiveRatio
+BOOL AT105_Permissive
+BOOL LV103_Permissive
+
+* Functions *
+OR MasterInhibit_OR
+NOT LV103_Permissive_NOT
+
+* Data Connections *
+FIT-101.PV, FIC-104.PrimaryPV
+FIT-102.PV, FIC-104.SecondaryPV
+FIC-104.SlaveSP, FIC-104_SLAVE.SP
+FIT-102.PV, FIC-104_SLAVE.PV
+FIC-104_SLAVE.XOUT, FV-102.Control_Signal
+FIT-101.Low_Alarm, MasterInhibit_OR.IN1
+FIT-101.General_Fault, MasterInhibit_OR.IN2
+AT-105.Alarm_Active, MasterInhibit_OR.IN3
+LV103_Permissive_NOT.OUT, MasterInhibit_OR.IN4
+MasterInhibit_OR.OUT, FIC-104.Inhibit
+MasterInhibit_OR.OUT, FIC-104_SLAVE.Inhibit
+MasterInhibit_OR.OUT, FV-102.Inhibit
+AT105_Permissive, AT-105.Bool_In
+LV103_Permissive, LV103_Permissive_NOT.IN
+FIT-101.PV, FIT101_BypassFlow_PV
+FIT-102.PV, FIT102_SamplingFlow_PV
+FIC-104.SlaveSP, FIC104_SamplingFlow_SP
+FIC-104.ActiveRatio, FIC104_ActiveRatio
+
+* Parameter Data Connections *
+62.5, FIT-101.Scaling_Slope
+-250.0, FIT-101.Scaling_Offset
+TRUE, FIT-101.Alarm_Enable
+TRUE, FIT-102.Alarm_Enable
+TRUE, FIC-104.Auto
+0.1, FIC-104.RatioSP
+0.0, FIC-104.MV_MIN
+200.0, FIC-104.MV_MAX
+TRUE, FIC-104_SLAVE.AUTO
+0.0, FIC-104_SLAVE.MV_MIN
+100.0, FIC-104_SLAVE.MV_MAX
+1.0, FIC-104_SLAVE.KP
+10.0, FIC-104_SLAVE.TR
+0.0, FIC-104_SLAVE.TD
+20.0, FIC-104_SLAVE.Deviation_Limit
+0.0, FIC-104_SLAVE.X0
+100.0, FV-102.Open_Limit
+0.0, FV-102.Close_Limit
+FALSE, FV-102.Manual_Mode
+TRUE, AT-105.Alarm_OnFalse
+FALSE, AT-105.Alarm_OnTrue
+TRUE, AT-105.Latch_Enable
+

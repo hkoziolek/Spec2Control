@@ -1,0 +1,98 @@
+Evaluation Results for steel-plant - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_2\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN TIT-101
+VALVE_ELECTRIC FV-102
+PID_BASIC FIC-102
+RATIO_CONTROL FFIC-103
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN TIT-101
+VALVE_ELECTRIC FV-102
+PID_BASIC FIC-102
+RATIO_CONTROL FFIC-103
+
+ALL DATA CONNECTIONS:
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-102.SP
+FT-102.PV, FIC-102.PV
+FIC-102.XOUT, FV-102.Control_Signal
+FT-101.Low_Alarm, FV102Inhibit_OR.IN1
+TIT-101.Low_Alarm, FV102Inhibit_OR.IN2
+FT-101.General_Fault, FV102Inhibit_OR.IN3
+FT-102.General_Fault, FV102Inhibit_OR.IN4
+TIT-101.General_Fault, FV102Inhibit_OR.IN5
+FT-101.High_Alarm, FV102Inhibit_OR.IN6
+FV102Inhibit_OR.OUT, FV-102.Inhibit
+FV102Inhibit_OR.OUT, FFIC-103.Inhibit
+FV102Inhibit_OR.OUT, AutoEnable_NOT.IN
+AutoEnable_NOT.OUT, FFIC-103.Auto
+AutoEnable_NOT.OUT, FIC-102.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=FT-101, RATIO_CONTROL=FFIC-103
+   Actual Connection: FT-101.PV, FFIC-103.PrimaryPV
+   Notes: Direct feed of primary PV from FT-101 into the ratio controller.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=FT-102, RATIO_CONTROL=FFIC-103
+   Actual Connection: FT-102.PV, FFIC-103.SecondaryPV
+   Notes: Direct feed of secondary PV from FT-102 into the ratio controller.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL=FFIC-103, PID_BASIC=FIC-102
+   Actual Connection: FFIC-103.SlaveSP, FIC-102.SP
+   Notes: Slave setpoint from ratio controller directly drives the flow PID setpoint.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC=FIC-102, VALVE_ELECTRIC=FV-102
+   Actual Connection: FIC-102.XOUT, FV-102.Control_Signal
+   Notes: Direct actuation path from PID to control valve. The alternative indirect path via MOTOR_VSD.Speed_SP is not used here and not needed.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with clear, consistent instance mapping. Additional logic (inhibit OR and Auto enable) is present and correctly applied to both the ratio controller and the valve/PID, indicating attention to interlocks and mode management. The PID’s PV is sourced from FT-102, aligning with the ratio control architecture.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

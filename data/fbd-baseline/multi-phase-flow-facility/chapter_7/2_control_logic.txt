@@ -1,0 +1,53 @@
+* Function Blocks *
+ANALOG_IN PIT-106
+BOOL_IN COMP-RUN-PERM
+PID_BASIC PIC-105
+VALVE_ELECTRIC V-010
+TON CompStartupDelay
+
+* Variables *
+REAL PIT106_Raw_mA
+BOOL CompressorRunPermissive
+REAL PIT106_PressureBar
+REAL PIC105_MV_Percent
+
+* Functions *
+NOT CompNotRunning
+OR AirCompInhibit
+NOT StartupNotElapsed
+
+* Data Connections * 
+PIT106_Raw_mA, PIT-106.Raw_Signal
+PIT-106.PV, PIC-105.PV
+PIC-105.XOUT, V-010.Control_Signal
+CompressorRunPermissive, COMP-RUN-PERM.Bool_In
+COMP-RUN-PERM.Bool_Out, CompStartupDelay.IN
+COMP-RUN-PERM.Bool_Out, CompNotRunning.IN
+CompStartupDelay.Q, StartupNotElapsed.IN
+CompNotRunning.OUT, AirCompInhibit.IN1
+PIT-106.High_Alarm, AirCompInhibit.IN2
+PIT-106.Low_Alarm, AirCompInhibit.IN3
+PIT-106.General_Fault, AirCompInhibit.IN4
+StartupNotElapsed.OUT, AirCompInhibit.IN5
+AirCompInhibit.OUT, PIC-105.Inhibit
+AirCompInhibit.OUT, V-010.Inhibit
+PIT-106.PV, PIT106_PressureBar
+PIC-105.XOUT, PIC105_MV_Percent
+
+* Parameter Data Connections *
+9.5, PIT-106.PV_High
+0.5, PIT-106.PV_Low
+0.625, PIT-106.Scaling_Slope
+-2.5, PIT-106.Scaling_Offset
+TRUE, PIC-105.AUTO
+8.5, PIC-105.SP
+0.0, PIC-105.MV_MIN
+100.0, PIC-105.MV_MAX
+3.0, PIC-105.KP
+1.2, PIC-105.TR
+0.3, PIC-105.TD
+FALSE, V-010.Manual_Mode
+100.0, V-010.Open_Limit
+0.0, V-010.Close_Limit
+T#7s, CompStartupDelay.PT
+

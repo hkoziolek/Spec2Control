@@ -1,0 +1,115 @@
+Evaluation Results for steel-plant - chapter_8
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_8\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_8\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_8\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 0.86%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_8\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+ANALOG_IN TT-701
+PID_BASIC FIC-702
+VALVE_ELECTRIC FV-702
+RATIO_CONTROL FFIC-701
+BOOL_IN BLS-701
+DIGITAL_IN ALM-701
+DIGITAL_IN ALM-702
+DIGITAL_IN ALM-703
+DIGITAL_IN ALM-704
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+ANALOG_IN TT-701
+PID_BASIC FIC-702
+VALVE_ELECTRIC FV-702
+RATIO_CONTROL FFIC-701
+
+ALL DATA CONNECTIONS:
+FT-701.PV, FFIC-701.PrimaryPV
+FT-702.PV, FFIC-701.SecondaryPV
+FFIC-701.SlaveSP, FIC-702.SP
+FT-702.PV, FIC-702.PV
+FIC-702.XOUT, FV-702.Control_Signal
+TT-701.High_Alarm, ALM-704.DI_Raw
+FT-701.General_Fault, ALM-702.DI_Raw
+FT-702.General_Fault, ALM-703.DI_Raw
+BLS-701.Bool_Out, BurnerOff_NOT.IN
+TT-701.High_Alarm, RatioControlInhibit_OR.IN1
+ALM-704.DI_Out, RatioControlInhibit_OR.IN2
+FT-701.Low_Alarm, RatioControlInhibit_OR.IN3
+BurnerOff_NOT.OUT, RatioControlInhibit_OR.IN4
+ALM-702.DI_Out, RatioControlInhibit_OR.IN5
+ALM-703.DI_Out, RatioControlInhibit_OR.IN6
+RatioControlInhibit_OR.OUT, FFIC-701.Inhibit
+FT-701.Low_Alarm, ValveInhibit_OR.IN1
+TT-701.Low_Alarm, ValveInhibit_OR.IN2
+TT-701.High_Alarm, ValveInhibit_OR.IN3
+ALM-704.DI_Out, ValveInhibit_OR.IN4
+ValveInhibit_OR.OUT, FV-702.Inhibit
+ValveInhibit_OR.OUT, FV-702.Manual_Mode
+ValveInhibit_OR.OUT, FIC-702.Inhibit
+FFIC-701.ActiveRatio, RatioHigh_GT.IN1
+FFIC-701.ActiveRatio, RatioLow_LT.IN1
+RatioHigh_GT.OUT, RatioLimit_OR.IN1
+RatioLow_LT.OUT, RatioLimit_OR.IN2
+RatioLimit_OR.OUT, ALM-701.DI_Raw
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=FT-701, RATIO_CONTROL=FFIC-701
+   Actual Connection: FT-701.PV, FFIC-701.PrimaryPV
+   Notes: Direct match to intended connection.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=FT-702, RATIO_CONTROL=FFIC-701
+   Actual Connection: FT-702.PV, FFIC-701.SecondaryPV
+   Notes: Direct match to intended connection.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL=FFIC-701, PID_BASIC=FIC-702
+   Actual Connection: FFIC-701.SlaveSP, FIC-702.SP
+   Notes: Direct match; ratio block drives PID setpoint as intended.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC=FIC-702, VALVE_ELECTRIC=FV-702
+   Actual Connection: FIC-702.XOUT, FV-702.Control_Signal
+   Notes: Direct match; alternate acceptable indirect via MOTOR_VSD not needed here.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly and consistently. Additional good practice observed: the PID PV is sourced from FT-702, and appropriate inhibit/interlock logic is present for ratio, valve, and PID.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

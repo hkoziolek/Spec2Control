@@ -1,0 +1,55 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN TIT-101
+VALVE_ELECTRIC FV-102
+PID_BASIC FIC-102
+RATIO_CONTROL FFIC-103
+
+* Variables *
+REAL FT101_WildFlow_PV
+REAL FT102_FluxFlow_PV
+REAL TIT101_Temperature_PV
+REAL FFIC103_FluxFlowSP
+REAL FIC102_ValveCommand
+
+* Functions *
+OR FV102Inhibit_OR
+NOT AutoEnable_NOT
+
+* Data Connections * 
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-102.SP
+FT-102.PV, FIC-102.PV
+FIC-102.XOUT, FV-102.Control_Signal
+FT-101.Low_Alarm, FV102Inhibit_OR.IN1
+TIT-101.Low_Alarm, FV102Inhibit_OR.IN2
+FT-101.General_Fault, FV102Inhibit_OR.IN3
+FT-102.General_Fault, FV102Inhibit_OR.IN4
+TIT-101.General_Fault, FV102Inhibit_OR.IN5
+FT-101.High_Alarm, FV102Inhibit_OR.IN6
+FV102Inhibit_OR.OUT, FV-102.Inhibit
+FV102Inhibit_OR.OUT, FFIC-103.Inhibit
+FV102Inhibit_OR.OUT, AutoEnable_NOT.IN
+AutoEnable_NOT.OUT, FFIC-103.Auto
+AutoEnable_NOT.OUT, FIC-102.AUTO
+FT-101.PV, FT101_WildFlow_PV
+FT-102.PV, FT102_FluxFlow_PV
+TIT-101.PV, TIT101_Temperature_PV
+FFIC-103.SlaveSP, FFIC103_FluxFlowSP
+FIC-102.XOUT, FIC102_ValveCommand
+
+* Parameter Data Connections *
+62.5, FT-101.Scaling_Slope
+-250.0, FT-101.Scaling_Offset
+50.0, FT-101.PV_Low
+1000.0, FT-101.PV_High
+TRUE, FT-101.Alarm_Enable
+TRUE, FT-102.Alarm_Enable
+800.0, TIT-101.PV_Low
+TRUE, TIT-101.Alarm_Enable
+2.5, FFIC-103.RatioSP
+200.0, FFIC-103.MV_MIN
+300.0, FFIC-103.MV_MAX
+

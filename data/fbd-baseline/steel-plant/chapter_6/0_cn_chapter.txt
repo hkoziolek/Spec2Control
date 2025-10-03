@@ -1,0 +1,28 @@
+## 6 ** Secondary Metallurgy ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|PT-501 | Pressure Transmitter | Measures process pressure in the system. |
+|SM-501 | Actuator | Modulates electrode position for heat input control. |
+|TT-501 | Temperature Transmitter | Measures steel bath temperature in ladle furnace. |
+
+### 6.1) Control Strategy Description
+
+The secondary metallurgy section employs PID control to regulate critical process parameters during ladle furnace treatment and vacuum degassing. The primary control loop governs the ladle furnace temperature (TT-501.PV) to maintain the steel bath at a precise setpoint (TT-501.SP) of 1620°C ± 5°C. The PID controller, identified as TT-501.PID, operates in reverse-acting mode to modulate the heat input via the electrode position actuator (SM-501.EA). The process variable (PV) is measured by temperature transmitter TT-501, which has a calibrated range of 1200°C to 1800°C and outputs a 4-20mA signal.
+
+The PID controller TT-501.PID is configured with the following tuning parameters: proportional gain (Kp) = 3.2, integral time (Ki) = 1.5 minutes, and derivative time (Kd) = 0.3 minutes. The controller output (MV) is clamped between 0% and 100%, corresponding to the full stroke of the electrode actuator (SM-501.EA). The actuator is configured as fail-down, retracting the electrodes in the event of signal loss to prevent overheating.
+
+To ensure smooth operation, the control logic includes bumpless transfer when switching between manual and automatic modes. When switching to auto mode, the controller output (MV) is initialized to match the current actuator position. Anti-windup logic is implemented to prevent integral term accumulation when the output is saturated. A deadband of ±2°C is applied to the error signal to minimize control hunting.
+
+### 6.2) Interlocks and Permissives
+
+The PID control for TT-501.PID is interlocked with the ladle furnace safety and operational conditions. The furnace cannot be heated unless the following permissives are satisfied: SM-501.LID_POS == "Closed" (ladle furnace lid closed), PT-501.PV > 0.8 bar (minimum inert gas pressure), and SM-501.EA_POS > 10% (electrodes sufficiently lowered). If any of these conditions are not met, the PID controller output (MV) is forced to 0%, and heating is disabled.
+
+Additionally, a high-temperature interlock (TT-501.PV > 1650°C) overrides the PID control and fully retracts the electrodes (SM-501.EA = 0%) to prevent steel overheating. The control loop also includes a 10-second delay on the heating enable signal to avoid false activation during transient conditions, such as ladle placement or initial gas purging.
+
+### 6.3) Alarm and Fault Handling
+
+The temperature control loop includes high-priority alarms for critical faults. If TT-501.PV exceeds 1650°C, a "High-High Temperature" alarm (TT-501.HH) is triggered, and the system initiates an emergency shutdown sequence, retracting the electrodes (SM-501.EA = 0%) and isolating power to the furnace. A "Low Temperature" alarm (TT-501.L) is activated if TT-501.PV falls below 1500°C, indicating potential process inefficiency or sensor malfunction.
+
+Sensor faults, such as a loss of signal from TT-501, are detected by monitoring the 4-20mA signal range. If TT-501.PV < 3.8mA or TT-501.PV > 20.2mA, a "Sensor Fault" alarm (TT-501.FLT) is raised, and the PID controller output (MV) is frozen at its last known value to prevent abrupt process changes. In the event of actuator failure (SM-501.EA_POS feedback deviates by >5% from MV for more than 5 seconds), a "Control Actuator Fault" alarm (SM-501.EA.FLT) is generated, and the system transitions to manual mode for operator intervention.
+
+All alarms are logged in the distributed control system (DCS) with timestamps and operator acknowledgment requirements. The control system also provides a trend display of TT-501.PV, TT-501.SP, and TT-501.MV for real-time monitoring and post-event analysis.

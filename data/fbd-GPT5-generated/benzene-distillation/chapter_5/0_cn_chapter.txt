@@ -1,0 +1,30 @@
+## 5 **Benzene Product Pumps (P-102A/B)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FI-102 | Flow Transmitter | Measures flow rate for pump operation logic and interlocks. |
+|LCV-102 | Level Control Valve | Regulates level in the accumulator (V-104). |
+|LIC-102 | Level Controller | Maintains desired level in the accumulator (V-104). |
+|P-102A | Pump | Lead pump for benzene transfer to product storage. |
+|P-102B | Pump | Standby pump for benzene transfer to product storage. |
+|PI-102 | Pressure Transmitter | Monitors suction and discharge pressure for pump control. |
+|V-104 | Vessel | Accumulator for benzene prior to product storage transfer. |
+
+### 5.1) Control Strategy Description
+
+The benzene product pumps P-102A (duty) and P-102B (standby) operate in a duty/standby configuration to ensure continuous transfer of benzene from the accumulator (V-104) to the product storage. In AUTO mode, P-102A is designated as the lead pump, while P-102B remains in standby. The switchover logic activates P-102B automatically if P-102A fails to maintain adequate discharge pressure, as measured by PI-102, or if a motor fault is detected. The failure condition is defined as PI-102 reading less than 25 psig for 10 seconds. A switchover delay of 5 seconds is incorporated to prevent nuisance switching during transient conditions.
+
+The pumps are equipped with runtime hour meters to facilitate manual rotation of the duty and standby roles. In MANUAL mode, the operator can designate either pump as lead or standby via the local control panel. TEST mode allows both pumps to operate simultaneously for system verification or during high-demand scenarios, initiated when FI-102 exceeds 500 gpm.
+
+A minimum runtime of 30 minutes is enforced for the active pump to prevent hunting. Both pumps will operate concurrently when the flow rate, as measured by FI-102, exceeds 700 gpm, with P-102B starting automatically regardless of the operating mode.
+
+### 5.2) Interlocks and Permissives
+
+Pumps P-102A and P-102B will only start if the suction pressure at V-104, as measured by PI-102, is greater than 15 psig. The discharge valve associated with the pump must be fully open, as confirmed by limit switches, before the pump is energized. Additionally, the high-level permissive from V-104, provided by LIC-102, ensures the pump will not start if the liquid level in the accumulator falls below 20%.
+
+During switchover, the failed pump is isolated by closing its associated discharge valve, and the standby pump is started after a 5-second delay. The switchover sequence bypasses the suction pressure interlock for 10 seconds to ensure the standby pump can establish flow. The system prevents simultaneous starting of both pumps unless FI-102 exceeds 700 gpm, in which case the interlock is overridden.
+
+### 5.3) Alarm and Fault Handling
+
+A low-pressure alarm (PI-102 < 25 psig for 5 seconds) triggers an alert to the operator, indicating potential pump failure. If the pressure remains low for 10 seconds, the system initiates switchover to the standby pump. A motor fault alarm is generated if the motor current exceeds 150% of the rated value, as detected by the motor protection relay.
+
+If both pumps fail to start or maintain discharge pressure, a high-priority alarm is triggered, and the control valve LCV-102 is closed to prevent backflow. An operator acknowledgment is required to reset the alarm and re-enable the pumps. All alarms are logged in the distributed control system (DCS) for maintenance and troubleshooting purposes.

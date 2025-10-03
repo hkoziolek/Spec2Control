@@ -1,0 +1,76 @@
+Evaluation Results for steel-plant - chapter_7
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_7\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_7\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_7\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(3), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\steel-plant\chapter_7\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\steel-plant\chapter_7\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN LIT-101
+ANALOG_IN FT-601
+ANALOG_IN TT-601
+PID_BASIC LIC-101
+VALVE_ELECTRIC MV-101
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN LIT-101
+ANALOG_IN FT-601
+ANALOG_IN TT-601
+PID_BASIC LIC-101
+VALVE_ELECTRIC MV-101
+
+ALL DATA CONNECTIONS:
+LIT-101.PV, LIC-101.PV
+LIC-101.XOUT, MV-101.Control_Signal
+MV-101.Feedback_Pos, LIC-101.X0
+LIT-101.General_Fault, InterlockLIC101_OR.IN1
+FT-601.Low_Alarm, InterlockLIC101_OR.IN2
+TT-601.High_Alarm, InterlockLIC101_OR.IN3
+LIT-101.High_Alarm, InterlockLIC101_OR.IN4
+LIC-101.PV_High_Alarm, InterlockLIC101_OR.IN5
+InterlockLIC101_OR.OUT, LIC-101.Inhibit
+InterlockLIC101_OR.OUT, MV-101.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN -> LIT-101; PID_BASIC -> LIC-101
+- Actual Connection: LIT-101.PV, LIC-101.PV
+- Notes: LIT-101 (level transmitter) directly drives LIC-101.PV as intended. Other available analog inputs (FT-601, TT-601) are not used for PID PV; they contribute to interlock inputs only.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC -> LIC-101; VALVE_ELECTRIC -> MV-101
+- Actual Connection: LIC-101.XOUT, MV-101.Control_Signal
+- Notes: Direct connection matches the intended output-to-actuator path. The allowed indirect alternative via MOTOR_VSD.Speed_SP is not present and not needed here. Additional supportive logic observed: MV-101.Feedback_Pos -> LIC-101.X0 suggests position feedback integration, and InterlockLIC101_OR.OUT inhibiting both LIC-101 and MV-101 provides coordinated interlock behavior.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The implementation cleanly matches the intended connections with direct links and sensible supporting interlocks/feedback, indicating robust control design.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

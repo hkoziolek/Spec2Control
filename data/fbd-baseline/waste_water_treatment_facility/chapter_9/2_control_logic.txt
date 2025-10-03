@@ -1,0 +1,103 @@
+* Function Blocks *
+ANALOG_IN FT-801
+RATIO_CONTROL FIC-101
+RATIO_CONTROL FIC-102
+MOTOR_VSD CL-801
+MOTOR_VSD DC-801
+VALVE_ELECTRIC LV-105
+VALVE_ON_OFF XV-106
+MOTOR_ON_OFF UV-801
+
+* Variables *
+REAL FT_801_EffluentFlow_PV
+REAL CL_801_ChlorineFlow_SP
+REAL DC_801_DechlorFlow_SP
+BOOL XV_106_FullyOpen_FB
+BOOL CL_801_Running_FB
+BOOL DC_801_Running_FB
+
+* Functions *
+MUL CL_RatioMinCalc
+MUL CL_RatioMaxCalc
+MUL DC_RatioMinCalc
+MUL DC_RatioMaxCalc
+NOT ValveNotOpen
+NOT CL_NotRunning
+OR ChemActive
+OR LV_105_AnyAlarm
+OR XV_106_AnyAlarm
+OR CL_801_Inh_OR1
+OR CL_801_Inh_OR2
+OR CL_801_Inh_OR3
+OR DC_801_Inh_OR1
+OR DC_801_Inh_OR2
+OR FT_801_AnyFault_OR1
+OR FT_801_AnyFault_OR2
+OR FIC_102_Inh_OR1
+
+* Data Connections * 
+FT-801.PV, FIC-101.PrimaryPV
+CL-801.FB_ActualSpeed, FIC-101.SecondaryPV
+CL_RatioMinCalc.OUT, FIC-101.MV_MIN
+CL_RatioMaxCalc.OUT, FIC-101.MV_MAX
+FIC-101.SlaveSP, CL-801.Speed_SP
+FT-801.PV, CL_RatioMinCalc.IN1
+FT-801.PV, CL_RatioMaxCalc.IN1
+FT-801.PV, FIC-102.PrimaryPV
+DC-801.FB_ActualSpeed, FIC-102.SecondaryPV
+DC_RatioMinCalc.OUT, FIC-102.MV_MIN
+DC_RatioMaxCalc.OUT, FIC-102.MV_MAX
+FIC-102.SlaveSP, DC-801.Speed_SP
+FT-801.PV, DC_RatioMinCalc.IN1
+FT-801.PV, DC_RatioMaxCalc.IN1
+XV-106.FB_Opened, ValveNotOpen.IN
+CL-801.FB_Running, CL_NotRunning.IN
+CL-801.FB_Running, ChemActive.IN1
+DC-801.FB_Running, ChemActive.IN2
+ChemActive.OUT, UV-801.Inhibit
+LV-105.Position_Error, LV_105_AnyAlarm.IN1
+LV-105.Alarm, LV_105_AnyAlarm.IN2
+XV-106.Alarm_Position_Error, XV_106_AnyAlarm.IN1
+XV-106.Alarm_General, XV_106_AnyAlarm.IN2
+ValveNotOpen.OUT, CL_801_Inh_OR1.IN1
+FT-801.Low_Alarm, CL_801_Inh_OR1.IN2
+CL_801_Inh_OR1.OUT, CL_801_Inh_OR2.IN1
+XV_106_AnyAlarm.OUT, CL_801_Inh_OR2.IN2
+CL_801_Inh_OR2.OUT, CL_801_Inh_OR3.IN1
+LV_105_AnyAlarm.OUT, CL_801_Inh_OR3.IN2
+CL_801_Inh_OR3.OUT, CL-801.Inhibit
+LV_105_AnyAlarm.OUT, DC_801_Inh_OR1.IN1
+FT-801.Low_Alarm, DC_801_Inh_OR1.IN2
+DC_801_Inh_OR1.OUT, DC_801_Inh_OR2.IN1
+CL_NotRunning.OUT, DC_801_Inh_OR2.IN2
+DC_801_Inh_OR2.OUT, DC-801.Inhibit
+FT-801.Low_Alarm, FT_801_AnyFault_OR1.IN1
+FT-801.High_Alarm, FT_801_AnyFault_OR1.IN2
+FT_801_AnyFault_OR1.OUT, FT_801_AnyFault_OR2.IN1
+FT-801.General_Fault, FT_801_AnyFault_OR2.IN2
+FT_801_AnyFault_OR2.OUT, FIC-101.Inhibit
+FT_801_AnyFault_OR2.OUT, FIC_102_Inh_OR1.IN1
+CL_NotRunning.OUT, FIC_102_Inh_OR1.IN2
+FIC_102_Inh_OR1.OUT, FIC-102.Inhibit
+FT-801.PV, FT_801_EffluentFlow_PV
+FIC-101.SlaveSP, CL_801_ChlorineFlow_SP
+FIC-102.SlaveSP, DC_801_DechlorFlow_SP
+XV-106.FB_Opened, XV_106_FullyOpen_FB
+CL-801.FB_Running, CL_801_Running_FB
+DC-801.FB_Running, DC_801_Running_FB
+
+* Parameter Data Connections *
+2.5, FIC-101.RatioSP
+1.2, FIC-102.RatioSP
+2.0, CL_RatioMinCalc.IN2
+3.0, CL_RatioMaxCalc.IN2
+1.0, DC_RatioMinCalc.IN2
+1.5, DC_RatioMaxCalc.IN2
+62.5, FT-801.Scaling_Slope
+-250.0, FT-801.Scaling_Offset
+TRUE, FT-801.Alarm_Enable
+T#5s, XV-106.Timeout
+T#5s, LV-105.Timeout
+TRUE, FIC-101.Auto
+TRUE, FIC-102.Auto
+

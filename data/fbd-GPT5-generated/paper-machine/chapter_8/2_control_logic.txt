@@ -1,0 +1,77 @@
+* Function Blocks *
+ANALOG_IN MM-701
+ANALOG_IN PT-701
+ANALOG_IN TT-102
+BOOL_IN CS-701
+BOOL_IN HS-701
+BOOL_IN SB-701
+PID_BASIC LIC-701
+VALVE_ELECTRIC PV-101
+
+* Variables *
+REAL MM701_SheetMoisture_PV
+REAL PT701_HydraulicPressure_PV
+REAL TT102_PressSectionTemperature_PV
+REAL LIC701_ControlOutput_MV_Percent
+REAL PV101_ValvePosition_Feedback_Percent
+BOOL CS701_ControlSwitch_State
+BOOL HS701_ManualOverride_State
+BOOL SB701_SheetBreak_Status
+
+* Functions *
+NOT SheetBreak_NOT
+AND PressRunPermissive_AND
+OR ValveInterlock_OR
+OR PIDInhibit_OR
+GT MoistureInterlock_GT
+
+* Data Connections *
+MM-701.PV, LIC-701.PV
+LIC-701.XOUT, PV-101.Control_Signal
+SB-701.Bool_Out, SheetBreak_NOT.IN
+SheetBreak_NOT.OUT, PressRunPermissive_AND.IN3
+CS-701.Bool_Out, PressRunPermissive_AND.IN1
+HS-701.Bool_Out, PressRunPermissive_AND.IN2
+PressRunPermissive_AND.OUT, LIC-701.AUTO
+MM-701.PV, MoistureInterlock_GT.IN1
+TT-102.High_Alarm, ValveInterlock_OR.IN1
+MoistureInterlock_GT.OUT, ValveInterlock_OR.IN2
+PV-101.Position_Error, ValveInterlock_OR.IN3
+ValveInterlock_OR.OUT, PV-101.Inhibit
+ValveInterlock_OR.OUT, PV-101.Manual_Mode
+PT-701.High_Alarm, PIDInhibit_OR.IN1
+MM-701.General_Fault, PIDInhibit_OR.IN2
+PIDInhibit_OR.OUT, LIC-701.Inhibit
+MM-701.PV, MM701_SheetMoisture_PV
+PT-701.PV, PT701_HydraulicPressure_PV
+TT-102.PV, TT102_PressSectionTemperature_PV
+LIC-701.XOUT, LIC701_ControlOutput_MV_Percent
+PV-101.Feedback_Pos, PV101_ValvePosition_Feedback_Percent
+CS-701.Bool_Out, CS701_ControlSwitch_State
+HS-701.Bool_Out, HS701_ManualOverride_State
+SB-701.Bool_Out, SB701_SheetBreak_Status
+
+* Parameter Data Connections *
+52.0, LIC-701.SP
+0.0, LIC-701.MV_MIN
+100.0, LIC-701.MV_MAX
+-3.0, LIC-701.KP
+1.2, LIC-701.TR
+0.2, LIC-701.TD
+58.0, LIC-701.PV_High
+46.0, LIC-701.PV_Low
+2.0, LIC-701.Deviation_Limit
+1.25, MM-701.Scaling_Slope
+35.0, MM-701.Scaling_Offset
+58.0, MM-701.PV_High
+46.0, MM-701.PV_Low
+TRUE, MM-701.Alarm_Enable
+75.0, TT-102.PV_High
+TRUE, TT-102.Alarm_Enable
+1200.0, PT-701.PV_High
+TRUE, PT-701.Alarm_Enable
+100.0, PV-101.Open_Limit
+0.0, PV-101.Close_Limit
+0.0, PV-101.Manual_Position
+65.0, MoistureInterlock_GT.IN2
+

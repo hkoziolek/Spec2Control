@@ -1,0 +1,126 @@
+Evaluation Results for coking-refinery - chapter_8
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_8\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_8\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_8\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), PID_BASIC(2), RATIO_CONTROL(1), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(3), PID_BASIC(2), RATIO_CONTROL(1), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_8\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_8\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+ANALOG_IN PT-701
+DIGITAL_IN FD-701
+PID_BASIC FIC-702
+PID_BASIC LIC-101
+VALVE_ELECTRIC FV-701
+VALVE_ELECTRIC FV-702
+RATIO_CONTROL FFIC-701
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+ANALOG_IN PT-701
+PID_BASIC FIC-702
+PID_BASIC LIC-101
+VALVE_ELECTRIC FV-701
+VALVE_ELECTRIC FV-702
+RATIO_CONTROL FFIC-701
+
+ALL DATA CONNECTIONS:
+FT-701.PV, FFIC-701.PrimaryPV
+FT-702.PV, FFIC-701.SecondaryPV
+FT-701.PV, LowFlowCheck_LT.IN1
+LowFlowCheck_LT.OUT, AirSP_Select_SEL.G
+FFIC-701.SlaveSP, AirSP_Select_SEL.IN0
+AirSP_Select_SEL.OUT, AirSP_TxFaultFallback_SEL.IN0
+AirSP_TxFaultFallback_SEL.OUT, FIC-702.SP
+FT-702.PV, FIC-702.PV
+FIC-702.XOUT, FV-702.Control_Signal
+FD-701.DI_Out, FlameNotDetected_NOT.IN
+FT-701.General_Fault, TxFaultOrRange_OR.IN1
+FT-702.General_Fault, TxFaultOrRange_OR.IN2
+FT-701.High_Alarm, TxFaultOrRange_OR.IN3
+FT-701.Low_Alarm, TxFaultOrRange_OR.IN4
+FT-702.High_Alarm, TxFaultOrRange_OR.IN5
+FT-702.Low_Alarm, TxFaultOrRange_OR.IN6
+LIC-101.PV_High_Alarm, LevelOutOfRange_OR.IN1
+LIC-101.PV_Low_Alarm, LevelOutOfRange_OR.IN2
+FlameNotDetected_NOT.OUT, RatioControl_Inhibit_OR.IN1
+FIC702_Inhibit_OR.OUT, RatioControl_Inhibit_OR.IN2
+TxFaultOrRange_OR.OUT, FIC702_Inhibit_OR.IN1
+LevelOutOfRange_OR.OUT, FIC702_Inhibit_OR.IN2
+PT-701.Low_Alarm, FIC702_Inhibit_OR.IN3
+LevelOutOfRange_OR.OUT, FuelValve_Inhibit_OR.IN1
+PT-701.Low_Alarm, FuelValve_Inhibit_OR.IN2
+FuelValve_Inhibit_OR.OUT, AirValve_Inhibit_OR.IN1
+FT-701.Low_Alarm, AirValve_Inhibit_OR.IN2
+RatioControl_Inhibit_OR.OUT, FFIC-701.Inhibit
+FIC702_Inhibit_OR.OUT, FIC-702.Inhibit
+FuelValve_Inhibit_OR.OUT, FV-701.Inhibit
+AirValve_Inhibit_OR.OUT, FV-702.Inhibit
+RatioControl_Inhibit_OR.OUT, RatioControlAutoGate_NOT.IN
+RatioControlAutoGate_NOT.OUT, FFIC-701.Auto
+FIC702_Inhibit_OR.OUT, FIC702AutoGate_NOT.IN
+FIC702AutoGate_NOT.OUT, FIC-702.AUTO
+TxFaultOrRange_OR.OUT, AirSP_TxFaultFallback_SEL.G
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=FT-701, RATIO_CONTROL=FFIC-701
+   Actual Connection: FT-701.PV, FFIC-701.PrimaryPV
+   Notes: Direct feed of FT-701 PV to the ratio controller’s PrimaryPV.
+
+Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=FT-702, RATIO_CONTROL=FFIC-701
+   Actual Connection: FT-702.PV, FFIC-701.SecondaryPV
+   Notes: Direct feed of FT-702 PV to the ratio controller’s SecondaryPV.
+
+Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND INDIRECT
+   Mapping: RATIO_CONTROL=FFIC-701, PID_BASIC=FIC-702
+   Actual Connection: 
+      FFIC-701.SlaveSP, AirSP_Select_SEL.IN0
+      AirSP_Select_SEL.OUT, AirSP_TxFaultFallback_SEL.IN0
+      AirSP_TxFaultFallback_SEL.OUT, FIC-702.SP
+   Notes: Slave setpoint is routed through selection/fallback blocks before reaching FIC-702.SP. This aligns with the intended connection via an indirect path.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC=FIC-702, VALVE_ELECTRIC=FV-702
+   Actual Connection: FIC-702.XOUT, FV-702.Control_Signal
+   Notes: Direct output from PID to valve. Alternative indirect mapping to MOTOR_VSD.Speed_SP was not used, but is not required here.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented correctly; two analog PVs feed the ratio controller directly, the ratio SlaveSP reaches the PID via robust selector/fallback logic, and the PID output drives the valve directly. Interlocks and auto gating are present and appear consistent.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,109 @@
+Evaluation Results for ammonium-nitrates - chapter_4
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_4\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_4\1_categorization.txt
+Ground truth strategy: Cascade Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_4\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(5), PID_BASIC(2), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(5), PID_BASIC(2), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_4\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_4\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, PID_BASIC1.PV
+PID_BASIC1.XOUT, PID_BASIC2.SP
+ANALOG_IN2.PV, PID_BASIC2.PV
+PID_BASIC2.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AT-303
+PID_BASIC FIC-301
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-301
+BOOL_IN GR-306
+ANALOG_IN PR-305
+ANALOG_IN RTD-302
+PID_BASIC TIC-302
+ANALOG_IN VS-304
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AT-303
+PID_BASIC FIC-301
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-301
+ANALOG_IN PR-305
+ANALOG_IN RTD-302
+PID_BASIC TIC-302
+ANALOG_IN VS-304
+
+ALL DATA CONNECTIONS:
+RTD-302.PV, TIC-302.PV
+TIC-302.XOUT, FIC-301.SP
+FT-301.PV, FIC-301.PV
+FIC-301.XOUT, FV-301.Control_Signal
+PR-305.General_Fault, PR305_OK_NOT.IN
+GR-306.Bool_Out, ProductPermissive_OR.IN1
+PR305_OK_NOT.OUT, ProductPermissive_OR.IN2
+ProductPermissive_OR.OUT, ProductNotReady_NOT.IN
+RTD-302.High_Alarm, CascadeBlock_OR.IN1
+RTD-302.Low_Alarm, CascadeBlock_OR.IN2
+FT-301.High_Alarm, CascadeBlock_OR.IN3
+FT-301.Low_Alarm, CascadeBlock_OR.IN4
+FT-301.General_Fault, CascadeBlock_OR.IN5
+FV-301.Position_Error, CascadeBlock_OR.IN6
+FV-301.Alarm, CascadeBlock_OR.IN7
+RTD-302.General_Fault, CascadeBlock_OR.IN8
+AT-303.High_Alarm, CascadeBlock_OR.IN9
+VS-304.General_Fault, CascadeBlock_OR.IN10
+ProductNotReady_NOT.OUT, CascadeBlock_OR.IN11
+CascadeBlock_OR.OUT, TIC-302.Inhibit
+CascadeBlock_OR.OUT, FIC-301.Inhibit
+CascadeBlock_OR.OUT, FV-301.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> PID_BASIC1.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 -> RTD-302; PID_BASIC1 -> TIC-302
+- Actual Connection: RTD-302.PV, TIC-302.PV
+- Notes: Direct PV feed from temperature RTD to temperature PID. Inhibit signal present (CascadeBlock_OR -> TIC-302.Inhibit) but does not alter the PV linkage.
+
+Intended: PID_BASIC1.XOUT -> PID_BASIC2.SP
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1 -> TIC-302; PID_BASIC2 -> FIC-301
+- Actual Connection: TIC-302.XOUT, FIC-301.SP
+- Notes: Classic cascade: TIC output drives FIC setpoint. Inhibit on both PIDs is managed via CascadeBlock_OR; data path remains intact.
+
+Intended: ANALOG_IN2.PV -> PID_BASIC2.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 -> FT-301; PID_BASIC2 -> FIC-301
+- Actual Connection: FT-301.PV, FIC-301.PV
+- Notes: Flow transmitter PV wired directly to flow PID PV. Alarm and fault signals from FT-301 feed CascadeBlock_OR, not the PV line.
+
+Intended: PID_BASIC2.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC2 -> FIC-301; VALVE_ELECTRIC -> FV-301
+- Actual Connection: FIC-301.XOUT, FV-301.Control_Signal
+- Notes: Direct PID output to valve control signal. Special indirect allowance (PID_BASIC1.XOUT -> MOTOR_VSD.Speed_SP) not applicable here. Common inhibit to FV-301 via CascadeBlock_OR noted.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended cascade connections are implemented directly and cleanly. Protective interlocks and alarms are centralized through CascadeBlock_OR to Inhibit inputs without breaking the intended signal flow.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

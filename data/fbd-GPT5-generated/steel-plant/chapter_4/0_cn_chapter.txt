@@ -1,0 +1,33 @@
+## 4 ** Blast Furnace ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|BF-301 | Equipment | Blast furnace for combustion and reduction processes |
+|FIC-302 | Flow Controller | Controls hot blast air flowrate to maintain ratio setpoint |
+|FT-301 | Flow Transmitter | Measures pulverized coal flowrate for ratio control |
+|FV-302 | Flow Valve | Modulates hot blast air flow based on controller output |
+|PT-301 | Pressure Transmitter | Measures pressure in the blast furnace system |
+|TT-301 | Temperature Transmitter | Monitors temperature in the blast furnace system |
+
+### 4.1) Control Strategy Description
+
+The ratio control strategy for the blast furnace (BF-301) ensures precise proportional relationships between the injected pulverized coal flow (wild flow) and the hot blast air flow (controlled flow) to maintain optimal combustion and reduction conditions. The pulverized coal flowrate is measured by FT-301 with a range of 0-5000 kg/hr, while the hot blast air flowrate is controlled by FIC-302, which modulates control valve FV-302. The ratio controller, FFIC-303, calculates the setpoint for FIC-302 based on the measured pulverized coal flow and a fixed ratio setpoint of 1.8:1 (hot blast air to pulverized coal).
+
+The ratio is implemented such that the hot blast air flow setpoint (SP) is dynamically calculated as:
+Hot Blast Air SP = Pulverized Coal Flow (FT-301) × 1.8.
+
+FFIC-303 is configured with ratio adjustment limits of 1.5:1 to 2.0:1 to allow for operational flexibility while maintaining safety and efficiency. The ratio controller also includes a manual bias adjustment capability of ±0.1 to fine-tune the ratio during transient conditions. Additionally, a low flow cutoff is implemented, where if FT-301 measures below 100 kg/hr, the ratio control is suspended, and FIC-302 reverts to a predefined minimum setpoint of 200 kg/hr to prevent air starvation.
+
+### 4.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with the blast furnace safety system to ensure safe operation. The following conditions must be met for FFIC-303 to operate in automatic mode:
+1. Pulverized coal flow (FT-301) must be within the range of 100-5000 kg/hr. If the flow is outside this range, the ratio control is disabled, and FIC-302 maintains a fixed fallback setpoint of 500 kg/hr.
+2. Hot blast air temperature (TT-301) must be above 900°C to ensure proper combustion. If TT-301 falls below this threshold, the ratio control is disabled, and FIC-302 is closed.
+3. Furnace pressure (PT-301) must be within the range of 1.5-2.5 bar(g). If PT-301 exceeds 2.5 bar(g), the ratio control is overridden, and FIC-302 is closed to reduce pressure buildup.
+
+Mode switching between manual and automatic operation of FFIC-303 is bumpless, with the current controlled flow setpoint clamped to the calculated value during transitions to prevent process disturbances.
+
+### 4.3) Alarm and Fault Handling
+
+The ratio control system includes alarms to notify operators of abnormal conditions. A high pulverized coal flow alarm (FT-301-H) is triggered if the flow exceeds 5000 kg/hr, while a low flow alarm (FT-301-L) is activated if the flow drops below 100 kg/hr. Similarly, a high hot blast air flow alarm (FIC-302-H) is triggered at 9000 kg/hr, and a low flow alarm (FIC-302-L) is activated at 200 kg/hr.
+
+In the event of a fault in the pulverized coal flow measurement (FT-301), the ratio controller FFIC-303 enters manual mode, and FIC-302 reverts to a fixed setpoint of 1000 kg/hr. If the hot blast air temperature (TT-301) or furnace pressure (PT-301) exceeds their respective alarm thresholds, the system initiates an emergency shutdown sequence, closing FV-302 and isolating the hot blast air supply. All alarm conditions are logged in the control system's historian for diagnostic purposes.

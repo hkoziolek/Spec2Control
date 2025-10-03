@@ -1,0 +1,77 @@
+Evaluation Results for lng-production - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_3\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(4), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(4), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\lng-production\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\lng-production\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AI-201
+VALVE_ELECTRIC FV-101
+ANALOG_IN LT-201
+ANALOG_IN PT-201
+PID_BASIC TIC-201
+ANALOG_IN TT-201
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AI-201
+VALVE_ELECTRIC FV-101
+ANALOG_IN LT-201
+ANALOG_IN PT-201
+PID_BASIC TIC-201
+ANALOG_IN TT-201
+
+ALL DATA CONNECTIONS:
+TT-201.PV, TIC-201.PV
+TIC-201.XOUT, FV-101.Control_Signal
+TT-201.High_Alarm, AmineShutdown.IN1
+PT-201.Low_Alarm, AmineShutdown.IN2
+LT-201.Low_Alarm, AmineShutdown.IN3
+AI-201.High_Alarm, AmineShutdown.IN4
+TT-201.General_Fault, AmineShutdown.IN5
+AmineShutdown.OUT, FV-101.Inhibit
+AmineShutdown.OUT, TIC-201.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended connection: ANALOG_IN.PV -> PID_BASIC.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN -> TT-201, PID_BASIC -> TIC-201
+   Actual Connection: TT-201.PV, TIC-201.PV
+   Notes: Multiple analog inputs exist, but TT-201 is the one tied to the PID’s PV, which aligns with TIC-201 being a temperature controller.
+
+Intended connection: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC -> TIC-201, VALVE_ELECTRIC -> FV-101
+   Actual Connection: TIC-201.XOUT, FV-101.Control_Signal
+   Notes: Direct link is present. An inhibit interlock (AmineShutdown.OUT) affects both the PID and the valve, which is typical for safety but does not alter the validity of the control signal path. The allowed indirect target (MOTOR_VSD.Speed_SP) is not used here, but not required since a direct connection exists.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: The implementation cleanly matches the intended design: correct sensor-to-PID PV wiring and PID output to the electric valve. Safety interlocks are present and appropriately applied to both controller and final element.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

@@ -1,0 +1,29 @@
+## 4 **Molecular-Sieve Dehydration and Mercury Removal**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AI-302 | Analyzer | Measures outlet H₂O concentration for process monitoring. |
+|AI-303 | Analyzer | Monitors mercury concentration in the gas stream. |
+|AI-304 | Analyzer | Provides H₂O concentration data for ratio control optimization. |
+|DI-301 | Discrete Input | Provides status signal for bed switching sequence. |
+|DP-301 | Differential Pressure Transmitter | Measures pressure drop across dehydration beds. |
+|FIC-302 | Flow Controller | Adjusts regeneration gas flow based on ratio control setpoint. |
+|FT-301 | Flow Transmitter | Measures feed gas flow entering dehydration beds. |
+|FV-302 | Flow Valve | Modulates regeneration gas flow for precise control. |
+
+### 4.1) Control Strategy Description
+
+The molecular-sieve dehydration beds operate in a sequenced configuration to remove water from the gas stream, while mercury guard beds ensure mercury concentrations remain below acceptable limits. Ratio control is implemented to maintain proportional flow relationships between the feed gas entering the dehydration beds and the regeneration gas used during bed switching. Feed gas flow is measured by FT-301 (wild flow) with a range of 0–10,000 Nm³/hr. Regeneration gas flow is controlled by FIC-302, which adjusts the setpoint based on the ratio controller FFIC-303. FFIC-303 calculates the regeneration gas flow setpoint as \( \text{SP}_{\text{regen}} = \text{PV}_{\text{feed}} \times R \), where \( R \) is the ratio setpoint configured to 0.25:1. The regeneration gas flow is modulated by FV-302 to ensure precise control.
+
+The ratio setpoint \( R \) is adjustable within limits of 0.20:1 to 0.30:1, allowing operators to optimize regeneration gas consumption based on bed performance and outlet H₂O concentration measured by AI-304. A deadband of ±3% is applied to the calculated setpoint to prevent unnecessary valve modulation during stable operation. Additionally, FFIC-303 includes manual bias adjustment capability, enabling operators to trim the ratio during transitions or abnormal conditions. Signal scaling ensures all flow measurements are normalized to a 0–100% engineering scale for accurate ratio calculation.
+
+### 4.2) Interlocks and Permissives
+
+The ratio control system is interlocked with bed sequencing logic to prevent regeneration gas flow during active dehydration cycles. The permissive signal for FFIC-303 activation is tied to the bed regeneration status, indicated by DI-301. If DI-301 signals that the bed is in dehydration mode, FFIC-303 output is clamped to zero, overriding the ratio calculation. Additionally, the system includes a low-flow cutoff for FT-301, set at 500 Nm³/hr, below which FFIC-303 disables regeneration gas flow to prevent excessive dilution or waste.
+
+Pressure interlocks from DP-301 ensure that excessive differential pressure across the molecular-sieve beds does not initiate regeneration gas flow. If DP-301 exceeds 20 kPa, the ratio control output is disabled, and an alarm is generated. Mercury guard bed analyzers AI-302 and AI-303 provide permissive signals for regeneration gas flow; if mercury concentrations exceed 0.01 µg/Nm³, FFIC-303 output is clamped to zero, preventing further contamination of the regeneration stream.
+
+### 4.3) Alarm and Fault Handling
+
+Alarm thresholds are configured for critical measurements to ensure safe operation of the ratio control system. If FT-301 (wild flow) falls below 500 Nm³/hr, a low-flow alarm is triggered, and FFIC-303 enters a fault state, disabling regeneration gas flow. Similarly, if DP-301 exceeds 20 kPa, a high differential pressure alarm is activated, and the ratio controller output is forced to zero. Outlet H₂O concentration measured by AI-304 has an alarm setpoint at 10 ppm; if exceeded, FFIC-303 ratio setpoint is automatically adjusted to the upper limit of 0.30:1 to increase regeneration gas flow.
+
+In the event of a mercury analyzer fault from AI-302 or AI-303, the system triggers a high-mercury alarm and clamps FFIC-303 output to zero. Ratio controller FFIC-303 includes fault detection logic to monitor signal integrity from FT-301 and FIC-302; if either signal is lost or outside the configured range, FFIC-303 enters manual mode, allowing operators to directly control FV-302. All alarms are logged in the DCS and require operator acknowledgment before the system resumes automatic control.

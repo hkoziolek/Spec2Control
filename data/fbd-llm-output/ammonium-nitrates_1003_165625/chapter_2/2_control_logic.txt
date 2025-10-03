@@ -1,0 +1,83 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN LT-104
+ANALOG_IN PH-105
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+PID_BASIC TIC-103
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+RATIO_CONTROL FFIC-102
+BOOL_IN VS-107
+
+* Variables *
+REAL FT101_AmmoniaFlow_PV
+REAL FT102_AcidFlow_PV
+REAL LT104_Level_PV
+REAL PH105_pH_PV
+REAL FFIC102_AcidFlow_SP
+REAL FFIC102_Active_Ratio
+BOOL VS107_Running
+
+* Functions *
+OR AcidInhibit_OR
+NOT VS107Permissive_NOT
+OR AmmoniaInhibit_OR
+
+* Data Connections * 
+FT-101.PV, FFIC-102.PrimaryPV
+FT-102.PV, FFIC-102.SecondaryPV
+FFIC-102.SlaveSP, FIC-102.SP
+FT-102.PV, FIC-102.PV
+FIC-102.XOUT, FV-102.Control_Signal
+LT-104.Low_Alarm, AcidInhibit_OR.IN1
+LT-104.High_Alarm, AcidInhibit_OR.IN2
+TIC-103.PV_High_Alarm, AcidInhibit_OR.IN3
+FIC-102.PV_Low_Alarm, AcidInhibit_OR.IN4
+AcidInhibit_OR.OUT, FFIC-102.Inhibit
+AcidInhibit_OR.OUT, FIC-102.Inhibit
+AcidInhibit_OR.OUT, FV-102.Inhibit
+VS-107.Bool_Out, VS107Permissive_NOT.IN
+VS107Permissive_NOT.OUT, AmmoniaInhibit_OR.IN1
+TIC-103.PV_High_Alarm, AmmoniaInhibit_OR.IN2
+FT-101.Low_Alarm, AmmoniaInhibit_OR.IN3
+AmmoniaInhibit_OR.OUT, FV-101.Inhibit
+FT-101.PV, FT101_AmmoniaFlow_PV
+FT-102.PV, FT102_AcidFlow_PV
+LT-104.PV, LT104_Level_PV
+PH-105.PV, PH105_pH_PV
+FFIC-102.SlaveSP, FFIC102_AcidFlow_SP
+FFIC-102.ActiveRatio, FFIC102_Active_Ratio
+VS107_Running, VS-107.Bool_In
+
+* Parameter Data Connections *
+1.8, FFIC-102.RatioSP
+TRUE, FFIC-102.Auto
+TRUE, FIC-102.AUTO
+TRUE, FIC-101.AUTO
+31.25, FT-101.Scaling_Slope
+-125, FT-101.Scaling_Offset
+10, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+10, FT-102.PV_Low
+TRUE, FT-102.Alarm_Enable
+190, TIC-103.PV_High
+10, FIC-102.PV_Low
+7.3, PH-105.PV_High
+6.7, PH-105.PV_Low
+TRUE, PH-105.Alarm_Enable
+20, LT-104.PV_Low
+90, LT-104.PV_High
+TRUE, LT-104.Alarm_Enable
+0, FFIC-102.MV_MIN
+100, FFIC-102.MV_MAX
+0, FIC-102.MV_MIN
+100, FIC-102.MV_MAX
+0, FIC-101.MV_MIN
+100, FIC-101.MV_MAX
+0, FV-101.Close_Limit
+100, FV-101.Open_Limit
+0, FV-102.Close_Limit
+100, FV-102.Open_Limit
+

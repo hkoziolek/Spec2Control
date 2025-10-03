@@ -1,0 +1,24 @@
+## 6 **Secondary (Biological) Treatment**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|B-501A | Blower | Provides air pressure for biological treatment system |
+|B-501B | Blower | Backup blower for air pressure delivery in treatment system |
+|FFIC-102 | Ratio Controller | Calculates airflow setpoint based on influent flow ratio |
+|FIC-101 | Flow Controller | Monitors influent flow rate to biological treatment system |
+|FIC-103 | Flow Controller | Modulates airflow delivery to maintain setpoint ratio |
+|FV-102 | Flow Valve | Regulates airflow to biological treatment zones |
+|MX-501 | Mixer | Ensures uniform mixing in treatment zones |
+|PT-501 | Pressure Transmitter | Monitors air pressure from blowers for system interlocks |
+|XV-105 | On-Off Valve | Ensures airflow continuity by verifying open position |
+
+### 6.1) Control Strategy Description
+
+In the Secondary (Biological) Treatment segment, ratio control is implemented to maintain proportional airflow delivery to the anoxic and aerobic zones based on influent flow rate. The wild flow measurement is provided by FIC-101, which monitors influent flow within a calibrated range of 0-5000 m³/hr. The ratio controller FFIC-102 calculates the required airflow setpoint for FIC-103, maintaining a fixed ratio of 2.0:1 (airflow-to-influent flow). The calculated setpoint for FIC-103 is determined using the formula: Airflow SP = Influent Flow × 2.0. FIC-103 modulates FV-102 to achieve the desired airflow, ensuring sufficient oxygen delivery for biological treatment. The ratio controller FFIC-102 incorporates manual bias adjustment within ±0.5 of the ratio setpoint, allowing operational flexibility during transient conditions. Ratio limits are clamped between 1.5:1 and 2.5:1 to prevent excessive or insufficient aeration.
+
+### 6.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with air header availability and blower operational status. FFIC-102 will not issue a setpoint to FIC-103 unless B-501A or B-501B is confirmed running and delivering air pressure above 3.0 bar (monitored by PT-501). Additionally, FV-102 will not open unless XV-105 is verified in the open position, ensuring airflow continuity. Low flow cutoff logic disables FFIC-102 when influent flow measured by FIC-101 drops below 100 m³/hr, preventing unnecessary blower operation during low-load conditions. Mixing equipment MX-501 must be operational before FFIC-102 is activated to ensure proper zone circulation.
+
+### 6.3) Alarm and Fault Handling
+
+A deviation alarm is triggered if the actual airflow measured by FIC-103 deviates from the calculated setpoint by more than 10% for a duration exceeding 30 seconds. FFIC-102 generates a fault alarm if the ratio exceeds the clamped limits of 1.5:1 or 2.5:1 due to erroneous inputs or manual bias adjustments. In the event of a blower failure (B-501A or B-501B), FFIC-102 transitions to manual mode, allowing operators to directly control FV-102 to maintain minimum airflow. If influent flow measured by FIC-101 falls below 100 m³/hr for more than 5 minutes, FFIC-102 will disable the ratio control loop and shut FV-102, generating a low-flow alarm.

@@ -1,0 +1,82 @@
+* Function Blocks *
+ANALOG_IN AT-303
+PID_BASIC FIC-301
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-301
+ANALOG_IN PR-305
+ANALOG_IN RTD-302
+PID_BASIC TIC-302
+ANALOG_IN VS-304
+BOOL_IN GR-306
+
+* Variables *
+REAL RTD302_BedTemp_PV
+REAL FT301_Flow_PV
+REAL TIC302_RSP_to_FIC301
+REAL FIC301_MV_Out_to_FV301
+REAL AT303_Humidity_PV
+REAL PR305_TowerPressure_PV
+REAL VS304_Vibration_PV
+
+* Functions *
+NOT NotCollecting_NOT
+OR FICInterlock_OR
+OR CascadeInterlock_OR
+
+* Data Connections * 
+RTD-302.PV, TIC-302.PV
+TIC-302.XOUT, FIC-301.SP
+FT-301.PV, FIC-301.PV
+FIC-301.XOUT, FV-301.Control_Signal
+FT-301.High_Alarm, FICInterlock_OR.IN1
+FT-301.Low_Alarm, FICInterlock_OR.IN4
+RTD-302.High_Alarm, CascadeInterlock_OR.IN1
+RTD-302.Low_Alarm, CascadeInterlock_OR.IN7
+GR-306.Bool_Out, NotCollecting_NOT.IN
+FV-301.Position_Error, FICInterlock_OR.IN2
+FT-301.General_Fault, FICInterlock_OR.IN3
+AT-303.High_Alarm, CascadeInterlock_OR.IN2
+VS-304.General_Fault, CascadeInterlock_OR.IN3
+FT-301.General_Fault, CascadeInterlock_OR.IN4
+RTD-302.General_Fault, CascadeInterlock_OR.IN5
+NotCollecting_NOT.OUT, CascadeInterlock_OR.IN6
+FICInterlock_OR.OUT, FIC-301.Inhibit
+CascadeInterlock_OR.OUT, TIC-302.Inhibit
+FV-301.Position_Error, FV-301.Inhibit
+RTD-302.PV, RTD302_BedTemp_PV
+FT-301.PV, FT301_Flow_PV
+TIC-302.XOUT, TIC302_RSP_to_FIC301
+FIC-301.XOUT, FIC301_MV_Out_to_FV301
+AT-303.PV, AT303_Humidity_PV
+PR-305.PV, PR305_TowerPressure_PV
+VS-304.PV, VS304_Vibration_PV
+
+* Parameter Data Connections *
+185.0, TIC-302.SP
+1.2, TIC-302.KP
+2.0, TIC-302.TR
+0.0, TIC-302.TD
+2.5, TIC-302.MV_MIN
+5.0, TIC-302.MV_MAX
+5.0, TIC-302.Deviation_Limit
+TRUE, TIC-302.AUTO
+3.5, FIC-301.KP
+0.3, FIC-301.TR
+0.0, FIC-301.TD
+0.0, FIC-301.MV_MIN
+100.0, FIC-301.MV_MAX
+0.1, FIC-301.Deviation_Limit
+TRUE, FIC-301.AUTO
+TRUE, FT-301.Alarm_Enable
+200.0, RTD-302.PV_High
+150.0, RTD-302.PV_Low
+TRUE, RTD-302.Alarm_Enable
+TRUE, AT-303.Alarm_Enable
+100.0, FV-301.Open_Limit
+0.0, FV-301.Close_Limit
+FALSE, FV-301.Manual_Mode
+TRUE, GR-306.Alarm_OnFalse
+FALSE, GR-306.Alarm_OnTrue
+FALSE, GR-306.Latch_Enable
+
+

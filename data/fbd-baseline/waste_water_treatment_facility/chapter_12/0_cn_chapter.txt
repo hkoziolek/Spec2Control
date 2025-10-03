@@ -1,0 +1,24 @@
+## 12 **Sludge/Biosolids Management**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|DG-1101 | Digester | Processes sludge for thickening operations |
+|DW-1101 | Dewatering Unit | Removes excess water from sludge |
+|IIC-101 | Solids Concentration Transmitter | Measures sludge consistency for control loop |
+|IIC-103 | Controller | Regulates process variables for system stability |
+|IIC-105 | Controller | Backup or auxiliary control for process adjustments |
+|LV-104 | Level Transmitter | Monitors sludge level in digester or dewatering unit |
+|OC-1101 | On-Off Valve | Controls flow isolation in sludge processing system |
+|PV-102 | Pressure Valve | Modulates flow to maintain target sludge consistency |
+|TH-1101 | Thickener | Performs sludge thickening to achieve desired solids concentration |
+
+### 12.1) Control Strategy Description
+
+The sludge thickening process in TH-1101 is regulated using a PID control loop implemented in IIC-101. The control objective is to maintain the sludge consistency at a target setpoint of 6.5% solids by weight (SP=6.5%). The process variable (PV) is measured by a solids concentration transmitter (IIC-101) with a calibrated range of 0-10% solids and a signal output of 4-20mA. The controller is configured for direct-acting operation, where an increase in PV results in an increase in the manipulated variable (MV) to PV-102. The proportional gain (Kp) is set to 3.0, integral time (Ki) to 1.2 minutes, and derivative time (Kd) to 0.3 minutes. The MV output is clamped between 10% and 90% to ensure safe operation of PV-102, which is a modulating valve with a fail-closed position. Bumpless transfer logic is implemented to allow seamless transition between manual and automatic modes, preventing abrupt changes in MV during mode switching. Anti-windup provisions are included to limit integral accumulation when MV saturates.
+
+### 12.2) Interlocks and Permissives
+
+The PID control loop for TH-1101 is interlocked with the operational status of DG-1101 and DW-1101 to prevent overloading downstream units. The IIC-101 controller is disabled if the digester (DG-1101) or dewatering unit (DW-1101) reports a high-level condition via LV-104, which is configured with a level transmitter spanning 0-100% and a high-level alarm threshold set at 85%. Additionally, PV-102 will not open unless odor control system OC-1101 confirms active operation via IIC-105, ensuring that odor emissions are mitigated during sludge processing. Setpoint clamping logic restricts the SP within the range of 4.0% to 8.0% solids to avoid unsafe thickening conditions that could damage TH-1101 or downstream equipment.
+
+### 12.3) Alarm and Fault Handling
+
+Alarm handling for the PID loop controlling TH-1101 is managed by IIC-103, which monitors PV deviations and actuator faults. A high PV alarm is triggered if the solids concentration exceeds 8.0%, while a low PV alarm is activated below 4.0%. In the event of a transmitter fault in IIC-101, the controller transitions to manual mode, maintaining the last known MV value to prevent uncontrolled operation of PV-102. If PV-102 fails to respond to MV adjustments, an actuator fault alarm is raised, and the valve is commanded to its fail-closed position. Settling time for the PID loop is tuned to achieve a response time of less than 60 seconds, ensuring rapid correction of PV deviations.

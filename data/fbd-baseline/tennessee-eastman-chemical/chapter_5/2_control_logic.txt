@@ -1,0 +1,63 @@
+* Function Blocks *
+ANALOG_IN TIT-106
+ANALOG_IN LT-107
+PID_BASIC TIC-106
+PID_BASIC LIC-107
+VALVE_ELECTRIC FV-105
+VALVE_ELECTRIC LV-102
+DIGITAL_IN CONDENSATE_RETURN_VALVE_OPEN_LS
+
+* Variables *
+REAL TIT106_ReboilerTemp_PV
+REAL LT107_Column2Level_PV
+REAL TIC106_FV105_SteamFlow_MV
+REAL LIC107_LV102_Outflow_MV
+
+* Functions *
+OR SteamValveInhibitLogic
+NOT CondensateNotOpen
+
+* Data Connections * 
+TIT-106.PV, TIC-106.PV
+TIC-106.XOUT, FV-105.Control_Signal
+LT-107.PV, LIC-107.PV
+LIC-107.XOUT, LV-102.Control_Signal
+CONDENSATE_RETURN_VALVE_OPEN_LS.DI_Out, CondensateNotOpen.IN
+CondensateNotOpen.OUT, SteamValveInhibitLogic.IN1
+TIC-106.PV_High_Alarm, SteamValveInhibitLogic.IN2
+SteamValveInhibitLogic.OUT, FV-105.Inhibit
+LIC-107.PV_Low_Alarm, LV-102.Inhibit
+TIT-106.PV, TIT106_ReboilerTemp_PV
+LT-107.PV, LT107_Column2Level_PV
+TIC-106.XOUT, TIC106_FV105_SteamFlow_MV
+LIC-107.XOUT, LIC107_LV102_Outflow_MV
+
+* Parameter Data Connections *
+18.75, TIT-106.Scaling_Slope
+-75, TIT-106.Scaling_Offset
+260, TIT-106.PV_High
+TRUE, TIT-106.Alarm_Enable
+6.25, LT-107.Scaling_Slope
+-25, LT-107.Scaling_Offset
+20, LT-107.PV_Low
+80, LT-107.PV_High
+TRUE, LT-107.Alarm_Enable
+200, TIC-106.SP
+-3.0, TIC-106.KP
+1.2, TIC-106.TR
+0.2, TIC-106.TD
+0, TIC-106.MV_MIN
+100, TIC-106.MV_MAX
+TRUE, TIC-106.AUTO
+50, LIC-107.SP
+2.5, LIC-107.KP
+1.0, LIC-107.TR
+0.0, LIC-107.TD
+0, LIC-107.MV_MIN
+100, LIC-107.MV_MAX
+TRUE, LIC-107.AUTO
+0, FV-105.Close_Limit
+100, FV-105.Open_Limit
+0, LV-102.Close_Limit
+100, LV-102.Open_Limit
+

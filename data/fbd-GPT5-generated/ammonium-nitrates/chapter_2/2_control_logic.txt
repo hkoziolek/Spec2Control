@@ -1,0 +1,69 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN LT-104
+ANALOG_IN PH-105
+PID_BASIC FIC-101
+PID_BASIC FIC-102
+PID_BASIC TIC-103
+RATIO_CONTROL FFIC-102
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+BOOL_IN VS-107
+
+* Variables *
+REAL FIC102_AcidFlow_SP_FromRatio
+REAL FV102_ValveCmd_Pct
+REAL FV101_ValveCmd_Pct
+REAL FT101_AmmoniaFlow_PV
+
+* Functions *
+OR AcidShutdown
+NOT ScrubberNotReady
+OR AmmoniaShutdown
+
+* Data Connections * 
+FT-101.PV, FFIC-102.PrimaryPV
+FT-102.PV, FFIC-102.SecondaryPV
+FT-102.PV, FIC-102.PV
+FFIC-102.SlaveSP, FIC-102.SP
+FIC-102.XOUT, FV-102.Control_Signal
+FT-101.PV, FIC-101.PV
+FIC-101.XOUT, FV-101.Control_Signal
+LT-104.High_Alarm, AcidShutdown.IN1
+LT-104.Low_Alarm, AcidShutdown.IN2
+FT-101.Low_Alarm, AcidShutdown.IN3
+FIC-102.PV_Low_Alarm, AcidShutdown.IN4
+TIC-103.PV_High_Alarm, AcidShutdown.IN5
+AcidShutdown.OUT, FFIC-102.Inhibit
+AcidShutdown.OUT, FV-102.Inhibit
+VS-107.Bool_Out, ScrubberNotReady.IN
+TIC-103.PV_High_Alarm, AmmoniaShutdown.IN1
+ScrubberNotReady.OUT, AmmoniaShutdown.IN2
+FT-101.Low_Alarm, AmmoniaShutdown.IN3
+AmmoniaShutdown.OUT, FV-101.Inhibit
+FFIC-102.SlaveSP, FIC102_AcidFlow_SP_FromRatio
+FIC-102.XOUT, FV102_ValveCmd_Pct
+FIC-101.XOUT, FV101_ValveCmd_Pct
+FT-101.PV, FT101_AmmoniaFlow_PV
+
+* Parameter Data Connections *
+31.25, FT-101.Scaling_Slope
+-125, FT-101.Scaling_Offset
+500, FT-101.PV_High
+10, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+20, LT-104.PV_Low
+90, LT-104.PV_High
+TRUE, LT-104.Alarm_Enable
+7.3, PH-105.PV_High
+6.7, PH-105.PV_Low
+TRUE, PH-105.Alarm_Enable
+190, TIC-103.PV_High
+10, FIC-102.PV_Low
+TRUE, FIC-102.AUTO
+1.8, FFIC-102.RatioSP
+0, FFIC-102.MV_MIN
+1000, FFIC-102.MV_MAX
+TRUE, FFIC-102.Auto
+

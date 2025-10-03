@@ -1,0 +1,91 @@
+* Function Blocks *
+ANALOG_IN CT-501
+ANALOG_IN LT-501
+ANALOG_IN PT-502
+ANALOG_IN PG-501
+ANALOG_IN SEL-501
+PID_BASIC FC-502
+PID_BASIC SELC-501
+VALVE_ELECTRIC FV-502
+VALVE_ELECTRIC PGA-501
+MOTOR_ON_OFF M-501
+
+* Variables *
+REAL SELC_501_MV_Percent
+REAL FC_502_MV_Percent
+
+* Functions *
+OR PG_Alarms_OR
+OR Pressure_OOR_OR
+OR FC_FinalInhibit_OR
+NOT M_Run_NOT
+OR FC_Inhibit_OR1
+OR SELC_FinalInhibit_OR
+
+* Data Connections *
+CT-501.PV, FC-502.PV
+FC-502.XOUT, FV-502.Control_Signal
+SEL-501.PV, SELC-501.PV
+SELC-501.XOUT, PGA-501.Control_Signal
+PG-501.High_Alarm, PG_Alarms_OR.IN1
+PG-501.Low_Alarm, PG_Alarms_OR.IN2
+M-501.FB_Running, M_Run_NOT.IN
+M_Run_NOT.OUT, SELC_FinalInhibit_OR.IN1
+PG_Alarms_OR.OUT, SELC_FinalInhibit_OR.IN2
+SELC_FinalInhibit_OR.OUT, SELC-501.Inhibit
+SELC_FinalInhibit_OR.OUT, PGA-501.Inhibit
+PG_Alarms_OR.OUT, M-501.Inhibit
+PT-502.High_Alarm, Pressure_OOR_OR.IN1
+PT-502.Low_Alarm, Pressure_OOR_OR.IN2
+LT-501.Low_Alarm, FC_Inhibit_OR1.IN1
+Pressure_OOR_OR.OUT, FC_Inhibit_OR1.IN2
+FC_Inhibit_OR1.OUT, FC_FinalInhibit_OR.IN1
+CT-501.General_Fault, FC_FinalInhibit_OR.IN2
+FC_FinalInhibit_OR.OUT, FC-502.Inhibit
+FC_FinalInhibit_OR.OUT, FV-502.Inhibit
+SELC-501.XOUT, SELC_501_MV_Percent
+FC-502.XOUT, FC_502_MV_Percent
+
+* Parameter Data Connections *
+0.1875, CT-501.Scaling_Slope
+1.25, CT-501.Scaling_Offset
+TRUE, CT-501.Alarm_Enable
+4.0, CT-501.PV_High
+2.0, CT-501.PV_Low
+TRUE, PT-502.Alarm_Enable
+600.0, PT-502.PV_High
+300.0, PT-502.PV_Low
+TRUE, PG-501.Alarm_Enable
+5.0, PG-501.PV_High
+0.5, PG-501.PV_Low
+0.0625, SEL-501.Scaling_Slope
+-0.05, SEL-501.Scaling_Offset
+TRUE, SEL-501.Alarm_Enable
+1.1, SEL-501.PV_High
+0.3, SEL-501.PV_Low
+TRUE, LT-501.Alarm_Enable
+100.0, LT-501.PV_High
+20.0, LT-501.PV_Low
+TRUE, FC-502.AUTO
+3.0, FC-502.SP
+0.0, FC-502.MV_MIN
+100.0, FC-502.MV_MAX
+2.2, FC-502.KP
+0.7, FC-502.TR
+0.0, FC-502.TD
+4.0, FC-502.PV_High
+2.0, FC-502.PV_Low
+TRUE, SELC-501.AUTO
+0.7, SELC-501.SP
+0.0, SELC-501.MV_MIN
+100.0, SELC-501.MV_MAX
+1.8, SELC-501.KP
+0.5, SELC-501.TR
+0.1, SELC-501.TD
+1.1, SELC-501.PV_High
+0.3, SELC-501.PV_Low
+100.0, FV-502.Open_Limit
+0.0, FV-502.Close_Limit
+100.0, PGA-501.Open_Limit
+0.0, PGA-501.Close_Limit
+

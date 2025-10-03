@@ -1,0 +1,88 @@
+* Function Blocks *
+ANALOG_IN CT-601
+ANALOG_IN FT-601
+ANALOG_IN PIT-601
+ANALOG_IN VT-601
+PID_BASIC FIC-601
+RATIO_CONTROL FFIC-601
+VALVE_ELECTRIC FV-601
+MOTOR_ON_OFF P-601
+BOOL_IN FS-601
+BOOL_IN P-601-RUN
+BOOL_IN PIT-601-OK
+BOOL_IN VT-601-OK
+DIGITAL_IN ALM-601
+DIGITAL_IN ALM-602
+DIGITAL_IN ALM-603
+DIGITAL_IN ALM-604
+
+* Variables *
+REAL FT601_Flow_SP
+REAL Ratio_Bias
+
+* Functions *
+AND RatioPermissive_AND
+NOT PIT601_OK_NOT
+NOT VT601_OK_NOT
+NOT RatioPermissive_NOT
+OR RatioInhibit_OR
+OR FICInhibit_OR
+OR FlowRangeAlarm_OR
+NOT RatioAuto_NOT
+
+* Data Connections * 
+CT-601.PV, FFIC-601.PrimaryPV
+FT-601.PV, FFIC-601.SecondaryPV
+FFIC-601.SlaveSP, FIC-601.SP
+FT-601.PV, FIC-601.PV
+FIC-601.XOUT, FV-601.Control_Signal
+PIT-601.Low_Alarm, PIT601_OK_NOT.IN
+PIT601_OK_NOT.OUT, PIT-601-OK.Bool_In
+VT-601.Low_Alarm, VT601_OK_NOT.IN
+VT601_OK_NOT.OUT, VT-601-OK.Bool_In
+P-601.FB_Running, P-601-RUN.Bool_In
+P-601-RUN.Bool_Out, RatioPermissive_AND.IN1
+FS-601.Bool_Out, RatioPermissive_AND.IN2
+PIT-601-OK.Bool_Out, RatioPermissive_AND.IN3
+VT-601-OK.Bool_Out, RatioPermissive_AND.IN4
+RatioPermissive_AND.OUT, RatioPermissive_NOT.IN
+RatioPermissive_NOT.OUT, RatioInhibit_OR.IN1
+ALM-602.DI_Out, RatioInhibit_OR.IN2
+RatioInhibit_OR.OUT, FFIC-601.Inhibit
+RatioInhibit_OR.OUT, FV-601.Manual_Mode
+RatioInhibit_OR.OUT, RatioAuto_NOT.IN
+RatioAuto_NOT.OUT, FFIC-601.Auto
+RatioAuto_NOT.OUT, FIC-601.AUTO
+RatioPermissive_NOT.OUT, FICInhibit_OR.IN1
+ALM-603.DI_Out, FICInhibit_OR.IN2
+FICInhibit_OR.OUT, FIC-601.Inhibit
+FICInhibit_OR.OUT, FV-601.Inhibit
+FIC-601.PV_High_Alarm, FlowRangeAlarm_OR.IN1
+FIC-601.PV_Low_Alarm, FlowRangeAlarm_OR.IN2
+FlowRangeAlarm_OR.OUT, ALM-601.DI_Raw
+CT-601.General_Fault, ALM-602.DI_Raw
+FT-601.General_Fault, ALM-603.DI_Raw
+FIC-601.Deviation_Alarm, ALM-604.DI_Raw
+FFIC-601.SlaveSP, FT601_Flow_SP
+Ratio_Bias, FFIC-601.Bias
+
+* Parameter Data Connections *
+2.5, FFIC-601.RatioSP
+T#2s, FFIC-601.TrimTi
+10, FFIC-601.MV_MIN
+500, FFIC-601.MV_MAX
+TRUE, CT-601.Alarm_Enable
+0.5, CT-601.PV_Low
+3.0, CT-601.PV_High
+TRUE, FT-601.Alarm_Enable
+0, FT-601.PV_Low
+500, FT-601.PV_High
+TRUE, PIT-601.Alarm_Enable
+300, PIT-601.PV_Low
+TRUE, VT-601.Alarm_Enable
+30, VT-601.PV_Low
+10, FIC-601.PV_Low
+500, FIC-601.PV_High
+20, FV-601.Manual_Position
+20, FIC-601.X0
+

@@ -1,0 +1,19 @@
+## 3 **3-Phase Separator Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FV-102 | Flow Valve | Regulates outlet flow to control separator pressure |
+|LI-502 | Level Transmitter | Monitors separator level for operator observation |
+|PIC-501 | Pressure Controller | Maintains separator pressure at setpoint using PID control |
+|PT-501 | Pressure Transmitter | Provides pressure measurement signal for control loop |
+
+### 3.1) Control Strategy Description
+
+The 3-phase separator pressure is controlled using PIC501, which regulates the outlet flow via FV102 to maintain a stable pressure setpoint. The pressure transmitter PT501 provides a 4-20mA signal corresponding to a pressure range of 0-150 psi. The controller PIC501 is configured for reverse-acting control to increase valve opening as pressure decreases. The PID tuning parameters are set as follows: Kp = 2.0, Ki = 0.5 min, and Kd = 0.1 min. The setpoint for pressure control is fixed at 75 psi and is clamped between 70 psi and 80 psi to ensure process stability. The level inside the separator is monitored using LI502, which provides a 4-20mA signal corresponding to a level range of 0-100% and serves as an input for operator monitoring but does not directly influence the PID loop. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes.
+
+### 3.2) Interlocks and Permissives
+
+The control loop for PIC501 is interlocked with PT501 to ensure valid pressure readings; if PT501 fails or provides a signal outside the range of 4-20mA, the controller output to FV102 will be forced to its fail-safe position. FV102 is configured to fail-closed to prevent overpressure conditions in the separator. Additionally, the separator operation is permitted only when LI502 indicates a level above 10% to prevent dry running conditions. Any deviation from normal operating conditions will inhibit PIC501 operation and alert the operator.
+
+### 3.3) Alarm and Fault Handling
+
+Pressure alarms are configured on PT501 to trigger high-pressure and low-pressure warnings at 85 psi and 65 psi, respectively. A critical high-pressure alarm at 90 psi will initiate a shutdown of FV102 and isolate the separator. Level transmitter LI502 provides high and low-level alarms at 90% and 5%, respectively, to warn operators of abnormal separator conditions. In the event of a fault in PT501, PIC501 will enter manual mode, and FV102 will default to its fail-closed position. Alarm acknowledgment and reset logic are implemented to ensure operator intervention before resuming normal operation.

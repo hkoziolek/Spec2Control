@@ -1,0 +1,26 @@
+## 2 ** Sinter Plant ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-102 | Flow Controller | Adjusts flux flow to maintain iron ore fines-to-flux ratio. |
+|FT-101 | Flow Transmitter | Measures mass flow rate of iron ore fines (wild flow). |
+|FT-102 | Flow Transmitter | Measures mass flow rate of fluxes for ratio control. |
+|FV-102 | Flow Valve | Modulates flux flow to achieve setpoint calculated by ratio controller. |
+|TIT-101 | Temperature Transmitter | Monitors sintering machine's temperature profile for quality feedback. |
+
+### 2.1) Control Strategy Description
+
+The sinter plant ratio control system ensures precise proportional blending of iron ore fines, fluxes, and coke breeze to maintain optimal sintering conditions. The wild flow, representing the uncontrolled mass flow rate of iron ore fines, is measured by FT-101, with a range of 0-1000 kg/hr. The controlled flow, representing the mass flow rate of fluxes, is adjusted by FIC-102 to maintain a fixed ratio of 2.5:1 (iron ore fines to fluxes). The ratio controller FFIC-103 calculates the flux flow setpoint (SP) as the product of the wild flow measurement (PV) from FT-101 and the ratio setpoint. For example, if FT-101 measures 600 kg/hr, FFIC-103 calculates the flux flow SP as 240 kg/hr. The control valve FV-102 modulates the flux flow to achieve this setpoint.
+
+To ensure stability, the ratio setpoint is clamped between 2.0:1 and 3.0:1. Ratio bias adjustments are available via manual operator input on FFIC-103, allowing fine-tuning within ±0.2 of the setpoint. Automatic ratio trim logic adjusts the ratio based on sinter quality feedback from TIT-101, which monitors the sintering machine's temperature profile. A low flow cutoff disables ratio control if FT-101 measures less than 50 kg/hr, switching FIC-102 to manual mode to prevent hunting.
+
+### 2.2) Interlocks and Permissives
+
+The ratio control system incorporates interlocks to ensure safe operation. FFIC-103 is enabled only if FT-101 and FT-102 are operational, with valid flow measurements within their calibrated ranges. Boolean permissive logic ensures that FV-102 cannot open unless FT-101 detects a flow greater than 50 kg/hr and TIT-101 confirms a sintering machine temperature above 800°C. If FT-101 fails or TIT-101 measures a temperature below 800°C, FFIC-103 switches to manual mode, and FV-102 closes to prevent uncontrolled flux addition.
+
+Mode selection logic allows operators to toggle between automatic ratio control and manual adjustment. In manual mode, FIC-102 operates independently of FFIC-103, allowing direct control of FV-102. Signal scaling ensures ratio calculations remain accurate across the full flow range, with wild flow signals normalized to a 0-1000 kg/hr scale before input to FFIC-103.
+
+### 2.3) Alarm and Fault Handling
+
+The control system generates alarms for ratio deviations exceeding ±0.1 from the setpoint. If FFIC-103 detects a calculated flux flow SP outside the allowable range (200-300 kg/hr), a high/low ratio alarm is triggered. FT-101 and FT-102 transmitters are equipped with fault detection logic; any sensor failure activates a transmitter fault alarm and disables FFIC-103.
+
+In the event of a low flow condition (<50 kg/hr on FT-101), a low flow alarm is raised, and FFIC-103 transitions to manual mode. TIT-101 temperature deviations below 800°C trigger a sintering temperature alarm, inhibiting ratio control and closing FV-102 to prevent improper flux dosing. All alarms are logged in the plant historian for diagnostic purposes, and operators are notified via the HMI for corrective action.

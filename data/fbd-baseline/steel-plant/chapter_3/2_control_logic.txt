@@ -1,0 +1,115 @@
+* Function Blocks *
+ANALOG_IN PT-201A
+ANALOG_IN PT-201B
+ANALOG_IN PT-201C
+ANALOG_IN TT-201A
+ANALOG_IN TT-201B
+ANALOG_IN TT-201C
+VOTING_ANALOG PT-201_VOTE
+VOTING_ANALOG TT-201_VOTE
+MOTOR_ON_OFF P-201
+DIGITAL_IN MO-201
+DIGITAL_IN MO-202
+BOOL_IN I-201
+BOOL_IN I-202
+BOOL_IN SI-201
+BOOL_IN SI-202
+
+* Variables *
+REAL PT_201_VOTE_PV
+REAL TT_201_VOTE_PV
+
+* Functions *
+OR PT_GeneralFault
+NOT MO201_Invert
+OR PT_SummaryPre
+AND PT_SummaryMasked
+OR TT_GeneralFault
+NOT MO202_Invert
+OR TT_SummaryPre
+AND TT_SummaryMasked
+OR PressureInhibit
+OR TemperatureInhibit
+OR PumpInhibit
+GT PT_PressureHigh
+GT TT_TemperatureHigh
+GE PT_PressurePermissive
+LT TT_TemperaturePermissive
+AND StartPermissiveOK
+NOT StartPermissiveNot
+
+* Data Connections * 
+PT-201A.PV, PT-201_VOTE.Input1
+PT-201B.PV, PT-201_VOTE.Input2
+PT-201C.PV, PT-201_VOTE.Input3
+TT-201A.PV, TT-201_VOTE.Input1
+TT-201B.PV, TT-201_VOTE.Input2
+TT-201C.PV, TT-201_VOTE.Input3
+PT-201_VOTE.Voted_Output, PT_201_VOTE_PV
+TT-201_VOTE.Voted_Output, TT_201_VOTE_PV
+PT_201_VOTE_PV, PT_PressureHigh.IN1
+TT_201_VOTE_PV, TT_TemperatureHigh.IN1
+PT_201_VOTE_PV, PT_PressurePermissive.IN1
+TT_201_VOTE_PV, TT_TemperaturePermissive.IN1
+PT_PressureHigh.OUT, I-201.Bool_In
+TT_TemperatureHigh.OUT, I-202.Bool_In
+PT_PressurePermissive.OUT, StartPermissiveOK.IN1
+TT_TemperaturePermissive.OUT, StartPermissiveOK.IN2
+StartPermissiveOK.OUT, StartPermissiveNot.IN
+I-201.Bool_Out, PressureInhibit.IN1
+SI-201.Bool_Out, PressureInhibit.IN2
+PressureInhibit.OUT, PT-201_VOTE.Inhibit
+I-202.Bool_Out, TemperatureInhibit.IN1
+SI-202.Bool_Out, TemperatureInhibit.IN2
+TemperatureInhibit.OUT, TT-201_VOTE.Inhibit
+TemperatureInhibit.OUT, PumpInhibit.IN1
+StartPermissiveNot.OUT, PumpInhibit.IN2
+PumpInhibit.OUT, P-201.Inhibit
+PT-201A.General_Fault, PT_GeneralFault.IN1
+PT-201B.General_Fault, PT_GeneralFault.IN2
+PT-201C.General_Fault, PT_GeneralFault.IN3
+MO-201.DI_Out, MO201_Invert.IN
+PT_GeneralFault.OUT, PT_SummaryPre.IN1
+PT-201_VOTE.Alarm_Voting_Error, PT_SummaryPre.IN2
+PT_SummaryPre.OUT, PT_SummaryMasked.IN1
+MO201_Invert.OUT, PT_SummaryMasked.IN2
+PT_SummaryMasked.OUT, SI-201.Bool_In
+TT-201A.General_Fault, TT_GeneralFault.IN1
+TT-201B.General_Fault, TT_GeneralFault.IN2
+TT-201C.General_Fault, TT_GeneralFault.IN3
+MO-202.DI_Out, MO202_Invert.IN
+TT_GeneralFault.OUT, TT_SummaryPre.IN1
+TT-201_VOTE.Alarm_Voting_Error, TT_SummaryPre.IN2
+TT_SummaryPre.OUT, TT_SummaryMasked.IN1
+MO202_Invert.OUT, TT_SummaryMasked.IN2
+TT_SummaryMasked.OUT, SI-202.Bool_In
+
+* Parameter Data Connections *
+TRUE, PT-201A.Alarm_Enable
+TRUE, PT-201B.Alarm_Enable
+TRUE, PT-201C.Alarm_Enable
+TRUE, TT-201A.Alarm_Enable
+TRUE, TT-201B.Alarm_Enable
+TRUE, TT-201C.Alarm_Enable
+100.0, PT-201A.PV_High
+100.0, PT-201B.PV_High
+100.0, PT-201C.PV_High
+5.0, PT-201_VOTE.Deviation_Limit
+5.0, TT-201_VOTE.Deviation_Limit
+TRUE, PT-201_VOTE.EnableAlarm
+TRUE, TT-201_VOTE.EnableAlarm
+"2oo3", PT-201_VOTE.Voting_Scheme
+"Median", TT-201_VOTE.Voting_Scheme
+TRUE, I-201.Alarm_OnTrue
+TRUE, I-201.Latch_Enable
+TRUE, I-202.Alarm_OnTrue
+TRUE, I-202.Latch_Enable
+TRUE, SI-201.Alarm_OnTrue
+TRUE, SI-201.Latch_Enable
+TRUE, SI-202.Alarm_OnTrue
+TRUE, SI-202.Latch_Enable
+100.0, PT_PressureHigh.IN2
+75.0, TT_TemperatureHigh.IN2
+21.0, PT_PressurePermissive.IN2
+75.0, TT_TemperaturePermissive.IN2
+

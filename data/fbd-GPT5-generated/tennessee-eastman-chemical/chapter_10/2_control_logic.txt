@@ -1,0 +1,79 @@
+* Function Blocks *
+ANALOG_IN FIT-102
+PID_BASIC IIC-103
+VALVE_ELECTRIC LV-101
+ANALOG_IN LT-201
+BOOL_IN FIF-102
+BOOL_IN LIH-201
+BOOL_IN LC-002
+BOOL_IN VAF-101
+BOOL_IN FAH-102
+BOOL_IN FAL-102
+
+* Variables *
+REAL FIT_102_Raw_mA
+REAL LT_201_Raw_mA
+REAL FIT_102_Flow_PV
+REAL LT_201_Level_PV
+REAL IIC_103_CO_to_LV_101
+REAL IIC_103_SP
+
+* Functions *
+NOT DecanterPermissive_NOT
+OR FlowLoopTrips_OR
+OR AutoTrips_OR
+NOT TripsClear_NOT
+MULT SP10pct_MULT
+
+* Data Connections * 
+FIT_102_Raw_mA, FIT-102.Raw_Signal
+LT_201_Raw_mA, LT-201.Raw_Signal
+FIT-102.PV, IIC-103.PV
+IIC-103.XOUT, LV-101.Control_Signal
+LV-101.Feedback_Pos, IIC-103.X0
+LT-201.High_Alarm, LIH-201.Bool_In
+LIH-201.Bool_Out, FlowLoopTrips_OR.IN1
+FIT-102.General_Fault, FIF-102.Bool_In
+FIF-102.Bool_Out, FlowLoopTrips_OR.IN2
+LV-101.Position_Error, VAF-101.Bool_In
+VAF-101.Bool_Out, FlowLoopTrips_OR.IN3
+LC-002.Bool_Out, DecanterPermissive_NOT.IN
+DecanterPermissive_NOT.OUT, FlowLoopTrips_OR.IN4
+FlowLoopTrips_OR.OUT, LV-101.Inhibit
+FlowLoopTrips_OR.OUT, IIC-103.Inhibit
+FlowLoopTrips_OR.OUT, LV-101.Manual_Mode
+FlowLoopTrips_OR.OUT, AutoTrips_OR.IN1
+IIC-103.SP, SP10pct_MULT.IN1
+SP10pct_MULT.OUT, IIC-103.Deviation_Limit
+IIC-103.Deviation_Alarm, AutoTrips_OR.IN2
+AutoTrips_OR.OUT, TripsClear_NOT.IN
+TripsClear_NOT.OUT, IIC-103.AUTO
+FIT-102.High_Alarm, FAH-102.Bool_In
+FIT-102.Low_Alarm, FAL-102.Bool_In
+FIT-102.PV, FIT_102_Flow_PV
+LT-201.PV, LT_201_Level_PV
+IIC-103.XOUT, IIC_103_CO_to_LV_101
+IIC_103_SP, IIC-103.SP
+
+* Parameter Data Connections *
+12.5, FIT-102.Scaling_Slope
+-50, FIT-102.Scaling_Offset
+190, FIT-102.PV_High
+30, FIT-102.PV_Low
+TRUE, FIT-102.Alarm_Enable
+1.8, IIC-103.KP
+0.5, IIC-103.TR
+0.1, IIC-103.TD
+0, IIC-103.MV_MIN
+100, IIC-103.MV_MAX
+190, IIC-103.PV_High
+30, IIC-103.PV_Low
+100, LV-101.Open_Limit
+0, LV-101.Close_Limit
+0, LV-101.Manual_Position
+T#10s, LV-101.Timeout
+90, LT-201.PV_High
+0, LT-201.PV_Low
+TRUE, LT-201.Alarm_Enable
+0.1, SP10pct_MULT.IN2
+

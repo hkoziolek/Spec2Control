@@ -1,0 +1,108 @@
+* Function Blocks *
+ANALOG_IN PT-401A
+ANALOG_IN PT-401B
+ANALOG_IN PT-401C
+ANALOG_IN TT-105
+ANALOG_IN TT-106
+ANALOG_IN TT-107
+VOTING_ANALOG PVT-401
+VOTING_ANALOG TVT-402
+PID_BASIC PIC-401
+PID_BASIC TIC-402
+VALVE_ELECTRIC PV-102
+VALVE_ELECTRIC FV-107
+VALVE_ON_OFF XV-104
+BOOL_IN I-401
+BOOL_IN I-402
+BOOL_IN MA-401
+
+* Variables *
+REAL PVT_401_Voted_Pressure
+REAL TVT_402_Voted_Temperature
+
+* Functions *
+OR PV102_Inhibit_OR
+AND AllPTBad_AND
+OR FV107_Inhibit_OR
+OR MasterAlarm_OR
+
+* Data Connections * 
+PT-401A.PV, PVT-401.Input1
+PT-401B.PV, PVT-401.Input2
+PT-401C.PV, PVT-401.Input3
+PVT-401.Voted_Output, PIC-401.PV
+PIC-401.XOUT, PV-102.Control_Signal
+TT-105.PV, TVT-402.Input1
+TT-106.PV, TVT-402.Input2
+TT-107.PV, TVT-402.Input3
+TVT-402.Voted_Output, TIC-402.PV
+TIC-402.XOUT, FV-107.Control_Signal
+PVT-401.Alarm_Voting_Error, PV102_Inhibit_OR.IN1
+PIC-401.PV_High_Alarm, PV102_Inhibit_OR.IN2
+PIC-401.PV_Low_Alarm, PV102_Inhibit_OR.IN3
+PV102_Inhibit_OR.OUT, I-401.Bool_In
+I-401.Bool_Out, PV-102.Inhibit
+PT-401A.General_Fault, AllPTBad_AND.IN1
+PT-401B.General_Fault, AllPTBad_AND.IN2
+PT-401C.General_Fault, AllPTBad_AND.IN3
+AllPTBad_AND.OUT, XV-104.Inhibit
+AllPTBad_AND.OUT, XV-104.Close_Cmd
+TVT-402.Alarm_Voting_Error, FV107_Inhibit_OR.IN1
+TIC-402.PV_High_Alarm, FV107_Inhibit_OR.IN2
+TIC-402.PV_Low_Alarm, FV107_Inhibit_OR.IN3
+FV107_Inhibit_OR.OUT, I-402.Bool_In
+I-402.Bool_Out, FV-107.Inhibit
+PV102_Inhibit_OR.OUT, MasterAlarm_OR.IN1
+FV107_Inhibit_OR.OUT, MasterAlarm_OR.IN2
+PT-401A.General_Fault, MasterAlarm_OR.IN3
+PT-401B.General_Fault, MasterAlarm_OR.IN4
+PT-401C.General_Fault, MasterAlarm_OR.IN5
+TT-105.General_Fault, MasterAlarm_OR.IN6
+TT-106.General_Fault, MasterAlarm_OR.IN7
+TT-107.General_Fault, MasterAlarm_OR.IN8
+MasterAlarm_OR.OUT, MA-401.Bool_In
+PVT-401.Voted_Output, PVT_401_Voted_Pressure
+TVT-402.Voted_Output, TVT_402_Voted_Temperature
+
+* Parameter Data Connections *
+1.8, PIC-401.SP
+TRUE, PIC-401.AUTO
+0, PIC-401.MV_MIN
+100, PIC-401.MV_MAX
+65, TIC-402.SP
+TRUE, TIC-402.AUTO
+0, TIC-402.MV_MIN
+100, TIC-402.MV_MAX
+0.09, PVT-401.Deviation_Limit
+2oo3, PVT-401.Voting_Scheme
+TRUE, PVT-401.EnableAlarm
+2, TVT-402.Deviation_Limit
+Median, TVT-402.Voting_Scheme
+TRUE, TVT-402.EnableAlarm
+2.0, PT-401A.PV_High
+1.6, PT-401A.PV_Low
+TRUE, PT-401A.Alarm_Enable
+2.0, PT-401B.PV_High
+1.6, PT-401B.PV_Low
+TRUE, PT-401B.Alarm_Enable
+2.0, PT-401C.PV_High
+1.6, PT-401C.PV_Low
+TRUE, PT-401C.Alarm_Enable
+TRUE, TT-105.Alarm_Enable
+TRUE, TT-106.Alarm_Enable
+TRUE, TT-107.Alarm_Enable
+100, PV-102.Open_Limit
+0, PV-102.Close_Limit
+T#10s, PV-102.Timeout
+100, FV-107.Open_Limit
+0, FV-107.Close_Limit
+T#10s, FV-107.Timeout
+FALSE, XV-104.Open_Cmd
+T#5s, XV-104.Timeout
+TRUE, I-401.Alarm_OnTrue
+TRUE, I-402.Alarm_OnTrue
+TRUE, MA-401.Alarm_OnTrue
+TRUE, I-401.Latch_Enable
+TRUE, I-402.Latch_Enable
+TRUE, MA-401.Latch_Enable
+

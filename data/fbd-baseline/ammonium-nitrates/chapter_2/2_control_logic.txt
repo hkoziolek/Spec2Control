@@ -1,0 +1,91 @@
+* Function Blocks *
+RATIO_CONTROL FFIC-102
+PID_BASIC FIC-102
+PID_BASIC FIC-101
+PID_BASIC TIC-103
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN LT-104
+ANALOG_IN PH-105
+VALVE_ELECTRIC FV-102
+VALVE_ELECTRIC FV-101
+BOOL_IN VS-107
+
+* Variables *
+REAL FIC102_AcidFlow_SP_FromRatio
+REAL FT101_AmmoniaFlow_PV
+REAL LT104_ReactorLevel_PV
+REAL PH105_ReactorPH_PV
+BOOL VS107_Scrubber_Permissive
+BOOL VS107_Scrubber_Running_DI
+REAL FT101_Raw_mA
+REAL FT102_Raw_mA
+REAL LT104_Raw_mA
+REAL PH105_Raw_mA
+REAL TIC103_Temperature_PV
+
+* Functions *
+OR AcidInhibit_OR
+NOT VS107_Fault_NOT
+OR AmmoniaInhibit_OR
+
+* Data Connections *
+FT101_Raw_mA, FT-101.Raw_Signal
+FT102_Raw_mA, FT-102.Raw_Signal
+LT104_Raw_mA, LT-104.Raw_Signal
+PH105_Raw_mA, PH-105.Raw_Signal
+VS107_Scrubber_Running_DI, VS-107.Bool_In
+FT-101.PV, FFIC-102.PrimaryPV
+FT-102.PV, FFIC-102.SecondaryPV
+FFIC-102.SlaveSP, FIC-102.SP
+FIC-102.XOUT, FV-102.Control_Signal
+FT-102.PV, FIC-102.PV
+FT-101.PV, FIC-101.PV
+FIC-101.XOUT, FV-101.Control_Signal
+LT-104.High_Alarm, AcidInhibit_OR.IN1
+LT-104.Low_Alarm, AcidInhibit_OR.IN2
+FT-101.Low_Alarm, AcidInhibit_OR.IN3
+FIC-102.PV_Low_Alarm, AcidInhibit_OR.IN4
+TIC-103.PV_High_Alarm, AcidInhibit_OR.IN5
+VS-107.Bool_Out, VS107_Fault_NOT.IN
+VS107_Fault_NOT.OUT, AmmoniaInhibit_OR.IN1
+TIC-103.PV_High_Alarm, AmmoniaInhibit_OR.IN2
+FT-101.Low_Alarm, AmmoniaInhibit_OR.IN3
+AcidInhibit_OR.OUT, FFIC-102.Inhibit
+AcidInhibit_OR.OUT, FIC-102.Inhibit
+AcidInhibit_OR.OUT, FV-102.Inhibit
+AmmoniaInhibit_OR.OUT, FV-101.Inhibit
+AmmoniaInhibit_OR.OUT, FIC-101.Inhibit
+TIC103_Temperature_PV, TIC-103.PV
+FFIC-102.SlaveSP, FIC102_AcidFlow_SP_FromRatio
+FT-101.PV, FT101_AmmoniaFlow_PV
+LT-104.PV, LT104_ReactorLevel_PV
+PH-105.PV, PH105_ReactorPH_PV
+VS-107.Bool_Out, VS107_Scrubber_Permissive
+
+* Parameter Data Connections *
+1.8, FFIC-102.RatioSP
+0, FFIC-102.MV_MIN
+100, FFIC-102.MV_MAX
+TRUE, FFIC-102.Auto
+31.25, FT-101.Scaling_Slope
+-125, FT-101.Scaling_Offset
+10, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+20, LT-104.PV_Low
+90, LT-104.PV_High
+TRUE, LT-104.Alarm_Enable
+6.7, PH-105.PV_Low
+7.3, PH-105.PV_High
+TRUE, PH-105.Alarm_Enable
+10, FIC-102.PV_Low
+0, FIC-102.MV_MIN
+100, FIC-102.MV_MAX
+TRUE, FIC-102.AUTO
+0, FIC-101.MV_MIN
+100, FIC-101.MV_MAX
+FALSE, FIC-101.AUTO
+0, FIC-101.X0
+190, TIC-103.PV_High
+TRUE, VS-107.Alarm_OnFalse
+

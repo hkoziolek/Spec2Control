@@ -1,0 +1,119 @@
+Evaluation Results for ammonium-nitrates - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_3\1_categorization.txt
+Ground truth strategy: Cascade Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(3), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(3), MOTOR_ON_OFF(1), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\ammonium-nitrates\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\ammonium-nitrates\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, PID_BASIC1.PV
+PID_BASIC1.XOUT, PID_BASIC2.SP
+ANALOG_IN2.PV, PID_BASIC2.PV
+PID_BASIC2.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+PID_BASIC TIC-201
+PID_BASIC FIC-102
+ANALOG_IN TT-103
+ANALOG_IN TT-104
+ANALOG_IN PT-203
+VALVE_ELECTRIC FV-102
+VALVE_ELECTRIC PV-106
+VALVE_ON_OFF XV-101
+MOTOR_ON_OFF P-205
+BOOL_IN HS-204
+DIGITAL_IN VS-206
+
+FILTERED FUNCTION BLOCKS (only types from template):
+PID_BASIC TIC-201
+PID_BASIC FIC-102
+ANALOG_IN TT-103
+ANALOG_IN TT-104
+ANALOG_IN PT-203
+VALVE_ELECTRIC FV-102
+VALVE_ELECTRIC PV-106
+
+ALL DATA CONNECTIONS:
+TT-103.PV, TIC-201.PV
+TIC-201.XOUT, FIC-102.SP
+TT-104.PV, FIC-102.PV
+FIC-102.XOUT, FV-102.Control_Signal
+TT-103.High_Alarm, HighTempOrHandTrip_OR.IN1
+HS-204.Bool_Out, HighTempOrHandTrip_OR.IN2
+PT-203.High_Alarm, VacuumOutOfRange_OR.IN1
+PT-203.Low_Alarm, VacuumOutOfRange_OR.IN2
+TT-103.General_Fault, SensorFaults_OR.IN1
+TT-104.General_Fault, SensorFaults_OR.IN2
+HighTempOrHandTrip_OR.OUT, CommonTrips_OR.IN1
+TT-104.Low_Alarm, CommonTrips_OR.IN2
+SensorFaults_OR.OUT, CommonTrips_OR.IN3
+CommonTrips_OR.OUT, FV102_Inhibit_OR.IN1
+XV101NotOpen_NOT.OUT, FV102_Inhibit_OR.IN2
+FV102_Inhibit_OR.OUT, FV-102.Inhibit
+CommonTrips_OR.OUT, TIC201_Inhibit_OR.IN1
+VacuumOutOfRange_OR.OUT, TIC201_Inhibit_OR.IN2
+TIC201_Inhibit_OR.OUT, TIC-201.Inhibit
+VacuumOutOfRange_OR.OUT, PV106_Inhibit_OR.IN1
+SensorFaults_OR.OUT, PV106_Inhibit_OR.IN2
+PV106_Inhibit_OR.OUT, PV-106.Inhibit
+XV-101.FB_Opened, XV101NotOpen_NOT.IN
+XV101NotOpen_NOT.OUT, P205_Inhibit_OR.IN1
+TT-103.Low_Alarm, P205_Inhibit_OR.IN2
+SensorFaults_OR.OUT, P205_Inhibit_OR.IN3
+P205_Inhibit_OR.OUT, P-205.Inhibit
+CommonTrips_OR.OUT, FIC-102.Inhibit
+HighTempOrHandTrip_OR.OUT, XV-101.Close_Cmd
+HighTempOrHandTrip_OR.OUT, TripSignalInvert_NOT.IN
+TripSignalInvert_NOT.OUT, XV-101.Open_Cmd
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV → PID_BASIC1.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 → TT-103; PID_BASIC1 → TIC-201
+- Actual Connection: TT-103.PV, TIC-201.PV
+- Notes: Direct PV to PV connection; TT-103 feeds TIC-201 as intended.
+
+Intended: PID_BASIC1.XOUT → PID_BASIC2.SP
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1 → TIC-201; PID_BASIC2 → FIC-102
+- Actual Connection: TIC-201.XOUT, FIC-102.SP
+- Notes: Direct cascade output from TIC-201 to FIC-102 setpoint is implemented.
+
+Intended: ANALOG_IN2.PV → PID_BASIC2.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 → TT-104; PID_BASIC2 → FIC-102
+- Actual Connection: TT-104.PV, FIC-102.PV
+- Notes: Secondary PV to downstream PID is correctly wired.
+
+Intended: PID_BASIC2.XOUT → VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC2 → FIC-102; VALVE_ELECTRIC → FV-102
+- Actual Connection: FIC-102.XOUT, FV-102.Control_Signal
+- Notes: Direct control signal from FIC-102 to FV-102 is present. Alternate indirect path to MOTOR_VSD.Speed_SP not applicable here and not needed.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended cascade connections are implemented directly and cleanly: TT-103 → TIC-201 → FIC-102 → FV-102, with TT-104 as the downstream PV. Additional interlocks/inhibits are present but do not disrupt the core signal paths.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

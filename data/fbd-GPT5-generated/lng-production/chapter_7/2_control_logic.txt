@@ -1,0 +1,77 @@
+* Function Blocks *
+ANALOG_IN FT-601A
+ANALOG_IN FT-601B
+ANALOG_IN LIT-601
+ANALOG_IN LT-601
+RATIO_CONTROL FFIC-601
+PID_BASIC FIC-601B
+VALVE_ELECTRIC FV-601B
+MOTOR_ON_OFF C-601
+DIGITAL_IN HS-601
+
+* Variables *
+REAL FT-601A_LNGFlow_PV
+REAL FT-601B_BOGFlow_PV
+REAL LIT-601_TankLevel_PV
+REAL FT-601B_SP_FromRatio
+REAL FFIC-601_RatioDeviation
+
+* Functions *
+OR RatioControlInhibit
+OR CompressorInhibit
+LT FT601A_Below200
+
+* Data Connections *
+FT-601A.PV, FFIC-601.PrimaryPV
+FT-601B.PV, FFIC-601.SecondaryPV
+FT-601B.PV, FIC-601B.PV
+FFIC-601.SlaveSP, FIC-601B.SP
+FIC-601B.XOUT, FV-601B.Control_Signal
+LIT-601.High_Alarm, RatioControlInhibit.IN1
+HS-601.DI_Out, RatioControlInhibit.IN2
+FT-601A.Low_Alarm, RatioControlInhibit.IN3
+FT-601A.General_Fault, RatioControlInhibit.IN4
+FT-601B.General_Fault, RatioControlInhibit.IN5
+RatioControlInhibit.OUT, FFIC-601.Inhibit
+LIT-601.High_Alarm, FIC-601B.Inhibit
+LIT-601.High_Alarm, FV-601B.Inhibit
+LT-601.Low_Alarm, CompressorInhibit.IN1
+FV-601B.Position_Error, CompressorInhibit.IN2
+FV-601B.Alarm, CompressorInhibit.IN3
+FT601A_Below200.OUT, CompressorInhibit.IN4
+CompressorInhibit.OUT, C-601.Inhibit
+FT-601A.PV, FT601A_Below200.IN1
+FT-601A.PV, FT-601A_LNGFlow_PV
+FT-601B.PV, FT-601B_BOGFlow_PV
+LIT-601.PV, LIT-601_TankLevel_PV
+FFIC-601.SlaveSP, FT-601B_SP_FromRatio
+FFIC-601.RatioErr, FFIC-601_RatioDeviation
+
+* Parameter Data Connections *
+4500, FT-601A.PV_High
+100, FT-601A.PV_Low
+TRUE, FT-601A.Alarm_Enable
+312.5, FT-601A.Scaling_Slope
+-1250, FT-601A.Scaling_Offset
+900, FT-601B.PV_High
+50, FT-601B.PV_Low
+TRUE, FT-601B.Alarm_Enable
+62.5, FT-601B.Scaling_Slope
+-250, FT-601B.Scaling_Offset
+90, LIT-601.PV_High
+TRUE, LIT-601.Alarm_Enable
+10, LT-601.PV_Low
+TRUE, LT-601.Alarm_Enable
+0.2, FFIC-601.RatioSP
+0, FFIC-601.MV_MIN
+1000, FFIC-601.MV_MAX
+0, FIC-601B.MV_MIN
+100, FIC-601B.MV_MAX
+900, FIC-601B.PV_High
+50, FIC-601B.PV_Low
+100, FV-601B.Open_Limit
+0, FV-601B.Close_Limit
+T#5s, FV-601B.Timeout
+FALSE, FV-601B.Manual_Mode
+200, FT601A_Below200.IN2
+

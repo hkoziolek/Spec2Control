@@ -1,0 +1,29 @@
+## 7 **LNG Storage and Ship-Loading**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|C-601 | Compressor | Manages boil-off gas (BOG) flow during LNG operations |
+|FIC-601B | Flow Controller | Modulates compressor suction valve to maintain desired BOG flow rate |
+|FT-601A | Flow Transmitter | Measures LNG flow rate from storage tanks |
+|FT-601B | Flow Transmitter | Measures boil-off gas (BOG) flow rate |
+|FV-601B | Flow Valve | Controls compressor suction to regulate BOG flow |
+|HS-601 | Hand Switch | Interlock for SIL-3 tank-overfill prevention system |
+|LIT-601 | Level Transmitter | Measures LNG storage tank level |
+|LT-601 | Level Transmitter | Monitors LNG storage tank level for control strategy |
+
+### 7.1) Control Strategy Description
+
+The ratio control strategy for LNG storage and ship-loading operations ensures proportional flow relationships between LNG pumped from the storage tanks (LT-601) and boil-off gas (BOG) managed by compressors (C-601). The wild flow variable is the LNG flow rate measured by flow transmitter FT-601A, with a range of 0–5000 m³/hr. The controlled flow variable is the BOG flow rate measured by FT-601B, with a range of 0–1000 m³/hr. Ratio controller FFIC-601 maintains a fixed ratio of 5:1 between LNG flow and BOG flow. The ratio controller calculates the BOG flow setpoint (FT-601B.SP) as FT-601A.PV × 0.2, where 0.2 represents the inverse of the 5:1 ratio.
+
+The controlled flow setpoint FT-601B.SP is sent to flow controller FIC-601B, which modulates the compressor suction valve FV-601B to maintain the desired BOG flow rate. The ratio is adjustable between 4:1 and 6:1 via operator input to FFIC-601.RSP, with setpoint clamping logic limiting adjustments outside this range. A 3% deadband is applied to FFIC-601 to prevent hunting during stable operation. Signal scaling ensures accurate ratio calculations, with FT-601A and FT-601B outputs normalized to engineering units for precise control.
+
+### 7.2) Interlocks and Permissives
+
+The ratio control loop is interlocked with the SIL-3 tank-overfill prevention system (HS-601). If LT-601 level exceeds 90% (LIT-601.PV > 90%), FFIC-601 is disabled, and FIC-601B closes FV-601B fully to prevent excess BOG generation. Additionally, if FT-601A.PV falls below 100 m³/hr, FFIC-601 transitions to manual mode, and the operator must manually set FT-601B.SP. Compressor C-601 cannot start unless LT-601 level is above 10% (LIT-601.PV > 10%) and FT-601A.PV exceeds 200 m³/hr. These permissives ensure safe startup and operation.
+
+A Boolean interlock prevents ratio control activation if HS-601 is in alarm state, ensuring priority safety actions override normal control logic. Mode selection logic allows operators to switch between ratio control, manual control, or individual flow control modes. The system defaults to manual control during maintenance or abnormal conditions.
+
+### 7.3) Alarm and Fault Handling
+
+Alarm thresholds are configured for both wild and controlled flow measurements. If FT-601A.PV exceeds 4500 m³/hr or drops below 100 m³/hr, an alarm is triggered to alert the operator of abnormal LNG flow conditions. Similarly, if FT-601B.PV exceeds 900 m³/hr or falls below 50 m³/hr, an alarm is generated to indicate potential compressor or valve issues.
+
+In the event of a ratio deviation exceeding ±10% from the setpoint (FFIC-601.DEV > 10%), a high-priority alarm is triggered, and FFIC-601 enters fail-safe mode, holding the last valid setpoint. If FT-601A or FT-601B transmitters fail (FT-601A.STATUS or FT-601B.STATUS = FAIL), FFIC-601 disables ratio control and alerts the operator to switch to manual mode. Compressor C-601 trips if FV-601B fails to respond within 5 seconds of a control signal (FV-601B.STATUS = FAIL), ensuring protection against uncontrolled BOG generation.

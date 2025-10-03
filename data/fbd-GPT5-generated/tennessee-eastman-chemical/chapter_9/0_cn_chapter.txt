@@ -1,0 +1,31 @@
+## 9 **Condenser Systems**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FI-103 | Flow Transmitter | Measures flow rate of cooling medium through condenser system. |
+|FIC-103 | Flow Controller | Regulates cooling medium flow to maintain overhead vapor temperature. |
+|LC-002 | Level Controller | Controls liquid level in associated vessel or system. |
+|LV-102 | Level Valve | Adjusts cooling medium flow rate based on controller output. |
+|TIT-101 | Temperature Transmitter | Measures temperature of overhead vapors in condenser system. |
+|XV-104 | On-Off Valve | Ensures cooling medium supply is open before LV-102 operation. |
+
+### 9.1) Control Strategy Description
+
+The condenser system utilizes PID control to regulate the flow rate of cooling medium through the condenser to maintain a stable temperature of overhead vapors. The process variable (PV) is the temperature measured by TIT-101, with the setpoint (SP) defined at 45°C. The manipulated variable (MV) is the position of LV-102, which adjusts the flow rate of the cooling medium. The PID controller, FIC-103, is configured as reverse-acting to ensure that an increase in temperature results in an increase in cooling medium flow.
+
+The PID tuning parameters for FIC-103 are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 min, and derivative time (Kd) = 0.3 min. The controller output range is normalized to 0-100% to correspond to the valve position signal, which operates on a 4-20mA scale. The temperature transmitter TIT-101 has a measurement span of 0-100°C with a 4-20mA output signal.
+
+The final control element, LV-102, is a fail-closed valve to ensure cooling medium flow stops during a fault condition. Bumpless transfer logic is implemented to allow smooth transitions between manual and automatic modes. A 2% deadband is applied to reduce valve oscillation during steady-state operation.
+
+### 9.2) Interlocks and Permissives
+
+The operation of LV-102 is interlocked with XV-104, a shut-off valve upstream of the cooling medium supply. XV-104 must be in the open position before LV-102 can modulate. TIT-101 must provide a valid signal within the transmitter range (0-100°C) for the PID control loop to operate. If TIT-101 fails or provides an out-of-range signal, FIC-103 will default to manual mode, and LV-102 will move to its fail-closed position.
+
+Permissive logic ensures that the condenser system operates only when the distillation column is active, as indicated by a valid level signal from LC-002. Additionally, the cooling medium pump must be running, verified by a flow signal from FI-103, before LV-102 can modulate.
+
+### 9.3) Alarm and Fault Handling
+
+An alarm is triggered if TIT-101 detects a temperature above 55°C, indicating potential condenser inefficiency. A high-high temperature alarm at 60°C will initiate an emergency shutdown sequence, closing XV-104 and LV-102 to prevent damage to downstream equipment.
+
+If TIT-101 fails or provides a signal outside its calibrated range, an instrument fault alarm is activated, and FIC-103 enters manual mode. LV-102 will move to its fail-closed position to halt cooling medium flow. Additionally, a low-flow alarm from FI-103 (<5% of the flow range) will disable LV-102 modulation and close XV-104 to protect the pump from dry running.
+
+Response times for fault detection and alarm activation are configured at 2 seconds to ensure rapid corrective action. Settling time for the PID loop is targeted at 10 seconds under normal operating conditions, ensuring stable temperature control without excessive oscillation.

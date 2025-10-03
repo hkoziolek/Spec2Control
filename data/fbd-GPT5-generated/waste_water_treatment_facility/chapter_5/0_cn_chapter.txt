@@ -1,0 +1,29 @@
+## 5 **Chemical Conditioning**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AC-401 | Alkalinity Transmitter | Measures alkalinity in mg/L for chemical conditioning control |
+|CD-401 | Pump | Doses chemicals for pH adjustment in the process |
+|FT-101 | Flow Transmitter | Measures flow rate in the system |
+|LT-401 | Level Transmitter | Monitors liquid level in the tank or vessel |
+|PH-401 | pH Analyzer | Measures process pH for chemical conditioning control |
+|PIC-401 | pH Controller | Regulates chemical dosing to maintain pH setpoint |
+|PIC-402 | Alkalinity Controller | Adjusts chemical dosing to maintain alkalinity setpoint |
+|TS-401 | Temperature Sensor | Monitors temperature in the process system |
+
+### 5.1) Control Strategy Description
+
+The Chemical Conditioning section implements PID control to regulate pH and alkalinity upstream of biological treatment. The process variable (PV) for pH control is measured by PH-401, a pH analyzer with a transmitter range of 0-14 pH units, outputting a 4-20mA signal normalized to a 0-100% scale. The setpoint (SP) for pH adjustment is operator-configurable within the range of 6.5 to 7.5 pH units, with the default setpoint set to 7.0 pH units. The PID controller, designated as PIC-401, is configured for reverse-acting control to increase chemical dosing when the measured pH falls below the setpoint. Tuning parameters are set as follows: proportional gain (Kp) = 2.0, integral time (Ki) = 1.0 min, and derivative time (Kd) = 0.2 min. The manipulated variable (MV) drives the chemical dosing pumps, CD-401, with an output range of 0-100% corresponding to pump flow rates between 0 and 50 L/min. The pumps are fail-closed to prevent chemical overdosing during fault conditions.
+
+For alkalinity control, AC-401 measures alkalinity in mg/L with a transmitter range of 0-500 mg/L, outputting a 4-20mA signal. The SP for alkalinity adjustment is set to 150 mg/L, constrained within the operating range of 100-200 mg/L. The PID controller, designated as PIC-402, is configured for direct-acting control to increase dosing when alkalinity falls below the setpoint. Tuning parameters are set as follows: Kp = 1.5, Ki = 0.8 min, and Kd = 0.1 min. The MV adjusts the chemical dosing pumps, CD-401, with output limits constrained to prevent pump flow exceeding 75% capacity during normal operation. Anti-windup logic is enabled to prevent integral accumulation during saturation conditions. Bumpless transfer logic ensures smooth transitions between manual and automatic modes.
+
+### 5.2) Interlocks and Permissives
+
+Chemical dosing is permitted only when influent flow is verified by FT-101, with a minimum flow threshold of 50 m³/h. The permissive condition is satisfied when FT-101 outputs a signal above 4.5mA. Additionally, chemical storage tanks (TS-401) must report a minimum level of 20% via LT-401 to enable dosing operations. If LT-401 detects a level below 20%, the permissive signal to CD-401 is removed, and dosing is inhibited. Both PH-401 and AC-401 transmitters must be operational, with valid signals within their respective ranges, for the PID controllers PIC-401 and PIC-402 to execute control. A deadband of ±0.1 pH units is applied to pH control to prevent hunting, while a deadband of ±5 mg/L is applied to alkalinity control.
+
+Mode selection logic allows operators to switch between automatic and manual control. In manual mode, the operator directly sets the MV for CD-401, bypassing PID control. Automatic mode is enabled only when all permissives are satisfied, and the controllers are in a healthy state. Timer delays of 10 seconds are implemented to prevent rapid cycling of permissive signals during transient conditions.
+
+### 5.3) Alarm and Fault Handling
+
+Alarms are generated if PH-401 or AC-401 transmitters report signals outside their calibrated ranges (e.g., <4mA or >20mA). A high-priority alarm is triggered if pH exceeds 8.0 or falls below 6.0, or if alkalinity exceeds 300 mg/L or falls below 50 mg/L. In such cases, CD-401 dosing pumps are immediately stopped, and operators are notified via the SCADA system. A fault condition in TS-401, such as a level reading below 10%, triggers a chemical storage alarm and inhibits dosing operations.
+
+PID controllers PIC-401 and PIC-402 enter fault mode if their respective transmitters fail or if the MV reaches saturation for more than 30 seconds. In fault mode, the controllers freeze their outputs and switch to manual mode, with bumpless transfer logic ensuring no abrupt changes in pump operation. Operators are required to acknowledge alarms before resuming automatic control.

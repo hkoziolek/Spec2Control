@@ -1,0 +1,63 @@
+      <pou name="BOOL_IN" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Bool_In">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_OnTrue">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_OnFalse">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Latch_Enable">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Reset_Latch">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Bool_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Active">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Latched_Status">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

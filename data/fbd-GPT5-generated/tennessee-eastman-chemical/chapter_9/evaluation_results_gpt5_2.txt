@@ -1,0 +1,81 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_9
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_9\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_9\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_9\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(2), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_9\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_9\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TIT-101
+ANALOG_IN FI-103
+PID_BASIC FIC-103
+VALVE_ELECTRIC LV-102
+VALVE_ON_OFF XV-104
+BOOL_IN XV-104_OPEN
+BOOL_IN LC-002_VALID
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TIT-101
+ANALOG_IN FI-103
+PID_BASIC FIC-103
+VALVE_ELECTRIC LV-102
+
+ALL DATA CONNECTIONS:
+TIT-101.PV, FIC-103.PV
+FIC-103.XOUT, LV-102.Control_Signal
+XV-104.FB_Opened, XV-104_OPEN.Bool_In
+XV-104_OPEN.Bool_Out, XV104NotOpen_NOT.IN
+LC-002_VALID.Bool_Out, LC002Invalid_NOT.IN
+FI-103.Low_Alarm, XV104_Inhibit_OR.IN1
+FIC-103.PV_High_Alarm, XV104_Inhibit_OR.IN2
+XV104_Inhibit_OR.OUT, XV-104.Inhibit
+TIT-101.General_Fault, LV102_Inhibit_OR.IN1
+XV104NotOpen_NOT.OUT, LV102_Inhibit_OR.IN2
+LC002Invalid_NOT.OUT, LV102_Inhibit_OR.IN3
+XV104_Inhibit_OR.OUT, LV102_Inhibit_OR.IN4
+LV102_Inhibit_OR.OUT, LV-102.Inhibit
+TIT-101.General_Fault, FIC-103.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN.PV -> PID_BASIC.PV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN = TIT-101; PID_BASIC = FIC-103
+   Actual Connection: TIT-101.PV, FIC-103.PV
+   Notes: There is also an unused analog input available (FI-103). Verify that using TIT-101 (a temperature tag by name) as the PV for FIC-103 (a flow controller by name) is intentional. Additional logic ties TIT-101.General_Fault to FIC-103.Inhibit, which is appropriate fault handling.
+
+2) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC = FIC-103; VALVE_ELECTRIC = LV-102
+   Actual Connection: FIC-103.XOUT, LV-102.Control_Signal
+   Notes: Indirect alternative (PID_BASIC.XOUT to MOTOR_VSD.Speed_SP) was not used and is not needed. LV-102 has comprehensive inhibit logic (from TIT-101.General_Fault, XV-104 status, LC-002 validity, etc.) feeding LV-102.Inhibit; this can correctly block valve actuation under unsafe conditions.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Both intended connections are implemented directly and supplemented by sensible inhibit/fault interlocks. The tag naming suggests a potential mismatch between the PV source (TIT-101) and the controller type (FIC-103); confirm this is by design.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

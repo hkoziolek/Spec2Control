@@ -1,0 +1,107 @@
+Evaluation Results for tennessee-eastman-chemical - chapter_5
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_5\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_5\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_5\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(2), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(2), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\tennessee-eastman-chemical\chapter_5\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\tennessee-eastman-chemical\chapter_5\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN TIT-106
+PID_BASIC TIC-106
+VALVE_ELECTRIC FV-105
+ANALOG_IN LT-107
+PID_BASIC LIC-107
+VALVE_ELECTRIC LV-102
+DIGITAL_IN COND-RETURN-OPEN-LS
+BOOL_IN FV-105-PERM-CONDR-OPEN
+BOOL_IN LV-102-LOWLEVEL-INTERLOCK
+BOOL_IN FV-105-HIGHTEMP-INTERLOCK
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN TIT-106
+PID_BASIC TIC-106
+VALVE_ELECTRIC FV-105
+ANALOG_IN LT-107
+PID_BASIC LIC-107
+VALVE_ELECTRIC LV-102
+
+ALL DATA CONNECTIONS:
+TIT-106.PV, TIC-106.PV
+TIC-106.XOUT, FV-105.Control_Signal
+LT-107.PV, LIC-107.PV
+LIC-107.XOUT, LV-102.Control_Signal
+COND-RETURN-OPEN-LS.DI_Out, FV-105-PERM-CONDR-OPEN.Bool_In
+FV-105-PERM-CONDR-OPEN.Bool_Out, CondReturnNotOpen_NOT.IN
+TIC-106.PV_High_Alarm, FV-105-HIGHTEMP-INTERLOCK.Bool_In
+FV-105-HIGHTEMP-INTERLOCK.Bool_Out, FV105_Inhibit_OR.IN2
+CondReturnNotOpen_NOT.OUT, FV105_Inhibit_OR.IN1
+FV105_Inhibit_OR.OUT, FV-105.Inhibit
+LIC-107.PV_Low_Alarm, LV-102-LOWLEVEL-INTERLOCK.Bool_In
+LV-102-LOWLEVEL-INTERLOCK.Bool_Out, LV-102.Inhibit
+TIT-106.General_Fault, TIC106_AUTO_from_Fault_NOT.IN
+TIC106_AUTO_from_Fault_NOT.OUT, TIC-106.AUTO
+LT-107.PV, LIC107_Level_GT_30.IN1
+LT-107.PV, LIC107_Level_LT_70.IN1
+LIC107_Level_GT_30.OUT, LIC107_LevelWindow_AND.IN1
+LIC107_Level_LT_70.OUT, LIC107_LevelWindow_AND.IN2
+LIC107_LevelWindow_AND.OUT, LIC107_ManualAllowed_AND.IN2
+LT-107.General_Fault, LIC107_FaultOrManual_OR.IN1
+LIC107_ManualAllowed_AND.OUT, LIC107_FaultOrManual_OR.IN2
+LIC107_FaultOrManual_OR.OUT, LIC107_AUTO_from_OR_NOT.IN
+LIC107_AUTO_from_OR_NOT.OUT, LIC-107.AUTO
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN1.PV -> PID_BASIC1.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1 = TIT-106, PID_BASIC1 = TIC-106
+- Actual Connection: TIT-106.PV, TIC-106.PV
+- Notes: PV is also used for TIC-106 alarms/interlocks (e.g., PV_High_Alarm driving FV-105 inhibit), but the primary PV-to-PID input is a direct link.
+
+Intended: ANALOG_IN2.PV -> PID_BASIC2.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN2 = LT-107, PID_BASIC2 = LIC-107
+- Actual Connection: LT-107.PV, LIC-107.PV
+- Notes: LT-107.PV additionally feeds level window comparators and AUTO enable logic for LIC-107, confirming integrated use of the PV signal.
+
+Intended: PID_BASIC1.XOUT -> VALVE_ELECTRIC1.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1 = TIC-106, VALVE_ELECTRIC1 = FV-105
+- Actual Connection: TIC-106.XOUT, FV-105.Control_Signal
+- Notes: No MOTOR_VSD.Speed_SP path present (indirect option not applicable). FV-105 has inhibit logic driven by TIC-106 PV high alarm and a condenser return open status, which may block actuation but does not alter the direct XOUT-to-Control_Signal link.
+
+Intended: PID_BASIC2.XOUT -> VALVE_ELECTRIC2.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC2 = LIC-107, VALVE_ELECTRIC2 = LV-102
+- Actual Connection: LIC-107.XOUT, LV-102.Control_Signal
+- Notes: LV-102 includes an inhibit driven by a low-level interlock from LIC-107. AUTO mode management for LIC-107 is derived from level window and fault logic; the control output linkage remains direct.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: Both control loops are correctly wired with direct PV-to-PID and PID-to-actuator connections, complemented by well-implemented interlocks and AUTO mode logic. The design appears robust and consistent.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

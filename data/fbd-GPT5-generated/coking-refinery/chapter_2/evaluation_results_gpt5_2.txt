@@ -1,0 +1,117 @@
+Evaluation Results for coking-refinery - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_2\1_categorization.txt
+Ground truth strategy: Ratio Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(6), PID_BASIC(1), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(6), PID_BASIC(2), RATIO_CONTROL(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN1.PV, RATIO_CONTROL.PrimaryPV
+ANALOG_IN2.PV, RATIO_CONTROL.SecondaryPV
+RATIO_CONTROL.SlaveSP, PID_BASIC.SP
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN PIT-106
+ANALOG_IN TIT-104
+ANALOG_IN TIT-105
+ANALOG_IN TIT-107
+RATIO_CONTROL FFIC-103
+PID_BASIC FIC-104
+VALVE_ELECTRIC FV-104
+PID_BASIC PIC-102
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN PIT-106
+ANALOG_IN TIT-104
+ANALOG_IN TIT-105
+ANALOG_IN TIT-107
+RATIO_CONTROL FFIC-103
+PID_BASIC FIC-104
+VALVE_ELECTRIC FV-104
+PID_BASIC PIC-102
+
+ALL DATA CONNECTIONS:
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-104.SP
+FT-102.PV, FIC-104.PV
+FIC-104.XOUT, FV-104.Control_Signal
+TIT-104.High_Alarm, ValveInhibit_OR.IN1
+TIT-104.Low_Alarm, ValveInhibit_OR.IN2
+TIT-105.High_Alarm, ValveInhibit_OR.IN3
+TIT-105.Low_Alarm, ValveInhibit_OR.IN4
+TIT-107.High_Alarm, ValveInhibit_OR.IN5
+TIT-107.Low_Alarm, ValveInhibit_OR.IN6
+PIT-106.High_Alarm, ValveInhibit_OR.IN7
+PIT-106.Low_Alarm, ValveInhibit_OR.IN8
+FT-101.General_Fault, ValveInhibit_OR.IN9
+FT-102.General_Fault, ValveInhibit_OR.IN10
+FT-101.PV, FeedAbove500_GT.IN1
+FeedAbove500_GT.OUT, LowFeedPermissive_NOT.IN
+LowFeedPermissive_NOT.OUT, ValveInhibit_OR.IN11
+ValveInhibit_OR.OUT, FV-104.Inhibit
+ValveInhibit_OR.OUT, FIC-104.Inhibit
+FT-101.Low_Alarm, RatioInhibit_OR.IN1
+PIT-106.High_Alarm, RatioInhibit_OR.IN2
+PIT-106.Low_Alarm, RatioInhibit_OR.IN3
+FT-101.General_Fault, RatioInhibit_OR.IN4
+FT-102.General_Fault, RatioInhibit_OR.IN5
+FV-104.Position_Error, RatioInhibit_OR.IN6
+RatioInhibit_OR.OUT, FFIC-103.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+1) Intended: ANALOG_IN1.PV -> RATIO_CONTROL.PrimaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN1=FT-101; RATIO_CONTROL=FFIC-103
+   Actual Connection: FT-101.PV, FFIC-103.PrimaryPV
+   Notes: FT-101 appears to be the primary flow input to the ratio controller.
+
+2) Intended: ANALOG_IN2.PV -> RATIO_CONTROL.SecondaryPV
+   Status: FOUND DIRECT
+   Mapping: ANALOG_IN2=FT-102; RATIO_CONTROL=FFIC-103
+   Actual Connection: FT-102.PV, FFIC-103.SecondaryPV
+   Notes: FT-102 is the secondary flow input to the ratio controller.
+
+3) Intended: RATIO_CONTROL.SlaveSP -> PID_BASIC.SP
+   Status: FOUND DIRECT
+   Mapping: RATIO_CONTROL=FFIC-103; PID_BASIC=FIC-104
+   Actual Connection: FFIC-103.SlaveSP, FIC-104.SP
+   Notes: Ratio inhibit is wired to FFIC-103.Inhibit; consistent with cascade ratio-to-flow loop design.
+
+4) Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+   Status: FOUND DIRECT
+   Mapping: PID_BASIC=FIC-104; VALVE_ELECTRIC=FV-104
+   Actual Connection: FIC-104.XOUT, FV-104.Control_Signal
+   Notes: Alternative indirect path to MOTOR_VSD.Speed_SP not used; direct valve command is present. Inhibit signal is applied to both FIC-104 and FV-104, indicating coordinated permissive handling.
+
+OVERALL ASSESSMENT:
+Coverage: 4/4
+Quality: All intended connections are implemented directly with clear, consistent instance mapping. Additional interlocks/permissives (inhibits, alarms) are integrated appropriately, and the slave flow controller PV is sourced (FT-102.PV to FIC-104.PV) consistent with a ratio-slave configuration.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

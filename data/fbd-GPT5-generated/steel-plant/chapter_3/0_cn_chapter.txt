@@ -1,0 +1,44 @@
+## 3 ** Coking Facility ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CO-201 | Coking Oven | Primary vessel for coke production process |
+|CO-202 | Quenching Tower | Cools coke using quenching water |
+|DA-201 | Deviation Alarm | Alerts when temperature sensors deviate beyond ±5% from median value |
+|DA-202 | Deviation Alarm | Monitors pressure sensor deviations in the coking ovens |
+|FA-201 | Flow Alarm | Indicates abnormal flow conditions in the quenching system |
+|FA-202 | Flow Alarm | Monitors flow deviations in the coking process |
+|I-201 | Interlock | Ensures safe operation of coking oven systems |
+|I-202 | Interlock | Protects quenching tower operations from unsafe conditions |
+|MO-201 | Maintenance Override | Allows manual exclusion of faulty pressure sensors |
+|MO-202 | Maintenance Override | Enables manual bypass of faulty temperature sensors |
+|P-201 | Pump | Circulates quenching water in the cooling system |
+|PT-201A | Pressure Transmitter | Measures internal pressure of coking ovens |
+|PT-201B | Pressure Transmitter | Redundant pressure measurement for coking ovens |
+|PT-201C | Pressure Transmitter | Third pressure sensor for voting logic in coking ovens |
+|SI-201 | System Interlock | Prevents unsafe pressure conditions in coking ovens |
+|SI-202 | System Interlock | Protects against unsafe temperature conditions in quenching tower |
+|TT-201A | Temperature Transmitter | Measures quenching water temperature in the tower |
+|TT-201B | Temperature Transmitter | Redundant temperature measurement for quenching tower |
+|TT-201C | Temperature Transmitter | Third temperature sensor for voting logic in quenching tower |
+
+### 3.1) Control Strategy Description
+
+The coking facility employs redundant measurement voting logic to ensure reliable control of critical parameters during coke production. Pressure transmitters PT-201A, PT-201B, and PT-201C monitor the internal pressure of the coking ovens (CO-201), while temperature sensors TT-201A, TT-201B, and TT-201C measure the quenching water temperature in the quenching tower (CO-202). A 2oo3 voting scheme is implemented for both pressure and temperature measurements to ensure system reliability and fault tolerance.
+
+For pressure control, the voted output signal PT-201_VOTE is generated when at least two of the three pressure transmitters (PT-201A/B/C) read within ±5% of each other and exceed the setpoint of 21.0 psig. If one transmitter fails (e.g., signal <3.8 mA or >20.5 mA), the system transitions to degraded mode, operating as 1oo2 voting using the remaining two transmitters. Similarly, for temperature control, the voted output TT-201_VOTE is determined by the median value of TT-201A/B/C readings. A deviation alarm DA-201 is triggered if any temperature sensor deviates by more than ±5% from the median value.
+
+Voting logic ensures that bad PV signals are automatically bypassed, and maintenance override provisions allow operators to manually exclude faulty sensors during troubleshooting. The control system integrates Boolean comparison logic to validate agreement between sensors and deadband logic to prevent chattering near setpoints.
+
+### 3.2) Interlocks and Permissives
+
+High-pressure interlock I-201 activates when PT-201_VOTE exceeds the high-pressure threshold of 100.0 psig, initiating an emergency venting sequence in the coking ovens (CO-201). Low-pressure permissive P-201 ensures normal operation only when PT-201_VOTE is above 21.0 psig. Temperature interlock I-202 engages when TT-201_VOTE exceeds 75.0°C, halting quenching operations in CO-202 to prevent thermal damage.
+
+Interlocks are designed to operate in both normal and degraded modes. In degraded mode, the system uses 1oo2 voting logic for pressure and temperature control, ensuring continued operation with reduced redundancy. Permissives require both pressure and temperature conditions to be satisfied simultaneously for equipment startup, ensuring safe and stable operation.
+
+### 3.3) Alarm and Fault Handling
+
+Deviation alarms DA-201 and DA-202 are generated if the pressure or temperature transmitters exceed the allowable deviation limit of ±5% from the median value. Fault alarms FA-201 and FA-202 are triggered when any sensor signal falls outside the valid range (<3.8 mA or >20.5 mA).
+
+In the event of a transmitter failure, the system automatically bypasses the faulty sensor and transitions to degraded mode operation. Maintenance override switches MO-201 and MO-202 allow operators to manually exclude sensors for calibration or replacement. Alarm aggregation logic consolidates deviation and fault alarms into summary indications SI-201 and SI-202, prioritizing critical faults for operator attention.
+
+Edge detection logic monitors voting state changes and ensures smooth transitions between normal and degraded modes. Deadband logic prevents repetitive alarm activation near deviation thresholds, reducing nuisance alarms and maintaining system stability.

@@ -1,0 +1,82 @@
+* Function Blocks *
+ANALOG_IN FI-102
+ANALOG_IN PI-102
+VALVE_ELECTRIC LCV-102
+BOOL_IN LIC-102
+MOTOR_ON_OFF P-102A
+MOTOR_ON_OFF P-102B
+DUTY_STANDBY P-102
+
+* Variables *
+REAL FI102_FlowRate_PV
+REAL PI102_Pressure_PV
+BOOL LIC102_Level_StartPermissive
+BOOL P102_ActiveIsA_Status
+
+* Functions *
+NOT NotActive_NOT
+AND ActiveALowP_AND
+AND NotActiveBLowP_AND
+OR A_Fault_OR
+OR B_Fault_OR
+TON LowPress10s_TON
+TON SwitchoverDelay5s_TON
+OR CmdAorB_OR
+TON MinRun30m_TON
+OR B_Start_OR
+OR P102A_Inhib_OR
+OR P102B_Inhib_OR
+
+* Data Connections *
+LIC-102.Bool_Out, P-102.Enable
+LIC-102.Bool_Out, P-102.StartRequest
+PI-102.Low_Alarm, LowPress10s_TON.IN
+LowPress10s_TON.Q, SwitchoverDelay5s_TON.IN
+SwitchoverDelay5s_TON.Q, P-102.SwitchoverDelayElapsed
+P-102.ActiveIsA, ActiveALowP_AND.IN1
+LowPress10s_TON.Q, ActiveALowP_AND.IN2
+P-102.ActiveIsA, NotActive_NOT.IN
+NotActive_NOT.OUT, NotActiveBLowP_AND.IN1
+LowPress10s_TON.Q, NotActiveBLowP_AND.IN2
+P-102A.FB_Trip, A_Fault_OR.IN1
+ActiveALowP_AND.OUT, A_Fault_OR.IN2
+P-102B.FB_Trip, B_Fault_OR.IN1
+NotActiveBLowP_AND.OUT, B_Fault_OR.IN2
+A_Fault_OR.OUT, P-102.PumpA_Fault
+B_Fault_OR.OUT, P-102.PumpB_Fault
+P-102A.FB_Running, P-102.PumpA_RunFB
+P-102B.FB_Running, P-102.PumpB_RunFB
+P-102.CmdPumpA, P-102A.Start_Cmd
+P-102.CmdPumpB, B_Start_OR.IN1
+FI-102.High_Alarm, B_Start_OR.IN2
+B_Start_OR.OUT, P-102B.Start_Cmd
+P-102.CmdPumpA, CmdAorB_OR.IN1
+P-102.CmdPumpB, CmdAorB_OR.IN2
+CmdAorB_OR.OUT, MinRun30m_TON.IN
+MinRun30m_TON.Q, P-102.MinRunElapsed
+PI-102.Low_Alarm, P102A_Inhib_OR.IN1
+P-102A.FB_Trip, P102A_Inhib_OR.IN2
+P-102.Alarm_NoAvailablePump, P102A_Inhib_OR.IN3
+P102A_Inhib_OR.OUT, P-102A.Inhibit
+PI-102.Low_Alarm, P102B_Inhib_OR.IN1
+P-102B.FB_Trip, P102B_Inhib_OR.IN2
+P-102.Alarm_NoAvailablePump, P102B_Inhib_OR.IN3
+P102B_Inhib_OR.OUT, P-102B.Inhibit
+P-102.Alarm_NoAvailablePump, LCV-102.Inhibit
+FI-102.PV, FI102_FlowRate_PV
+PI-102.PV, PI102_Pressure_PV
+LIC-102.Bool_Out, LIC102_Level_StartPermissive
+P-102.ActiveIsA, P102_ActiveIsA_Status
+
+* Parameter Data Connections *
+700.0, FI-102.PV_High
+500.0, FI-102.PV_Low
+TRUE, FI-102.Alarm_Enable
+25.0, PI-102.PV_Low
+TRUE, PI-102.Alarm_Enable
+T#10s, LowPress10s_TON.PT
+T#5s, SwitchoverDelay5s_TON.PT
+T#30m, MinRun30m_TON.PT
+T#30m, P-102A.MinRunTime
+T#30m, P-102B.MinRunTime
+

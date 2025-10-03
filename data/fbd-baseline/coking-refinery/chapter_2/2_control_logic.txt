@@ -1,0 +1,102 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN PIT-106
+ANALOG_IN TIT-104
+ANALOG_IN TIT-105
+ANALOG_IN TIT-107
+RATIO_CONTROL FFIC-103
+PID_BASIC FIC-104
+VALVE_ELECTRIC FV-104
+
+* Variables *
+REAL FT101_FeedFlow_PV_kgphr
+REAL FT102_RefluxFlow_PV_kgphr
+REAL FFIC103_RefluxFlow_SP_kgphr
+REAL FIC104_Output_Percent
+REAL FV104_ValvePosition_Percent
+REAL FV104_FeedbackPos_Percent
+BOOL FV104_ValveMoving
+REAL PIT106_ColumnPressure_bar
+REAL TIT104_Temperature_C
+REAL TIT105_Temperature_C
+REAL TIT107_Temperature_C
+
+* Functions *
+OR RatioInhibit_OR
+NOT FeedNotAbove500_NOT
+OR ValveInhibit_OR
+
+* Data Connections *
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-104.SP
+FT-102.PV, FIC-104.PV
+FIC-104.XOUT, FV-104.Control_Signal
+PIT-106.High_Alarm, RatioInhibit_OR.IN1
+PIT-106.Low_Alarm, RatioInhibit_OR.IN2
+TIT-104.High_Alarm, RatioInhibit_OR.IN3
+TIT-104.Low_Alarm, RatioInhibit_OR.IN4
+TIT-105.High_Alarm, RatioInhibit_OR.IN5
+TIT-105.Low_Alarm, RatioInhibit_OR.IN6
+TIT-107.High_Alarm, RatioInhibit_OR.IN7
+TIT-107.Low_Alarm, RatioInhibit_OR.IN8
+FT-101.Low_Alarm, RatioInhibit_OR.IN9
+FT-101.General_Fault, RatioInhibit_OR.IN10
+FT-102.General_Fault, RatioInhibit_OR.IN11
+FV-104.Position_Error, RatioInhibit_OR.IN12
+RatioInhibit_OR.OUT, FFIC-103.Inhibit
+RatioInhibit_OR.OUT, FIC-104.Inhibit
+FT-101.High_Alarm, FeedNotAbove500_NOT.IN
+FeedNotAbove500_NOT.OUT, ValveInhibit_OR.IN1
+TIT-104.High_Alarm, ValveInhibit_OR.IN2
+TIT-104.Low_Alarm, ValveInhibit_OR.IN3
+TIT-105.High_Alarm, ValveInhibit_OR.IN4
+TIT-105.Low_Alarm, ValveInhibit_OR.IN5
+TIT-107.High_Alarm, ValveInhibit_OR.IN6
+TIT-107.Low_Alarm, ValveInhibit_OR.IN7
+ValveInhibit_OR.OUT, FV-104.Inhibit
+FT-101.PV, FT101_FeedFlow_PV_kgphr
+FT-102.PV, FT102_RefluxFlow_PV_kgphr
+FFIC-103.SlaveSP, FFIC103_RefluxFlow_SP_kgphr
+FIC-104.XOUT, FIC104_Output_Percent
+FV-104.Valve_Position, FV104_ValvePosition_Percent
+FV-104.Feedback_Pos, FV104_FeedbackPos_Percent
+FV-104.Valve_Moving, FV104_ValveMoving
+PIT-106.PV, PIT106_ColumnPressure_bar
+TIT-104.PV, TIT104_Temperature_C
+TIT-105.PV, TIT105_Temperature_C
+TIT-107.PV, TIT107_Temperature_C
+
+* Parameter Data Connections *
+0.5, FFIC-103.RatioSP
+0.0, FFIC-103.MV_MIN
+2500.0, FFIC-103.MV_MAX
+0.0, FFIC-103.Bias
+TRUE, FFIC-103.Auto
+312.5, FT-101.Scaling_Slope
+-1250.0, FT-101.Scaling_Offset
+TRUE, FT-101.Alarm_Enable
+100.0, FT-101.PV_Low
+156.25, FT-102.Scaling_Slope
+-625.0, FT-102.Scaling_Offset
+TRUE, FT-102.Alarm_Enable
+0.5, PIT-106.PV_Low
+1.5, PIT-106.PV_High
+TRUE, PIT-106.Alarm_Enable
+120.0, TIT-104.PV_Low
+350.0, TIT-104.PV_High
+TRUE, TIT-104.Alarm_Enable
+120.0, TIT-105.PV_Low
+350.0, TIT-105.PV_High
+TRUE, TIT-105.Alarm_Enable
+120.0, TIT-107.PV_Low
+350.0, TIT-107.PV_High
+TRUE, TIT-107.Alarm_Enable
+TRUE, FIC-104.AUTO
+0.0, FIC-104.MV_MIN
+100.0, FIC-104.MV_MAX
+FALSE, FV-104.Manual_Mode
+0.0, FV-104.Close_Limit
+100.0, FV-104.Open_Limit
+

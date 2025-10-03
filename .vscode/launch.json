@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+       {
+            "name": "Run Backend",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "spec2control-backend:app",
+                "--reload",
+                "--port",
+                "8001"
+            ],
+            "justMyCode": true,
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src"
+        },
+    ]
+}

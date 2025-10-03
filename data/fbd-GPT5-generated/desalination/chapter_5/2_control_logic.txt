@@ -1,0 +1,85 @@
+* Function Blocks *
+BOOL_IN ANK-301
+DIGITAL_IN FAH-301
+DIGITAL_IN FAL-301
+PID_BASIC FIC-301
+ANALOG_IN FT-301
+VALVE_ELECTRIC FV-301
+DIGITAL_IN LAL-301
+ANALOG_IN LT-301
+DIGITAL_IN PAH-103
+DIGITAL_IN PFA-301
+DIGITAL_IN TAH-101
+MOTOR_VSD UMP-301A
+MOTOR_VSD UMP-301B
+VALVE_ON_OFF XV-107
+
+* Variables *
+REAL CHLOR-PUMP-301AB_Stroke_CMD
+
+* Functions *
+GE DetectHighSaturation_GE
+LE DetectLowSaturation_LE
+TON DeviationPersistTimer_TON
+NOT NotDevPersist_NOT
+OR PIDInhibit_OR
+OR AnyPumpReady_OR
+NOT NoPumpAvailable_NOT
+NOT NotXV107Open_NOT
+OR PumpInhibit_OR
+OR ValveTrip_OR
+
+* Data Connections *
+FT-301.PV, FIC-301.PV
+FIC-301.XOUT, FV-301.Control_Signal
+FV-301.Feedback_Pos, FIC-301.X0
+FIC-301.Deviation_Alarm, DeviationPersistTimer_TON.IN
+DeviationPersistTimer_TON.Q, NotDevPersist_NOT.IN
+NotDevPersist_NOT.OUT, PIDInhibit_OR.IN1
+FIC-301.XOUT, DetectHighSaturation_GE.IN1
+DetectHighSaturation_GE.Q, PIDInhibit_OR.IN2
+FIC-301.XOUT, DetectLowSaturation_LE.IN1
+DetectLowSaturation_LE.Q, PIDInhibit_OR.IN3
+PIDInhibit_OR.OUT, FIC-301.Inhibit
+UMP-301A.FB_Ready, AnyPumpReady_OR.IN1
+UMP-301B.FB_Ready, AnyPumpReady_OR.IN2
+AnyPumpReady_OR.OUT, NoPumpAvailable_NOT.IN
+XV-107.FB_Opened, NotXV107Open_NOT.IN
+LAL-301.DI_Out, PumpInhibit_OR.IN1
+LT-301.Low_Alarm, PumpInhibit_OR.IN2
+ANK-301.Bool_Out, PumpInhibit_OR.IN3
+NotXV107Open_NOT.OUT, PumpInhibit_OR.IN4
+NoPumpAvailable_NOT.OUT, PumpInhibit_OR.IN5
+PumpInhibit_OR.OUT, UMP-301A.Inhibit
+PumpInhibit_OR.OUT, UMP-301B.Inhibit
+PAH-103.DI_Out, ValveTrip_OR.IN1
+TAH-101.DI_Out, ValveTrip_OR.IN2
+LAL-301.DI_Out, ValveTrip_OR.IN3
+ANK-301.Bool_Out, ValveTrip_OR.IN4
+ValveTrip_OR.OUT, FV-301.Inhibit
+FIC-301.XOUT, CHLOR-PUMP-301AB_Stroke_CMD
+
+* Parameter Data Connections *
+3.125, FT-301.Scaling_Slope
+-12.5, FT-301.Scaling_Offset
+48.0, FT-301.PV_High
+8.0, FT-301.PV_Low
+TRUE, FT-301.Alarm_Enable
+30.0, FIC-301.SP
+1.8, FIC-301.KP
+0.5, FIC-301.TR
+0.05, FIC-301.TD
+5.0, FIC-301.MV_MIN
+95.0, FIC-301.MV_MAX
+0.3, FIC-301.Deviation_Limit
+48.0, FIC-301.PV_High
+8.0, FIC-301.PV_Low
+TRUE, FIC-301.AUTO
+100.0, FV-301.Open_Limit
+0.0, FV-301.Close_Limit
+FALSE, FV-301.Manual_Mode
+95.0, DetectHighSaturation_GE.IN2
+5.0, DetectLowSaturation_LE.IN2
+T#23s, DeviationPersistTimer_TON.PT
+20.0, LT-301.PV_Low
+

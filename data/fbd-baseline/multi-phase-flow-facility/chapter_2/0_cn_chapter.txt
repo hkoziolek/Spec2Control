@@ -1,0 +1,32 @@
+## 2 **2-Phase Separator Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CV-401 | Control Valve | Regulates separator pressure based on PIC-401 output |
+|CV-406 | Control Valve | Modulates liquid flow rate per FIC-406 command |
+|FFIC-402 | Ratio Controller | Calculates liquid flow setpoint using gas flow measurement and ratio |
+|FIC-406 | Flow Controller | Controls liquid flow rate exiting the separator |
+|FT-404 | Flow Transmitter | Measures gas flow rate exiting the separator |
+|FT-406 | Flow Transmitter | Measures liquid flow rate exiting the separator |
+|PIC-401 | Pressure Controller | Maintains separator pressure at 5.0 bar |
+|PT-403 | Pressure Transmitter | Monitors separator pressure for control and interlock purposes |
+|PT-408 | Pressure Transmitter | Auxiliary pressure measurement for system monitoring |
+
+### 2.1) Control Strategy Description
+
+The 2-phase separator control system utilizes ratio control to maintain a proportional relationship between the liquid and gas flow rates exiting the separator. Flow transmitter FT406 measures the liquid flow rate, while flow transmitter FT404 measures the gas flow rate. The ratio controller FFIC402 calculates the liquid flow setpoint based on the gas flow measurement and a predefined ratio. The ratio setpoint is configured to maintain a 2.5:1 liquid-to-gas flow ratio, ensuring optimal separation efficiency.
+
+The ratio calculation is performed as follows: Liquid flow setpoint (SP) = Gas flow rate (FT404) × 2.5. The calculated liquid flow setpoint is sent to flow controller FIC406, which modulates the control valve CV406 to achieve the desired liquid flow rate. The gas flow rate measured by FT404 is treated as the wild flow variable, while the liquid flow rate is the controlled variable. Flow measurement ranges for FT406 and FT404 are 0-500 kg/hr and 0-1000 kg/hr, respectively. Ratio adjustments are limited between 2.0:1 and 3.0:1 to prevent operational instability.
+
+Pressure transmitter PT403 monitors separator pressure, and pressure controller PIC401 adjusts control valve CV401 to maintain a pressure setpoint of 5.0 bar, ensuring stable operation of the separation process.
+
+### 2.2) Interlocks and Permissives
+
+The ratio control system is interlocked with the separator pressure control to ensure safe operation. If PT403 detects a pressure deviation exceeding ±0.5 bar from the setpoint, PIC401 overrides ratio control and closes CV406 to prevent liquid overflow. Additionally, the ratio controller FFIC402 is disabled if FT404 detects a gas flow rate below 50 kg/hr, preventing erroneous ratio calculations during low flow conditions.
+
+Permissives include validation of FT406 and FT404 signals. If either transmitter fails or provides a signal outside the calibrated range, FFIC402 enters manual mode, allowing operators to manually adjust the liquid flow setpoint. The ratio control system is also disabled during separator startup or shutdown sequences, as indicated by PT408 readings below 1.0 bar.
+
+### 2.3) Alarm and Fault Handling
+
+Alarm conditions are configured for deviations in the liquid-to-gas ratio beyond ±0.2 from the setpoint. If the ratio exceeds the allowable limits, an alarm is triggered, and FFIC402 transitions to manual mode. FT406 and FT404 are equipped with signal validation alarms to detect transmitter faults or calibration drift.
+
+Low flow alarms are set at 50 kg/hr for FT404 and 20 kg/hr for FT406. If either flow transmitter detects a flow below these thresholds, the control system initiates a low-flow shutdown sequence, closing CV406 and isolating the liquid stream. Separator pressure alarms are set at 6.0 bar for high pressure and 4.0 bar for low pressure, with PIC401 taking corrective action to stabilize the system.

@@ -1,0 +1,55 @@
+* Function Blocks *
+ANALOG_IN LIT-101
+ANALOG_IN FT-601
+ANALOG_IN TT-601
+PID_BASIC LIC-101
+VALVE_ELECTRIC MV-101
+
+* Variables *
+REAL LIT101_MoldLevel_PV_mm
+REAL FT601_CoolingWaterFlow_PV_m3ph
+REAL TT601_MoldTemp_PV_degC
+REAL LIC101_ValveCommand_Percent
+REAL MV101_ValvePosition_Percent
+
+* Functions *
+OR InterlockLIC101_OR
+
+* Data Connections * 
+LIT-101.PV, LIC-101.PV
+LIC-101.XOUT, MV-101.Control_Signal
+MV-101.Feedback_Pos, LIC-101.X0
+LIT-101.General_Fault, InterlockLIC101_OR.IN1
+FT-601.Low_Alarm, InterlockLIC101_OR.IN2
+TT-601.High_Alarm, InterlockLIC101_OR.IN3
+LIT-101.High_Alarm, InterlockLIC101_OR.IN4
+LIC-101.PV_High_Alarm, InterlockLIC101_OR.IN5
+InterlockLIC101_OR.OUT, LIC-101.Inhibit
+InterlockLIC101_OR.OUT, MV-101.Inhibit
+LIT-101.PV, LIT101_MoldLevel_PV_mm
+FT-601.PV, FT601_CoolingWaterFlow_PV_m3ph
+TT-601.PV, TT601_MoldTemp_PV_degC
+LIC-101.XOUT, LIC101_ValveCommand_Percent
+MV-101.Valve_Position, MV101_ValvePosition_Percent
+
+* Parameter Data Connections *
+18.75, LIT-101.Scaling_Slope
+-75, LIT-101.Scaling_Offset
+250, LIT-101.PV_High
+TRUE, LIT-101.Alarm_Enable
+37.5, FT-601.PV_Low
+TRUE, FT-601.Alarm_Enable
+950, TT-601.PV_High
+TRUE, TT-601.Alarm_Enable
+150, LIC-101.SP
+0, LIC-101.MV_MIN
+100, LIC-101.MV_MAX
+3.0, LIC-101.KP
+1.2, LIC-101.TR
+0.1, LIC-101.TD
+20, LIC-101.Deviation_Limit
+280, LIC-101.PV_High
+TRUE, LIC-101.AUTO
+100, MV-101.Open_Limit
+0, MV-101.Close_Limit
+

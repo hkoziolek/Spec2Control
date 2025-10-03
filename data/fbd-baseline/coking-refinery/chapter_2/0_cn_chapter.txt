@@ -1,0 +1,34 @@
+## 2 **Atmospheric Distillation Unit (ADU)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-104 | Flow Controller | Modulates reflux flow to achieve desired setpoint based on ratio control logic |
+|FT-101 | Flow Transmitter | Measures crude oil feed flow rate for ratio control calculations |
+|FT-102 | Flow Transmitter | Measures reflux stream flow rate for ratio control and monitoring |
+|FV-104 | Flow Valve | Adjusts reflux flow rate to maintain the setpoint provided by FIC-104 |
+|PIC-102 | Pressure Controller | Regulates pressure within the system to ensure stable operation |
+|PIT-106 | Pressure Transmitter | Monitors system pressure for control and safety purposes |
+|TIT-104 | Temperature Transmitter | Measures temperature at a specific point for process monitoring |
+|TIT-105 | Temperature Transmitter | Monitors temperature for control and operational adjustments |
+|TIT-107 | Temperature Transmitter | Provides temperature data for process optimization and safety checks |
+
+### 2.1) Control Strategy Description
+
+The Atmospheric Distillation Unit (ADU) employs ratio control to maintain precise proportional relationships between the crude oil feed stream and the reflux stream to ensure optimal separation efficiency within the distillation column. The wild flow measurement is provided by FT-101, which monitors the crude oil feed rate in the range of 0-5000 kg/hr. The controlled flow measurement is provided by FT-102, which monitors the reflux stream flow rate in the range of 0-2500 kg/hr. The ratio controller FFIC-103 calculates the reflux flow setpoint (SP) as a function of the crude oil feed flow, using the defined ratio setpoint of 0.5:1 (reflux-to-feed ratio).
+
+The ratio control logic is implemented as follows: FFIC-103 receives the real-time crude oil feed flow signal from FT-101 and calculates the reflux flow SP using the formula SP = FT-101 × 0.5. This setpoint is transmitted to FIC-104, which modulates the reflux flow control valve FV-104 to achieve the desired flow rate. The ratio controller FFIC-103 is configured with ratio adjustment limits between 0.4:1 and 0.6:1 to allow for operational flexibility while maintaining safe and efficient column operation.
+
+Raw sensor data from FT-101 and FT-102 undergoes linear scaling to ensure calibrated flow values are used in control calculations. The control system clamps the reflux flow SP within the range of 0-2500 kg/hr to prevent unsafe conditions. Lead compensation is applied to FFIC-103 to account for dynamic delays in the reflux flow response relative to crude oil feed changes. Three operating modes are available for FFIC-103: Auto (automatic ratio control), Manual (operator-defined reflux flow SP), and Off (isolated control).
+
+### 2.2) Interlocks and Permissives
+
+To ensure safe operation, the ratio control system integrates interlocks and permissives. The reflux flow control valve FV-104 will not open unless the crude oil feed flow measured by FT-101 exceeds 500 kg/hr, preventing excessive reflux flow during low feed conditions. Additionally, FFIC-103 is interlocked with PIC-102 to ensure that column pressure remains within the operational range of 0.5-1.5 bar. If column pressure deviates beyond these limits, FFIC-103 will suspend automatic ratio control and revert to manual mode.
+
+Low flow cutoff logic is implemented such that FFIC-103 disables ratio calculation if FT-101 reports a crude oil feed flow below 100 kg/hr, preventing erroneous control actions during startup or shutdown conditions. Boolean interlocks are configured to ensure that FV-104 remains closed if TIT-104, TIT-105, or TIT-107 report column temperatures outside the safe operating range of 120°C to 350°C.
+
+### 2.3) Alarm and Fault Handling
+
+The ratio control system generates alarms for the following conditions: deviation of the reflux-to-feed ratio beyond the defined adjustment limits (0.4:1 to 0.6:1), loss of signal from FT-101 or FT-102, and failure of FV-104 to respond to control signals from FIC-104. In the event of a fault, FFIC-103 will automatically transition to manual mode, allowing the operator to define the reflux flow SP directly.
+
+If the crude oil feed flow measured by FT-101 falls below 100 kg/hr, a low flow alarm will be triggered, and FFIC-103 will suspend ratio control. Similarly, if column pressure measured by PIT-106 exceeds 1.5 bar or falls below 0.5 bar, FFIC-103 will disable automatic control and alert the operator. Temperature faults from TIT-104, TIT-105, or TIT-107 will also trigger alarms and prompt a system-wide shutdown of reflux flow control to prevent thermal damage to the column.
+
+All alarm conditions are logged in the Distributed Control System (DCS) for operator review, and fault diagnostics are available to assist in troubleshooting sensor or actuator failures.

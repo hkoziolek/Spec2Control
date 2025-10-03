@@ -1,0 +1,95 @@
+* Function Blocks *
+ANALOG_IN FT-301
+ANALOG_IN PT-301
+ANALOG_IN TT-301
+RATIO_CONTROL FFIC-303
+PID_BASIC FIC-302
+VALVE_ELECTRIC FV-302
+
+* Variables *
+REAL FFIC303_HotBlastAirFlow_SP
+REAL FT301_PulverizedCoalFlow_PV
+REAL PT301_FurnacePressure_PV
+REAL TT301_HotBlastAirTemperature_PV
+REAL HotBlastAirFlow_PV
+
+* Functions *
+ADD RatioBias_Add_ADD
+MIN RatioUpperLimit_MIN
+MAX RatioClamp_MAX
+LT LowFlow_LT_LT
+SEL LowFlowSel_SEL
+SEL RangeFailSel_SEL
+OR FT301_RangeFail_OR
+OR PT301_RangeFail_OR
+OR RatioInhibit1_OR
+OR RatioInhibit2_OR
+OR RatioInhibit3_OR
+OR ESD_Close_OR
+
+* Data Connections *
+FT-301.PV, FFIC-303.PrimaryPV
+RatioBias_Add_ADD.OUT, RatioUpperLimit_MIN.IN2
+RatioUpperLimit_MIN.OUT, RatioClamp_MAX.IN2
+RatioClamp_MAX.OUT, FFIC-303.RatioSP
+FT-301.PV, LowFlow_LT_LT.IN1
+LowFlow_LT_LT.OUT, LowFlowSel_SEL.G
+FFIC-303.SlaveSP, LowFlowSel_SEL.IN0
+LowFlowSel_SEL.OUT, RangeFailSel_SEL.IN0
+FT301_RangeFail_OR.OUT, RangeFailSel_SEL.G
+RangeFailSel_SEL.OUT, FIC-302.SP
+HotBlastAirFlow_PV, FFIC-303.SecondaryPV
+HotBlastAirFlow_PV, FIC-302.PV
+FIC-302.XOUT, FV-302.Control_Signal
+FT-301.Low_Alarm, FT301_RangeFail_OR.IN1
+FT-301.High_Alarm, FT301_RangeFail_OR.IN2
+PT-301.Low_Alarm, PT301_RangeFail_OR.IN1
+PT-301.High_Alarm, PT301_RangeFail_OR.IN2
+FT301_RangeFail_OR.OUT, RatioInhibit1_OR.IN1
+TT-301.Low_Alarm, RatioInhibit1_OR.IN2
+RatioInhibit1_OR.OUT, RatioInhibit2_OR.IN1
+PT301_RangeFail_OR.OUT, RatioInhibit2_OR.IN2
+RatioInhibit2_OR.OUT, RatioInhibit3_OR.IN1
+FT-301.General_Fault, RatioInhibit3_OR.IN2
+RatioInhibit3_OR.OUT, FFIC-303.Inhibit
+TT-301.Low_Alarm, ESD_Close_OR.IN1
+PT-301.High_Alarm, ESD_Close_OR.IN2
+ESD_Close_OR.OUT, FIC-302.Inhibit
+ESD_Close_OR.OUT, FV-302.Inhibit
+FFIC-303.SlaveSP, FFIC303_HotBlastAirFlow_SP
+FT-301.PV, FT301_PulverizedCoalFlow_PV
+PT-301.PV, PT301_FurnacePressure_PV
+TT-301.PV, TT301_HotBlastAirTemperature_PV
+
+* Parameter Data Connections *
+5000.0, FT-301.PV_High
+100.0, FT-301.PV_Low
+TRUE, FT-301.Alarm_Enable
+2.5, PT-301.PV_High
+1.5, PT-301.PV_Low
+TRUE, PT-301.Alarm_Enable
+900.0, TT-301.PV_Low
+TRUE, TT-301.Alarm_Enable
+1.8, RatioBias_Add_ADD.IN1
+0.0, RatioBias_Add_ADD.IN2
+2.0, RatioUpperLimit_MIN.IN1
+1.5, RatioClamp_MAX.IN1
+100.0, LowFlow_LT_LT.IN2
+200.0, LowFlowSel_SEL.IN1
+500.0, RangeFailSel_SEL.IN1
+TRUE, FFIC-303.Auto
+0.0, FFIC-303.Bias
+200.0, FFIC-303.MV_MIN
+9000.0, FFIC-303.MV_MAX
+1000.0, FFIC-303.ManOut
+TRUE, FIC-302.AUTO
+0.0, FIC-302.MV_MIN
+100.0, FIC-302.MV_MAX
+9000.0, FIC-302.PV_High
+200.0, FIC-302.PV_Low
+FALSE, FV-302.Manual_Mode
+0.0, FV-302.Manual_Position
+100.0, FV-302.Open_Limit
+0.0, FV-302.Close_Limit
+T#10s, FV-302.Timeout
+

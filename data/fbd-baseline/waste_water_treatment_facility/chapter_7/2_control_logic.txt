@@ -1,0 +1,112 @@
+* Function Blocks *
+MOTOR_ON_OFF CL-601A
+MOTOR_ON_OFF CL-601B
+MOTOR_ON_OFF PS-601A
+MOTOR_ON_OFF PS-601B
+ANALOG_IN PT-601A
+ANALOG_IN PT-601B
+DIGITAL_IN LS-601
+VALVE_ELECTRIC VS-601A
+VALVE_ELECTRIC VS-601B
+DUTY_STANDBY CL-601A_CL-601B
+DUTY_STANDBY PS-601A_PS-601B
+TON Clar_MinRunTimer_TON
+TON Clar_DutyTimer_TON
+TON Clar_SwitchoverDelay_TON
+TON Pump_MinRunTimer_TON
+TON Pump_DutyTimer_TON
+TON Pump_SwitchoverDelay_TON
+
+* Variables *
+REAL PT-601A_DischargePressure_PV
+REAL PT-601B_DischargePressure_PV
+BOOL CL-601_ActiveIsA
+BOOL PS-601_ActiveIsA
+
+* Functions *
+OR ClarifierAnyRunning_OR
+NOT ClarifierNoneRunning_NOT
+OR PumpAnyRunning_OR
+NOT PumpNoneRunning_NOT
+OR PS601A_Inhibit_OR
+OR PS601B_Inhibit_OR
+
+* Data Connections * 
+CL-601A.FB_Running, CL-601A_CL-601B.PumpA_RunFB
+CL-601B.FB_Running, CL-601A_CL-601B.PumpB_RunFB
+CL-601A.FB_Trip, CL-601A_CL-601B.PumpA_Fault
+CL-601B.FB_Trip, CL-601A_CL-601B.PumpB_Fault
+CL-601A_CL-601B.CmdPumpA, CL-601A.Start_Cmd
+CL-601A_CL-601B.CmdPumpB, CL-601B.Start_Cmd
+CL-601A.FB_Running, ClarifierAnyRunning_OR.IN1
+CL-601B.FB_Running, ClarifierAnyRunning_OR.IN2
+ClarifierAnyRunning_OR.OUT, Clar_MinRunTimer_TON.IN
+ClarifierAnyRunning_OR.OUT, Clar_DutyTimer_TON.IN
+ClarifierAnyRunning_OR.OUT, ClarifierNoneRunning_NOT.IN
+ClarifierNoneRunning_NOT.OUT, Clar_SwitchoverDelay_TON.IN
+Clar_MinRunTimer_TON.Q, CL-601A_CL-601B.MinRunElapsed
+Clar_DutyTimer_TON.Q, CL-601A_CL-601B.DutyElapsed
+Clar_SwitchoverDelay_TON.Q, CL-601A_CL-601B.SwitchoverDelayElapsed
+PS-601A.FB_Running, PS-601A_PS-601B.PumpA_RunFB
+PS-601B.FB_Running, PS-601A_PS-601B.PumpB_RunFB
+PS-601A.FB_Trip, PS-601A_PS-601B.PumpA_Fault
+PS-601B.FB_Trip, PS-601A_PS-601B.PumpB_Fault
+PS-601A_PS-601B.CmdPumpA, PS-601A.Start_Cmd
+PS-601A_PS-601B.CmdPumpB, PS-601B.Start_Cmd
+PS-601A.FB_Running, PumpAnyRunning_OR.IN1
+PS-601B.FB_Running, PumpAnyRunning_OR.IN2
+PumpAnyRunning_OR.OUT, Pump_MinRunTimer_TON.IN
+PumpAnyRunning_OR.OUT, Pump_DutyTimer_TON.IN
+PumpAnyRunning_OR.OUT, PumpNoneRunning_NOT.IN
+PumpNoneRunning_NOT.OUT, Pump_SwitchoverDelay_TON.IN
+Pump_MinRunTimer_TON.Q, PS-601A_PS-601B.MinRunElapsed
+Pump_DutyTimer_TON.Q, PS-601A_PS-601B.DutyElapsed
+Pump_SwitchoverDelay_TON.Q, PS-601A_PS-601B.SwitchoverDelayElapsed
+PT-601A.Low_Alarm, PS601A_Inhibit_OR.IN1
+LS-601.DI_Out, PS601A_Inhibit_OR.IN2
+PS601A_Inhibit_OR.OUT, PS-601A.Inhibit
+PT-601B.Low_Alarm, PS601B_Inhibit_OR.IN1
+LS-601.DI_Out, PS601B_Inhibit_OR.IN2
+PS601B_Inhibit_OR.OUT, PS-601B.Inhibit
+LS-601.DI_Out, CL-601A.Inhibit
+LS-601.DI_Out, CL-601B.Inhibit
+LS-601.DI_Out, CL-601A_CL-601B.Inhibit
+LS-601.DI_Out, PS-601A_PS-601B.Inhibit
+PT-601A.PV, PT-601A_DischargePressure_PV
+PT-601B.PV, PT-601B_DischargePressure_PV
+CL-601A_CL-601B.ActiveIsA, CL-601_ActiveIsA
+PS-601A_PS-601B.ActiveIsA, PS-601_ActiveIsA
+
+* Parameter Data Connections *
+T#5s, CL-601A.Start_Delay
+T#30m, CL-601A.MinRunTime
+T#5s, CL-601B.Start_Delay
+T#30m, CL-601B.MinRunTime
+T#5s, PS-601A.Start_Delay
+T#30m, PS-601A.MinRunTime
+T#5s, PS-601B.Start_Delay
+T#30m, PS-601B.MinRunTime
+25.0, PT-601A.PV_Low
+TRUE, PT-601A.Alarm_Enable
+25.0, PT-601B.PV_Low
+5, VS-601A.PV_High
+5, VS-601A.PV_High
+2.5, LS-601.PV_High
+TRUE, PT-601B.Alarm_Enable
+TRUE, CL-601A_CL-601B.Enable
+TRUE, CL-601A_CL-601B.AlternateEnable
+TRUE, CL-601A_CL-601B.StartRequest
+TRUE, PS-601A_PS-601B.Enable
+TRUE, PS-601A_PS-601B.AlternateEnable
+TRUE, PS-601A_PS-601B.StartRequest
+T#30m, Clar_MinRunTimer_TON.PT
+T#72h, Clar_DutyTimer_TON.PT
+T#10s, Clar_SwitchoverDelay_TON.PT
+T#30m, Pump_MinRunTimer_TON.PT
+T#72h, Pump_DutyTimer_TON.PT
+T#10s, Pump_SwitchoverDelay_TON.PT
+0.0, VS-601A.Close_Limit
+100.0, VS-601A.Open_Limit
+0.0, VS-601B.Close_Limit
+100.0, VS-601B.Open_Limit
+

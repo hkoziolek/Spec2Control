@@ -1,0 +1,31 @@
+## 4 **Decanter 1**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-004 | Flow Controller | Regulates flow to decanter system to prevent overcapacity. |
+|FIT-103 | Flow Transmitter | Measures flow rate for upstream control loop. |
+|FTL-101 | Level Transmitter Low | Low-level measurement for decanter system. |
+|LAH-101 | Level Alarm High | High-level alarm for decanter overflow protection. |
+|LAL-101 | Level Alarm Low | Low-level alarm for decanter underfill protection. |
+|LIC-101 | Level Controller | Maintains liquid level in decanter by controlling PV-102. |
+|LT-104 | Level Transmitter | Measures liquid level in decanter for LIC-101 control. |
+|PV-102 | Pressure Valve | Controls liquid drainage from decanter system. |
+
+### 4.1) Control Strategy Description
+
+The Decanter 1 system is designed to separate liquid phases from the overhead product of Column 1. Level control is implemented via LIC-101, which maintains the liquid level within the decanter by manipulating the opening of PV-102. The process variable (PV) is the liquid level measured by LT-104, and the manipulated variable (MV) is the valve position of PV-102. The setpoint (SP) for LIC-101 is configured at 65% of the decanter level, with an allowable operating range between 20% and 88% to ensure safe operation.
+
+LIC-101 operates in reverse-acting mode, as an increase in the level (PV) requires the valve (PV-102) to open further to drain liquid. The PID tuning parameters for LIC-101 are as follows: proportional gain (Kp) = 1.8, integral time (Ki) = 0.6 minutes, and derivative time (Kd) = 0.1 minutes. The controller output (CO) is limited to a range of 0% to 100% to match the valve actuator signal.
+
+The level measurement from LT-104 is transmitted as a 4-20mA signal corresponding to a level range of 0-5 meters. This signal is normalized to a 0-100% scale within LIC-101. The control valve PV-102 is a pneumatically actuated globe valve with a fail-closed configuration to prevent overfilling in the event of an actuator failure.
+
+### 4.2) Interlocks and Permissives
+
+The operation of LIC-101 is interlocked with the upstream flow control loop FC-4 to ensure that the decanter does not exceed its design capacity. If FIT-103 detects a flow rate exceeding 120% of the decanter's maximum design flow (measured as 0-50 m³/h), LIC-101 will automatically override the setpoint to 50% to reduce the risk of overflow.
+
+A permissive is implemented to prevent PV-102 from opening unless LT-104 indicates a level above 10%. This ensures that the valve does not operate in dry conditions, which could lead to cavitation or mechanical damage.
+
+### 4.3) Alarm and Fault Handling
+
+High and low-level alarms are configured on LIC-101. A high-level alarm (LAH-101) is triggered when LT-104 measures a level above 90%, and a low-level alarm (LAL-101) is triggered when the level falls below 15%. Both alarms are transmitted to the operator interface for immediate attention.
+
+In the event of a fault in LT-104, such as a signal loss or invalid reading, LIC-101 will enter manual mode, and PV-102 will default to a fail-closed position. The operator will be notified via a fault alarm (FTL-101) on the HMI. A bumpless transfer mechanism is implemented in LIC-101 to ensure a smooth transition between manual and automatic modes without introducing process disturbances.

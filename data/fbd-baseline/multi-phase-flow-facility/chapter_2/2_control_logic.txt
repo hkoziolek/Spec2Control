@@ -1,0 +1,60 @@
+* Function Blocks *
+ANALOG_IN FT-404
+ANALOG_IN FT-406
+ANALOG_IN PT-403
+ANALOG_IN PT-408
+RATIO_CONTROL FFIC-402
+PID_BASIC FIC-406
+PID_BASIC PIC-401
+VALVE_ELECTRIC CV-406
+VALVE_ELECTRIC CV-401
+
+* Variables *
+REAL FT404_GasFlow_PV
+REAL FT406_LiqFlow_PV
+REAL PT403_SepPressure_PV
+REAL PT408_AuxPressure_PV
+REAL FIC406_LiqFlow_SP_From_FFIC402
+
+* Functions *
+OR ValveInhibit_OR
+OR RatioInhibit_OR
+
+* Data Connections * 
+FT-404.PV, FFIC-402.PrimaryPV
+FT-406.PV, FFIC-402.SecondaryPV
+FFIC-402.SlaveSP, FIC-406.SP
+FT-406.PV, FIC-406.PV
+FIC-406.XOUT, CV-406.Control_Signal
+PT-403.PV, PIC-401.PV
+PIC-401.XOUT, CV-401.Control_Signal
+PT-403.High_Alarm, ValveInhibit_OR.IN1
+PT-403.Low_Alarm, ValveInhibit_OR.IN2
+FT-404.Low_Alarm, ValveInhibit_OR.IN3
+FT-406.Low_Alarm, ValveInhibit_OR.IN4
+ValveInhibit_OR.OUT, CV-406.Inhibit
+PT-403.High_Alarm, RatioInhibit_OR.IN1
+PT-403.Low_Alarm, RatioInhibit_OR.IN2
+FT-404.Low_Alarm, RatioInhibit_OR.IN3
+FT-404.General_Fault, RatioInhibit_OR.IN4
+FT-406.General_Fault, RatioInhibit_OR.IN5
+PT-408.Low_Alarm, RatioInhibit_OR.IN6
+RatioInhibit_OR.OUT, FFIC-402.Inhibit
+FT-404.PV, FT404_GasFlow_PV
+FT-406.PV, FT406_LiqFlow_PV
+PT-403.PV, PT403_SepPressure_PV
+PT-408.PV, PT408_AuxPressure_PV
+FFIC-402.SlaveSP, FIC406_LiqFlow_SP_From_FFIC402
+
+* Parameter Data Connections *
+2.5, FFIC-402.RatioSP
+TRUE, FFIC-402.Auto
+0.0, FFIC-402.MV_MIN
+500.0, FFIC-402.MV_MAX
+TRUE, FIC-406.AUTO
+TRUE, PIC-401.AUTO
+5.0, PIC-401.SP
+6.0, PIC-401.PV_High
+4.0, PIC-401.PV_Low
+50.0, FT-404.PV_Low
+20.0, FT-406.PV_Low

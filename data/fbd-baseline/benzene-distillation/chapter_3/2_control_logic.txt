@@ -1,0 +1,65 @@
+* Function Blocks *
+ANALOG_IN TI-106
+ANALOG_IN FIT-101
+ANALOG_IN PT-101
+PID_BASIC FIC-104
+VALVE_ELECTRIC TCV-106
+BOOL_IN LIC-002
+BOOL_IN TAH-106
+BOOL_IN TAL-106
+BOOL_IN FAH-104
+
+* Variables *
+REAL Reboiler_Temperature_PV_TI106
+REAL Steam_Flow_PV_FIT101
+REAL Column_Pressure_PV_PT101
+REAL FIC104_MV_SteamValveCmd
+BOOL LIC002_LowLevel_Trip
+
+* Functions *
+OR ReboilerTrip_OR
+
+* Data Connections *
+TI-106.PV, FIC-104.PV
+FIC-104.XOUT, TCV-106.Control_Signal
+TCV-106.Feedback_Pos, FIC-104.X0
+LIC-002.Bool_Out, ReboilerTrip_OR.IN1
+FIC-104.PV_High_Alarm, ReboilerTrip_OR.IN2
+TI-106.General_Fault, ReboilerTrip_OR.IN3
+PT-101.Low_Alarm, ReboilerTrip_OR.IN4
+ReboilerTrip_OR.OUT, TCV-106.Inhibit
+ReboilerTrip_OR.OUT, FIC-104.Inhibit
+TI-106.High_Alarm, TAH-106.Bool_In
+TI-106.Low_Alarm, TAL-106.Bool_In
+FIT-101.Low_Alarm, FAH-104.Bool_In
+TI-106.PV, Reboiler_Temperature_PV_TI106
+FIT-101.PV, Steam_Flow_PV_FIT101
+PT-101.PV, Column_Pressure_PV_PT101
+FIC-104.XOUT, FIC104_MV_SteamValveCmd
+LIC002_LowLevel_Trip, LIC-002.Bool_In
+
+* Parameter Data Connections *
+9.375, TI-106.Scaling_Slope
+62.5, TI-106.Scaling_Offset
+190.0, TI-106.PV_High
+170.0, TI-106.PV_Low
+TRUE, TI-106.Alarm_Enable
+180.0, FIC-104.SP
+0.0, FIC-104.MV_MIN
+100.0, FIC-104.MV_MAX
+3.0, FIC-104.KP
+1.2, FIC-104.TR
+0.3, FIC-104.TD
+TRUE, FIC-104.AUTO
+0.0, TCV-106.Close_Limit
+100.0, TCV-106.Open_Limit
+FALSE, TCV-106.Manual_Mode
+0.0, TCV-106.Manual_Position
+10.0, FIT-101.PV_Low
+TRUE, FIT-101.Alarm_Enable
+TRUE, PT-101.Alarm_Enable
+TRUE, TAH-106.Alarm_OnTrue
+TRUE, TAL-106.Alarm_OnTrue
+TRUE, FAH-104.Alarm_OnTrue
+TRUE, LIC-002.Alarm_OnTrue
+

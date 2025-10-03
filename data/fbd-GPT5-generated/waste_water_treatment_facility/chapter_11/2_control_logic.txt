@@ -1,0 +1,77 @@
+* Function Blocks *
+ANALOG_IN FIT-104
+RATIO_CONTROL FFIC-107
+PID_BASIC FIC-106
+MOTOR_VSD CD-1001
+VALVE_ELECTRIC PV-101
+VALVE_ON_OFF XV-102
+
+* Variables *
+REAL FIT104_InfluentFlow_PV
+REAL FFIC107_ChemDose_SlaveSP
+REAL FFIC107_ActiveRatio
+
+* Functions *
+NOT XV102_NotOpen
+OR CD1001_Inhibit
+OR FFIC107_Inhibit
+
+* Data Connections * 
+FIT-104.PV, FFIC-107.PrimaryPV
+CD-1001.FB_ActualSpeed, FFIC-107.SecondaryPV
+FFIC-107.SlaveSP, FIC-106.SP
+CD-1001.FB_ActualSpeed, FIC-106.PV
+FIC-106.XOUT, CD-1001.Speed_SP
+FIT-104.Low_Alarm, FFIC107_Inhibit.IN1
+FIT-104.General_Fault, FFIC107_Inhibit.IN2
+CD-1001.FB_Fault, FFIC107_Inhibit.IN3
+CD-1001.Alarm_Comm_Fail, FFIC107_Inhibit.IN4
+CD-1001.Alarm_Speed_Deviation, FFIC107_Inhibit.IN5
+FFIC107_Inhibit.OUT, FFIC-107.Inhibit
+XV-102.FB_Opened, XV102_NotOpen.IN
+XV102_NotOpen.OUT, CD1001_Inhibit.IN1
+PV-101.Alarm, CD1001_Inhibit.IN2
+PV-101.Position_Error, CD1001_Inhibit.IN5
+XV-102.Alarm_Position_Error, CD1001_Inhibit.IN3
+XV-102.Alarm_General, CD1001_Inhibit.IN4
+CD1001_Inhibit.OUT, CD-1001.Inhibit
+FIT-104.PV, FIT104_InfluentFlow_PV
+FFIC-107.SlaveSP, FFIC107_ChemDose_SlaveSP
+FFIC-107.ActiveRatio, FFIC107_ActiveRatio
+
+* Parameter Data Connections *
+"Influent Flow FIT-104", FIT-104.Name
+312.5, FIT-104.Scaling_Slope
+-1250.0, FIT-104.Scaling_Offset
+5000.0, FIT-104.PV_High
+100.0, FIT-104.PV_Low
+TRUE, FIT-104.Alarm_Enable
+"Chemical Ratio Controller FFIC-107", FFIC-107.Name
+TRUE, FFIC-107.Auto
+2.5, FFIC-107.RatioSP
+0.0, FFIC-107.Bias
+0.0, FFIC-107.TrimKp
+T#0s, FFIC-107.TrimTi
+0.0, FFIC-107.MV_MIN
+15000.0, FFIC-107.MV_MAX
+"Chemical Dosing PID FIC-106", FIC-106.Name
+TRUE, FIC-106.AUTO
+0.0, FIC-106.MV_MIN
+100.0, FIC-106.MV_MAX
+0.0, FIC-106.X0
+1.0, FIC-106.KP
+10.0, FIC-106.TR
+0.0, FIC-106.TD
+100.0, FIC-106.PV_High
+0.0, FIC-106.PV_Low
+3.0, FIC-106.Deviation_Limit
+"Chemical Dosing Pump CD-1001", CD-1001.Name
+T#2s, CD-1001.Accel_Ramp
+T#2s, CD-1001.Decel_Ramp
+"Pressure Control Valve PV-101", PV-101.Name
+100.0, PV-101.Open_Limit
+0.0, PV-101.Close_Limit
+T#5s, PV-101.Timeout
+"Shut-off Valve XV-102", XV-102.Name
+T#5s, XV-102.Timeout
+

@@ -1,0 +1,58 @@
+* Function Blocks *
+ANALOG_IN AI-201
+ANALOG_IN LT-201
+ANALOG_IN PT-201
+ANALOG_IN TT-201
+PID_BASIC TIC-201
+VALVE_ELECTRIC FV-101
+
+* Variables *
+REAL TT201_Temperature_PV
+REAL PT201_FlashTankPressure_PV
+REAL LT201_AbsorberLevel_PV
+REAL AI201_CO2_PV
+REAL TIC201_MV_SteamValveCmd
+
+* Functions *
+OR TIC201_Inhibit_OR
+OR FV101_Inhibit_OR
+
+* Data Connections *
+TT-201.PV, TIC-201.PV
+TIC-201.XOUT, FV-101.Control_Signal
+FV-101.Feedback_Pos, TIC-201.X0
+TT-201.High_Alarm, TIC201_Inhibit_OR.IN1
+PT-201.Low_Alarm, TIC201_Inhibit_OR.IN2
+AI-201.High_Alarm, TIC201_Inhibit_OR.IN3
+TT-201.General_Fault, TIC201_Inhibit_OR.IN4
+TIC201_Inhibit_OR.OUT, TIC-201.Inhibit
+TIC201_Inhibit_OR.OUT, FV101_Inhibit_OR.IN1
+LT-201.Low_Alarm, FV101_Inhibit_OR.IN2
+FV101_Inhibit_OR.OUT, FV-101.Inhibit
+TT-201.PV, TT201_Temperature_PV
+PT-201.PV, PT201_FlashTankPressure_PV
+LT-201.PV, LT201_AbsorberLevel_PV
+AI-201.PV, AI201_CO2_PV
+TIC-201.XOUT, TIC201_MV_SteamValveCmd
+
+* Parameter Data Connections *
+6.25, TT-201.Scaling_Slope
+-25, TT-201.Scaling_Offset
+50, TT-201.PV_High
+TRUE, TT-201.Alarm_Enable
+0.5, PT-201.PV_Low
+TRUE, PT-201.Alarm_Enable
+TRUE, LT-201.Alarm_Enable
+TRUE, AI-201.Alarm_Enable
+45, TIC-201.SP
+3.0, TIC-201.KP
+1.5, TIC-201.TR
+0.0, TIC-201.TD
+0, TIC-201.MV_MIN
+100, TIC-201.MV_MAX
+5, TIC-201.Deviation_Limit
+TRUE, TIC-201.AUTO
+0, FV-101.Close_Limit
+100, FV-101.Open_Limit
+FALSE, FV-101.Manual_Mode
+

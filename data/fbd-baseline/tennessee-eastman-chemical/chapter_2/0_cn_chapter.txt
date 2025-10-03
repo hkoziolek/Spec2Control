@@ -1,0 +1,34 @@
+## 2 **Feed System**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FAL-101 | Flow Alarm Low | Low flow alarm for feed system safety |
+|FAL-102 | Flow Alarm Low | Secondary low flow alarm for redundancy |
+|FAL-103 | Flow Alarm Low | Tertiary low flow alarm for critical protection |
+|FIC-104 | Flow Controller | Controls feedstock flow into the process |
+|FIT-101 | Flow Transmitter | Measures feedstock flow rate (0-200 GPM) |
+|IAL-101 | Interlock Alarm Low | Low-level interlock for process safety |
+|PI-001 | Pressure Indicator | Displays pressure in the feed system |
+|PV-103 | Control Valve | Modulates feedstock flow (fail-closed) |
+|XV-106 | On-Off Valve | Upstream shut-off valve for isolation |
+
+### 2.1) Control Strategy Description
+
+The feed system controls the flow of feedstock into the process using a single-loop PID feedback control strategy implemented in FIC-104. The process variable (PV) is the flow rate measured by FIT-101, with a transmitter range of 0-200 GPM (4-20 mA). The setpoint (SP) for FIC-104 is adjustable between 50 and 150 GPM, with a default operating setpoint of 100 GPM. The manipulated variable (MV) is the position of PV-103, a modulating control valve with a fail-closed configuration.
+
+FIC-104 is configured for reverse-acting control to ensure that an increase in flow rate results in a decrease in valve opening. PID tuning parameters are set as follows: proportional gain (Kp) = 1.5, integral time (Ki) = 0.6 min, and derivative time (Kd) = 0.1 min. The controller output is constrained between 0% and 100% to match the valve's operating range. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes. Anti-windup protection is enabled to prevent integrator saturation during output clamping.
+
+The raw signal from FIT-101 is scaled linearly to provide a calibrated flow value in engineering units (GPM) for control calculations. The setpoint input is clamped between 50 and 150 GPM to maintain process stability and protect downstream equipment.
+
+### 2.2) Interlocks and Permissives
+
+The feed control system includes interlocks to ensure safe operation. XV-106, a shut-off valve upstream of PV-103, must be fully open (confirmed by position feedback) before FIC-104 is allowed to operate in automatic mode. Additionally, the system requires a valid flow signal from FIT-101, with the transmitter output within the range of 4-20 mA. If the signal from FIT-101 is lost or falls outside the valid range, FIC-104 will switch to manual mode, and PV-103 will move to its fail-closed position.
+
+A permissive is implemented to prevent FIC-104 from initiating control unless the downstream process pressure, as measured by PI-1, is within the range of 20-50 psig. This prevents over-pressurization of the downstream system during startup.
+
+### 2.3) Alarm and Fault Handling
+
+The control system generates a high-flow alarm (FAL-101) if the flow rate measured by FIT-101 exceeds 180 GPM. A low-flow alarm (FAL-102) is triggered if the flow rate falls below 40 GPM. Both alarms are latched and require operator acknowledgment before being cleared.
+
+In the event of a fault in FIT-101, such as a transmitter failure or a signal outside the 4-20 mA range, a fault alarm (FAL-103) is activated, and FIC-104 transitions to manual mode. PV-103 will move to its fail-closed position to isolate the feedstock supply. The operator must investigate and resolve the fault before resuming automatic control.
+
+If XV-106 fails to open or its position feedback is invalid, an interlock alarm (IAL-101) is triggered, and FIC-104 is disabled. The system will not allow control to resume until XV-106 is confirmed open.

@@ -1,0 +1,62 @@
+* Function Blocks *
+ANALOG_IN PIT-106
+PID_BASIC PIC-105
+VALVE_ELECTRIC V-010
+BOOL_IN COMPRESSOR_RUN_PERMISSIVE
+TON StartupDelay_TON
+
+* Variables *
+REAL PIT106_PressurePV
+REAL PIC105_MV_Output
+
+* Functions *
+NOT CompressorNotRunning_NOT
+OR AllInhibits_OR
+NOT StartupDelayNot_NOT
+
+* Data Connections *
+PIT-106.PV, PIC-105.PV
+PIC-105.XOUT, V-010.Control_Signal
+COMPRESSOR_RUN_PERMISSIVE.Bool_Out, CompressorNotRunning_NOT.IN
+COMPRESSOR_RUN_PERMISSIVE.Bool_Out, StartupDelay_TON.IN
+StartupDelay_TON.Q, StartupDelayNot_NOT.IN
+CompressorNotRunning_NOT.OUT, AllInhibits_OR.IN1
+PIC-105.PV_High_Alarm, AllInhibits_OR.IN2
+PIC-105.PV_Low_Alarm, AllInhibits_OR.IN3
+PIT-106.General_Fault, AllInhibits_OR.IN4
+StartupDelayNot_NOT.OUT, AllInhibits_OR.IN5
+AllInhibits_OR.OUT, PIC-105.Inhibit
+AllInhibits_OR.OUT, V-010.Inhibit
+PIT-106.PV, PIT106_PressurePV
+PIC-105.XOUT, PIC105_MV_Output
+
+* Parameter Data Connections *
+PIT-106, PIT-106.Name
+9.5, PIT-106.PV_High
+0.5, PIT-106.PV_Low
+0.625, PIT-106.Scaling_Slope
+-2.5, PIT-106.Scaling_Offset
+TRUE, PIT-106.Alarm_Enable
+PIC-105, PIC-105.Name
+TRUE, PIC-105.AUTO
+8.5, PIC-105.SP
+0, PIC-105.MV_MIN
+100, PIC-105.MV_MAX
+3.0, PIC-105.KP
+1.2, PIC-105.TR
+0.3, PIC-105.TD
+10.0, PIC-105.PV_High
+0.5, PIC-105.PV_Low
+V-010, V-010.Name
+FALSE, V-010.Manual_Mode
+0, V-010.Manual_Position
+100, V-010.Open_Limit
+0, V-010.Close_Limit
+T#10s, V-010.Timeout
+COMPRESSOR_RUN_PERMISSIVE, COMPRESSOR_RUN_PERMISSIVE.Name
+FALSE, COMPRESSOR_RUN_PERMISSIVE.Alarm_OnTrue
+FALSE, COMPRESSOR_RUN_PERMISSIVE.Alarm_OnFalse
+FALSE, COMPRESSOR_RUN_PERMISSIVE.Latch_Enable
+FALSE, COMPRESSOR_RUN_PERMISSIVE.Reset_Latch
+T#7s, StartupDelay_TON.PT
+

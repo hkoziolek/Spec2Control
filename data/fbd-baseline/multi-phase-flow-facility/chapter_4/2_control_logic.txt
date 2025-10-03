@@ -1,0 +1,58 @@
+* Function Blocks *
+PID_BASIC FIC-302
+VALVE_ELECTRIC FV-101
+ANALOG_IN LI-201
+DIGITAL_IN XV-010-OPEN_FB
+DIGITAL_IN XV-011-OPEN_FB
+
+* Variables *
+REAL LI201_Raw_mA
+BOOL XV010_OpenSw_Raw
+BOOL XV011_OpenSw_Raw
+REAL LI201_Level_PV_Pct
+REAL FIC302_MV_To_FV101_Pct
+REAL FV101_Feedback_Position_Pct
+
+* Functions *
+AND FlowPathOpen_AND
+NOT NotFlowPathOpen_NOT
+OR FV101ManualMode_OR
+NOT LIFaultInvert_NOT
+AND LoopAutoPermissive_AND
+
+* Data Connections * 
+LI201_Raw_mA, LI-201.Raw_Signal
+XV010_OpenSw_Raw, XV-010-OPEN_FB.DI_Raw
+XV011_OpenSw_Raw, XV-011-OPEN_FB.DI_Raw
+LI-201.PV, FIC-302.PV
+FIC-302.XOUT, FV-101.Control_Signal
+XV-010-OPEN_FB.DI_Out, FlowPathOpen_AND.IN1
+XV-011-OPEN_FB.DI_Out, FlowPathOpen_AND.IN2
+FlowPathOpen_AND.OUT, NotFlowPathOpen_NOT.IN
+NotFlowPathOpen_NOT.OUT, FV101ManualMode_OR.IN1
+FIC-302.PV_High_Alarm, FV101ManualMode_OR.IN2
+FV101ManualMode_OR.OUT, FV-101.Manual_Mode
+LI-201.General_Fault, LIFaultInvert_NOT.IN
+LIFaultInvert_NOT.OUT, LoopAutoPermissive_AND.IN1
+FlowPathOpen_AND.OUT, LoopAutoPermissive_AND.IN2
+LoopAutoPermissive_AND.OUT, FIC-302.AUTO
+LI-201.PV, LI201_Level_PV_Pct
+FIC-302.XOUT, FIC302_MV_To_FV101_Pct
+FV-101.Feedback_Pos, FV101_Feedback_Position_Pct
+
+* Parameter Data Connections *
+80.0, LI-201.PV_High
+20.0, LI-201.PV_Low
+6.25, LI-201.Scaling_Slope
+-25.0, LI-201.Scaling_Offset
+70.0, FIC-302.SP
+0.0, FIC-302.MV_MIN
+100.0, FIC-302.MV_MAX
+25.0, FIC-302.X0
+1.8, FIC-302.KP
+2.0, FIC-302.TR
+0.3, FIC-302.TD
+100.0, FV-101.Open_Limit
+0.0, FV-101.Close_Limit
+0.0, FV-101.Manual_Position
+

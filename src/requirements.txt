@@ -1,0 +1,9 @@
+fastapi==0.115.12
+openai==1.86.0
+pydantic==2.11.7
+python-dotenv==1.1.0
+pythonnet>=3.0.0
+PyMuPDF>=1.26.3
+pymupdf4llm>=0.0.26
+typing-extensions == 4.14.1
+xsdata == 25.7

@@ -1,0 +1,36 @@
+## 3 **Column 1 and Reboiler**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-004 | Flow Controller | Controls flow rate in the process line |
+|LIC-106 | Level Controller | Maintains liquid level in Column 1 |
+|LT-105 | Level Transmitter | Measures liquid level in Column 1 |
+|LV-104 | Level Valve | Regulates liquid outflow from Column 1 |
+|TIC-101 | Temperature Controller| Controls temperature in Column 1 |
+|TIT-103 | Temperature Transmitter| Measures temperature in Column 1 |
+|XV-102 | On-Off Valve | Controls steam flow to the reboiler |
+
+### 3.1) Control Strategy Description
+
+The temperature control of Column 1 is managed by TIC-101, which receives a process variable (PV) from TIT-103. The setpoint (SP) for TIC-101 is configured at 180°C to maintain optimal separation conditions. TIC-101 operates in reverse-acting mode, where an increase in PV results in a decrease in the manipulated variable (MV) to control the steam flow to the reboiler.
+
+The PID tuning parameters for TIC-101 are defined as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.1 minutes. The controller output (MV) ranges from 0% to 100%, corresponding to a 4-20mA signal to the final control element, XV-102. The temperature transmitter, TIT-103, has a measurement span of 0°C to 250°C and outputs a 4-20mA signal to TIC-101.
+
+The liquid level in Column 1 is controlled by LIC-106, which receives the PV from LT-105. The SP is set at 50% of the column height to ensure steady operation. LIC-106 operates in direct-acting mode, where an increase in PV results in an increase in MV to LV-104. The PID tuning parameters for LIC-106 are: Kp = 2.5, Ki = 0.9 minutes, and Kd = 0.0 minutes. The level transmitter, LT-105, has a range of 0% to 100% and outputs a 4-20mA signal.
+
+Both TIC-101 and LIC-106 include bumpless transfer logic to ensure smooth transitions between manual and automatic modes. The SP for TIC-101 is clamped between 170°C and 190°C, while the SP for LIC-106 is clamped between 40% and 60% to maintain process stability. Anti-windup protection is implemented in both controllers to prevent integral term saturation.
+
+### 3.2) Interlocks and Permissives
+
+The operation of TIC-101 is interlocked with the status of XV-102. If XV-102 fails to respond within 5 seconds of a control signal, TIC-101 will automatically switch to manual mode, and an operator alarm will be generated. Additionally, TIC-101 will not activate unless the feed flow to Column 1, as monitored by FC-4, is above 10% of its design capacity.
+
+LIC-106 is interlocked with LV-104 such that if LV-104 fails in the closed position (fail-closed configuration), LIC-106 will hold its output at 0% to prevent overfilling of Column 1. A permissive is configured to ensure that LIC-106 cannot operate unless the reboiler steam flow, controlled by TIC-101, is active.
+
+A 21-second delay is implemented in the control logic of TIC-101 to prevent false activation during transient conditions, such as startup or feed composition changes. Similarly, LIC-106 includes a 15-second delay to avoid oscillations caused by rapid level fluctuations.
+
+### 3.3) Alarm and Fault Handling
+
+High-temperature and low-temperature alarms for Column 1 are configured at 200°C and 160°C, respectively, based on the PV from TIT-103. If the high-temperature alarm is triggered, TIC-101 will immediately reduce its output to 0%, closing XV-102 to cut off steam flow. Conversely, a low-temperature alarm will generate an operator notification but will not alter the controller output.
+
+For LIC-106, high-level and low-level alarms are set at 80% and 20% of the column height, respectively, based on the PV from LT-105. A high-level alarm will immediately close LV-104 to prevent overflow, while a low-level alarm will generate an operator notification without altering the controller output.
+
+In the event of a transmitter fault in TIT-103 or LT-105, the respective controllers (TIC-101 or LIC-106) will freeze their outputs at the last valid value and generate a fault alarm. Manual intervention will be required to restore normal operation.

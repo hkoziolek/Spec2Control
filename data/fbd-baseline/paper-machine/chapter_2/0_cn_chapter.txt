@@ -1,0 +1,33 @@
+## 2 **Wood Handling and Chipping**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FC-101 | Flow Controller | Maintains flow rate of debarked logs through chipper at setpoint of 250 m³/h |
+|FV-106 | Flow Valve | Controls flow downstream of the chipper, fail-closed for overfeeding prevention |
+|LT-101 | Level Transmitter | Measures flow rate of logs, transmitting 4–20 mA signal for 0–400 m³/h range |
+|LV-103 | Level Valve | Regulates level in associated process system |
+|M-102 | Motor | Drives conveyor to control log flow speed (0–3 m/s) |
+|XV-102 | On-Off Valve | Isolation valve for process control or safety |
+|XV-104 | On-Off Valve | Isolation valve for process control or safety |
+|XV-105 | On-Off Valve | Isolation valve for process control or safety |
+
+### 2.1) Control Strategy Description
+
+The primary control objective for the wood handling and chipping section is to maintain the flow rate of debarked logs through the knife-ring chipper at a target setpoint of 250 m³/h, ensuring consistent chip length within the range of 12–25 mm. Flow measurement is provided by LT-101, which transmits a 4–20 mA signal corresponding to a flow range of 0–400 m³/h. The PID controller FC-101 is configured as reverse-acting to decrease motor speed on M-102 when the flow exceeds the setpoint.
+
+The PID tuning parameters for FC-101 are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.3 minutes. The controller output (MV) drives the speed reference of motor M-102, scaled between 0–100% corresponding to conveyor speed limits of 0–3 m/s. Anti-windup logic is implemented to prevent integral accumulation when the output is clamped at its limits. Bumpless transfer is enabled to ensure smooth transitions between manual and automatic modes.
+
+The final control element is FV-106, a flow control valve positioned downstream of the chipper. FV-106 is configured as fail-closed to prevent overfeeding in the event of a fault. The valve response time is designed to achieve a settling time of less than 5 seconds for flow rate disturbances. A deadband of 2% is applied to the setpoint to minimize hunting behavior near the target flow rate.
+
+### 2.2) Interlocks and Permissives
+
+The operation of FC-101 is interlocked with the status of XV-102 and XV-104. Both shut-off valves must be confirmed open before the PID loop is enabled. LT-101 must provide a valid signal within its calibrated range (0–400 m³/h) for FC-101 to execute control. If LT-101 signal falls below 4 mA or exceeds 20 mA, the PID loop will be disabled, and M-102 will be stopped.
+
+Permissive logic ensures that M-102 cannot start unless LV-103 indicates a chip level above 20% in the chipper feed hopper. Additionally, XV-105 must be closed to isolate downstream equipment during startup or maintenance. The control system clamps the setpoint for FC-101 to a safe operating range of 50–350 m³/h to prevent excessive feed rates that could damage the chipper.
+
+### 2.3) Alarm and Fault Handling
+
+An alarm is triggered if the process variable (PV) from LT-101 deviates by more than ±10% from the setpoint for longer than 30 seconds. High-priority alarms include "Flow High" and "Flow Low," which are activated if LT-101 exceeds 380 m³/h or drops below 20 m³/h, respectively.
+
+In the event of a fault in LT-101, such as signal loss or out-of-range values, FC-101 will enter manual mode, and M-102 will be stopped. FV-106 will be commanded to its fail-closed position to prevent unregulated flow. A "PID Fault" alarm will indicate controller malfunction, prompting operator intervention.
+
+For motor faults on M-102, the control system will shut down the PID loop and close XV-102 and XV-104 to isolate the chipper. Restart timers are implemented to delay reactivation of M-102 for 60 seconds after fault clearance to protect the motor and downstream equipment.

@@ -1,0 +1,23 @@
+## 3 **Flow Equalization**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIT-102 | Flow Transmitter | Measures flow rate in the pipeline for monitoring and control purposes |
+|LIC-101 | Level Controller | Regulates tank level using PID control to maintain operator-defined setpoint |
+|LS-201 | Level Switch | Detects tank level for interlock and permissive functions |
+|LV-103 | Level Valve | Controls tank inlet flow to maintain desired level |
+|LV-104 | Level Valve | Regulates outlet flow from the tank for downstream processes |
+|MX-201 | Mixer | Ensures homogeneity in the tank by continuous mixing at fixed speed |
+|P-201A | Pump | Lead pump for transferring fluid from the equalization tank |
+|P-201B | Pump | Backup pump for transferring fluid from the equalization tank |
+
+### 3.1) Control Strategy Description
+
+The Flow Equalization system utilizes LIC-101 to maintain the level in the equalization tank by modulating the operation of P-201A/B and MX-201. LIC-101 employs a single-loop PID control algorithm to regulate the tank level (PV) to the operator-defined setpoint (SP). The setpoint for LIC-101 is adjustable between 12% and 87% of tank level, corresponding to a range of 1.2 meters to 8.7 meters, with the transmitter LS-201 providing a 4-20mA signal scaled to this range. LIC-101 is configured for reverse-acting control, ensuring pump speed decreases as the tank level approaches the setpoint. The PID tuning parameters are set as follows: Kp = 3.0, Ki = 0.5 min, and Kd = 0.1 min. The controller output (MV) modulates the speed of P-201A/B between 20% and 100% of their rated capacity, ensuring consistent downstream flow. Anti-windup logic is implemented to limit integral accumulation when the pumps are at their minimum or maximum speed. Bumpless transfer is enabled for smooth transitions between manual and automatic operation. MX-201 is operated continuously to maintain homogeneity in the tank, with the mixer speed fixed at 75% capacity.
+
+### 3.2) Interlocks and Permissives
+
+P-201A/B operation is interlocked with LS-201 to prevent dry running. If LS-201 detects a tank level below 10% (1.0 meters), LIC-101 disables pump operation and generates a permissive fault signal. MX-201 is interlocked with LS-201 to ensure mixing is disabled if the tank level falls below 5% (0.5 meters). Additionally, pump operation is interlocked with downstream flow permissives from FIT-102 to ensure that flow does not exceed 95% of the downstream process capacity. The pumps are configured with automatic switchover logic, ensuring that P-201A operates as the primary pump, with P-201B starting automatically if P-201A fails or if demand exceeds the capacity of a single pump. LV-103 and LV-104 are interlocked with LIC-101 to ensure that any level deviations exceeding 90% (9.0 meters) trigger an emergency drain sequence.
+
+### 3.3) Alarm and Fault Handling
+
+LIC-101 generates high-level and low-level alarms based on LS-201 measurements. A high-level alarm is triggered at 90% (9.0 meters), while a low-level alarm is triggered at 5% (0.5 meters). If LS-201 fails or provides an invalid signal, LIC-101 enters a fault state, disabling P-201A/B and MX-201 operation, and activating LV-103 to drain the tank to a safe level of 50% (5.0 meters). Fault conditions are latched until manually reset by the operator. FIT-102 is monitored for flow deviation alarms, with high-flow alarms triggered at 95% of capacity and low-flow alarms triggered at 5% of capacity. Alarm conditions are displayed on the SCADA system, with audible and visual indicators provided to alert operators.

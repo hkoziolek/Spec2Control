@@ -1,0 +1,105 @@
+* Function Blocks *
+ANALOG_IN AL-801
+ANALOG_IN AL-802
+ANALOG_IN AL-803
+ANALOG_IN AL-804
+ANALOG_IN FT-801
+ANALOG_IN FT-802
+ANALOG_IN PT-801
+RATIO_CONTROL FFIC-801
+PID_BASIC FIC-802
+VALVE_ELECTRIC FV-802
+TON HighRatio_TON
+
+* Variables *
+REAL FIC802_AirFlow_SP_FromRatio
+REAL FFIC801_ActiveAirToGasRatio
+REAL FT801_BFG_Flow_PV
+REAL FT802_Air_Flow_PV
+REAL PT801_BFG_Pressure_PV
+REAL AL801_HighRatio_SP
+REAL AL802_LowRatio_SP
+BOOL AL801_HighRatio_Alarm
+BOOL AL802_LowRatio_Alarm
+BOOL AL803_FT801_Fault_Alarm
+BOOL AL804_PT801_Fault_Alarm
+
+* Functions *
+OR PT801_OutOfRange_OR
+OR RatioInhibitCombine_OR
+OR RatioInhibitFinal_OR
+OR FIC802_Manual_OR
+OR FIC802_Manual2_OR
+GT HighRatio_GT
+LT LowRatio_LT
+
+* Data Connections *
+FT-801.PV, FFIC-801.PrimaryPV
+FT-802.PV, FFIC-801.SecondaryPV
+FFIC-801.SlaveSP, FIC-802.SP
+FT-802.PV, FIC-802.PV
+FIC-802.XOUT, FV-802.Control_Signal
+PT-801.High_Alarm, PT801_OutOfRange_OR.IN1
+PT-801.Low_Alarm, PT801_OutOfRange_OR.IN2
+PT801_OutOfRange_OR.OUT, FV-802.Inhibit
+FIC802_Manual2_OR.OUT, RatioInhibitCombine_OR.IN1
+FT-802.High_Alarm, RatioInhibitCombine_OR.IN2
+RatioInhibitCombine_OR.OUT, RatioInhibitFinal_OR.IN1
+PT801_OutOfRange_OR.OUT, RatioInhibitFinal_OR.IN2
+RatioInhibitFinal_OR.OUT, FFIC-801.Inhibit
+FT-801.Low_Alarm, FIC802_Manual_OR.IN1
+FT-801.General_Fault, FIC802_Manual_OR.IN2
+FIC802_Manual_OR.OUT, FIC802_Manual2_OR.IN1
+PT-801.General_Fault, FIC802_Manual2_OR.IN2
+FIC802_Manual2_OR.OUT, FIC-802.Inhibit
+FFIC-801.ActiveRatio, HighRatio_GT.IN1
+AL801_HighRatio_SP, HighRatio_GT.IN2
+HighRatio_GT.OUT, HighRatio_TON.IN
+HighRatio_TON.Q, AL801_HighRatio_Alarm
+FFIC-801.ActiveRatio, LowRatio_LT.IN1
+AL802_LowRatio_SP, LowRatio_LT.IN2
+LowRatio_LT.OUT, AL802_LowRatio_Alarm
+FFIC-801.SlaveSP, FIC802_AirFlow_SP_FromRatio
+FFIC-801.ActiveRatio, FFIC801_ActiveAirToGasRatio
+FT-801.PV, FT801_BFG_Flow_PV
+FT-802.PV, FT802_Air_Flow_PV
+PT-801.PV, PT801_BFG_Pressure_PV
+FT-801.General_Fault, AL803_FT801_Fault_Alarm
+PT-801.General_Fault, AL804_PT801_Fault_Alarm
+
+* Parameter Data Connections *
+6.25, FT-801.Scaling_Slope
+-25.0, FT-801.Scaling_Offset
+100.0, FT-801.PV_Low
+5000.0, FT-801.PV_High
+6.25, FT-802.Scaling_Slope
+-25.0, FT-802.Scaling_Offset
+0.0, FT-802.PV_Low
+6000.0, FT-802.PV_High
+6.25, PT-801.Scaling_Slope
+-25.0, PT-801.Scaling_Offset
+0.5, PT-801.PV_Low
+2.0, PT-801.PV_High
+TRUE, FT-801.Alarm_Enable
+TRUE, FT-802.Alarm_Enable
+TRUE, PT-801.Alarm_Enable
+TRUE, AL-801.Alarm_Enable
+TRUE, AL-802.Alarm_Enable
+2.5, FFIC-801.RatioSP
+0.0, FFIC-801.MV_MIN
+6000.0, FFIC-801.MV_MAX
+0.0, FFIC-801.Bias
+0.0, FFIC-801.TrimKp
+T#0s, FFIC-801.TrimTi
+TRUE, FFIC-801.Auto
+TRUE, FIC-802.AUTO
+0.0, FIC-802.MV_MIN
+100.0, FIC-802.MV_MAX
+0.0, FIC-802.PV_Low
+6000.0, FIC-802.PV_High
+50.0, FIC-802.X0
+50.0, FV-802.Manual_Position
+3.0, AL801_HighRatio_SP
+2.0, AL802_LowRatio_SP
+T#5s, HighRatio_TON.PT
+

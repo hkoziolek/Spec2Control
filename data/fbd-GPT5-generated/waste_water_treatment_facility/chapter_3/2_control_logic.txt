@@ -1,0 +1,96 @@
+* Function Blocks *
+ANALOG_IN FIT-102
+ANALOG_IN LS-201
+PID_BASIC LIC-101
+VALVE_ELECTRIC LV-103
+VALVE_ELECTRIC LV-104
+MOTOR_VSD P-201A
+MOTOR_VSD P-201B
+MOTOR_VSD MX-201
+
+* Variables *
+REAL FIT_102_Flow_PV
+REAL LS_201_Level_PV_m
+REAL LIC_101_PumpSpeed_MV_Percent
+REAL P_201A_Speed_CMD_Percent
+REAL P_201B_Speed_CMD_Percent
+REAL MX_201_Speed_CMD_Percent
+REAL LV_103_Position_CMD_Percent
+REAL LV_104_Position_CMD_Percent
+
+* Functions *
+OR PumpInhibit_OR
+OR MixerInhibit_OR
+NOT LV104Permissive_NOT
+
+* Data Connections * 
+LS-201.PV, LIC-101.PV
+LIC-101.XOUT, P-201A.Speed_SP
+LIC-101.XOUT, P-201B.Speed_SP
+LS-201.Low_Alarm, PumpInhibit_OR.IN1
+LS-201.General_Fault, PumpInhibit_OR.IN2
+FIT-102.High_Alarm, PumpInhibit_OR.IN3
+PumpInhibit_OR.OUT, P-201A.Inhibit
+PumpInhibit_OR.OUT, P-201B.Inhibit
+LIC-101.PV_Low_Alarm, MixerInhibit_OR.IN1
+LS-201.General_Fault, MixerInhibit_OR.IN2
+MixerInhibit_OR.OUT, MX-201.Inhibit
+LIC-101.PV_High_Alarm, LV-103.Inhibit
+LIC-101.PV_High_Alarm, LV104Permissive_NOT.IN
+LV104Permissive_NOT.OUT, LV-104.Inhibit
+LS-201.General_Fault, LIC-101.Inhibit
+FIT-102.PV, FIT_102_Flow_PV
+LS-201.PV, LS_201_Level_PV_m
+LIC-101.XOUT, LIC_101_PumpSpeed_MV_Percent
+P-201A.Speed_Out, P_201A_Speed_CMD_Percent
+P-201B.Speed_Out, P_201B_Speed_CMD_Percent
+MX-201.Speed_Out, MX_201_Speed_CMD_Percent
+LV-103.Valve_Position, LV_103_Position_CMD_Percent
+LV-104.Valve_Position, LV_104_Position_CMD_Percent
+
+* Parameter Data Connections *
+0.46875, LS-201.Scaling_Slope
+-0.675, LS-201.Scaling_Offset
+9.0, LS-201.PV_High
+1.0, LS-201.PV_Low
+TRUE, LS-201.Alarm_Enable
+6.25, FIT-102.Scaling_Slope
+-25.0, FIT-102.Scaling_Offset
+95.0, FIT-102.PV_High
+5.0, FIT-102.PV_Low
+TRUE, FIT-102.Alarm_Enable
+TRUE, LIC-101.AUTO
+5.0, LIC-101.SP
+20.0, LIC-101.MV_MIN
+100.0, LIC-101.MV_MAX
+20.0, LIC-101.X0
+3.0, LIC-101.KP
+0.5, LIC-101.TR
+0.1, LIC-101.TD
+9.0, LIC-101.PV_High
+0.5, LIC-101.PV_Low
+0.5, LIC-101.Deviation_Limit
+TRUE, P-201A.Start_Cmd
+FALSE, P-201A.Stop_Cmd
+T#5S, P-201A.Accel_Ramp
+T#5S, P-201A.Decel_Ramp
+TRUE, P-201B.Start_Cmd
+FALSE, P-201B.Stop_Cmd
+T#5S, P-201B.Accel_Ramp
+T#5S, P-201B.Decel_Ramp
+TRUE, MX-201.Start_Cmd
+FALSE, MX-201.Stop_Cmd
+75.0, MX-201.Speed_SP
+T#2S, MX-201.Accel_Ramp
+T#2S, MX-201.Decel_Ramp
+TRUE, LV-103.Manual_Mode
+0.0, LV-103.Manual_Position
+100.0, LV-103.Open_Limit
+0.0, LV-103.Close_Limit
+T#10S, LV-103.Timeout
+TRUE, LV-104.Manual_Mode
+0.0, LV-104.Manual_Position
+100.0, LV-104.Open_Limit
+0.0, LV-104.Close_Limit
+T#10S, LV-104.Timeout
+

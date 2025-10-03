@@ -1,0 +1,94 @@
+* Function Blocks *
+ANALOG_IN FT-601A
+ANALOG_IN FT-601B
+ANALOG_IN LIT-601
+ANALOG_IN LT-601
+BOOL_IN HS-601
+RATIO_CONTROL FFIC-601
+PID_BASIC FIC-601B
+VALVE_ELECTRIC FV-601B
+MOTOR_ON_OFF C-601
+
+* Variables *
+REAL FT601A_Raw_mA
+REAL FT601B_Raw_mA
+REAL LIT601_Raw_mA
+REAL LT601_Raw_mA
+BOOL HS601_HandSwitch_IN
+REAL FT601A_LNG_Flow_PV
+REAL FT601B_BOG_Flow_PV
+REAL FT601B_BOG_Flow_SP
+REAL LIT601_TankLevel_PV
+REAL LT601_TankLevel_PV
+
+* Functions *
+OR RatioControlInhibit
+OR CompressorInhibit
+
+* Data Connections * 
+FT601A_Raw_mA, FT-601A.Raw_Signal
+FT601B_Raw_mA, FT-601B.Raw_Signal
+LIT601_Raw_mA, LIT-601.Raw_Signal
+LT601_Raw_mA, LT-601.Raw_Signal
+HS601_HandSwitch_IN, HS-601.Bool_In
+FT-601A.PV, FFIC-601.PrimaryPV
+FT-601B.PV, FFIC-601.SecondaryPV
+FFIC-601.SlaveSP, FIC-601B.SP
+FT-601B.PV, FIC-601B.PV
+FIC-601B.XOUT, FV-601B.Control_Signal
+HS-601.Alarm_Active, RatioControlInhibit.IN1
+LIT-601.High_Alarm, RatioControlInhibit.IN2
+FT-601A.Low_Alarm, RatioControlInhibit.IN3
+FT-601A.General_Fault, RatioControlInhibit.IN4
+FT-601B.General_Fault, RatioControlInhibit.IN5
+FIC-601B.Deviation_Alarm, RatioControlInhibit.IN6
+RatioControlInhibit.OUT, FFIC-601.Inhibit
+LIT-601.High_Alarm, FIC-601B.Inhibit
+LIT-601.High_Alarm, FV-601B.Inhibit
+LIT-601.Low_Alarm, CompressorInhibit.IN1
+FV-601B.Alarm, CompressorInhibit.IN2
+FT-601A.General_Fault, CompressorInhibit.IN3
+FV-601B.Position_Error, CompressorInhibit.IN4
+CompressorInhibit.OUT, C-601.Inhibit
+FT-601A.PV, FT601A_LNG_Flow_PV
+FT-601B.PV, FT601B_BOG_Flow_PV
+FFIC-601.SlaveSP, FT601B_BOG_Flow_SP
+LIT-601.PV, LIT601_TankLevel_PV
+LT-601.PV, LT601_TankLevel_PV
+
+* Parameter Data Connections *
+312.5, FT-601A.Scaling_Slope
+-1250, FT-601A.Scaling_Offset
+4500, FT-601A.PV_High
+100, FT-601A.PV_Low
+TRUE, FT-601A.Alarm_Enable
+62.5, FT-601B.Scaling_Slope
+-250, FT-601B.Scaling_Offset
+900, FT-601B.PV_High
+50, FT-601B.PV_Low
+TRUE, FT-601B.Alarm_Enable
+6.25, LIT-601.Scaling_Slope
+-25, LIT-601.Scaling_Offset
+TRUE, LIT-601.Alarm_Enable
+6.25, LT-601.Scaling_Slope
+-25, LT-601.Scaling_Offset
+TRUE, HS-601.Alarm_OnTrue
+TRUE, FFIC-601.Auto
+0.2, FFIC-601.RatioSP
+0.0, FFIC-601.Bias
+0.0, FFIC-601.TrimKp
+T#0s, FFIC-601.TrimTi
+0.0, FFIC-601.MV_MIN
+1000.0, FFIC-601.MV_MAX
+0.0, FFIC-601.ManOut
+TRUE, FIC-601B.AUTO
+0.0, FIC-601B.MV_MIN
+100.0, FIC-601B.MV_MAX
+0.0, FIC-601B.X0
+100, FIC-601B.Deviation_Limit
+FALSE, FV-601B.Manual_Mode
+0.0, FV-601B.Manual_Position
+100.0, FV-601B.Open_Limit
+0.0, FV-601B.Close_Limit
+T#5s, FV-601B.Timeout
+

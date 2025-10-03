@@ -1,0 +1,70 @@
+* Function Blocks *
+ANALOG_IN FT-301
+ANALOG_IN FT-302
+ANALOG_IN LS-301
+ANALOG_IN PS-301
+DIGITAL_IN SS-301
+VALVE_ELECTRIC FV-102
+RATIO_CONTROL FFIC-303
+PID_BASIC FIC-302
+
+* Variables *
+REAL FT301_InfluentFlow_PV
+REAL FT302_SludgeFlow_PV
+REAL LS301_WeirLevel_PV
+REAL PS301_SludgePressure_PV
+REAL FT302_SludgeFlow_SP
+
+* Functions *
+GT FlowAboveCutoff_GT
+OR MasterInhibit_OR
+
+* Data Connections * 
+FT-301.PV, FFIC-303.PrimaryPV
+FT-302.PV, FFIC-303.SecondaryPV
+FFIC-303.SlaveSP, FIC-302.SP
+FT-302.PV, FIC-302.PV
+FIC-302.XOUT, FV-102.Control_Signal
+FT-301.PV, FlowAboveCutoff_GT.IN1
+FlowAboveCutoff_GT.OUT, FFIC-303.Auto
+FlowAboveCutoff_GT.OUT, FIC-302.AUTO
+LS-301.High_Alarm, MasterInhibit_OR.IN1
+LS-301.Low_Alarm, MasterInhibit_OR.IN2
+FT-301.High_Alarm, MasterInhibit_OR.IN3
+FT-301.Low_Alarm, MasterInhibit_OR.IN4
+FT-301.General_Fault, MasterInhibit_OR.IN5
+FT-302.High_Alarm, MasterInhibit_OR.IN6
+FT-302.Low_Alarm, MasterInhibit_OR.IN7
+FT-302.General_Fault, MasterInhibit_OR.IN8
+FIC-302.Deviation_Alarm, MasterInhibit_OR.IN9
+FV-102.Position_Error, MasterInhibit_OR.IN10
+FV-102.Alarm, MasterInhibit_OR.IN11
+SS-301.DI_Out, MasterInhibit_OR.IN12
+MasterInhibit_OR.OUT, FFIC-303.Inhibit
+MasterInhibit_OR.OUT, FIC-302.Inhibit
+MasterInhibit_OR.OUT, FV-102.Inhibit
+MasterInhibit_OR.OUT, FV-102.Manual_Mode
+FT-301.PV, FT301_InfluentFlow_PV
+FT-302.PV, FT302_SludgeFlow_PV
+LS-301.PV, LS301_WeirLevel_PV
+PS-301.PV, PS301_SludgePressure_PV
+FFIC-303.SlaveSP, FT302_SludgeFlow_SP
+
+* Parameter Data Connections *
+TRUE, FT-301.Alarm_Enable
+TRUE, FT-302.Alarm_Enable
+5.0, LS-301.PV_High
+2.0, LS-301.PV_Low
+TRUE, LS-301.Alarm_Enable
+0.3, FFIC-303.RatioSP
+0.0, FFIC-303.Bias
+0.0, FFIC-303.TrimKp
+T#0s, FFIC-303.TrimTi
+0.0, FFIC-303.MV_MIN
+200.0, FFIC-303.MV_MAX
+0.0, FIC-302.MV_MIN
+100.0, FIC-302.MV_MAX
+10.0, FIC-302.Deviation_Limit
+50.0, FlowAboveCutoff_GT.IN2
+0.0, FV-102.Manual_Position
+

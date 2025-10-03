@@ -1,0 +1,96 @@
+* Function Blocks *
+ANALOG_IN AC-401
+MOTOR_VSD CD-401
+ANALOG_IN FT-101
+ANALOG_IN LT-401
+ANALOG_IN PH-401
+PID_BASIC PIC-401
+PID_BASIC PIC-402
+ANALOG_IN TS-401
+
+* Variables *
+REAL PH_401_pH_PV
+REAL AC_401_Alkalinity_PV
+REAL FT_101_InfluentFlow_PV
+REAL LT_401_TankLevel_PV
+REAL TS_401_Temperature_PV
+REAL PIC_401_pH_MV_Percent
+REAL PIC_402_Alkalinity_MV_Percent
+
+* Functions *
+GT Compare_PID_Outputs_GT
+SEL Select_Max_MV_SEL
+OR SensorFaults_OR
+OR CD401_Inhibit_OR
+
+* Data Connections * 
+PH-401.PV, PIC-401.PV
+AC-401.PV, PIC-402.PV
+PIC-401.XOUT, Compare_PID_Outputs_GT.IN1
+PIC-402.XOUT, Compare_PID_Outputs_GT.IN2
+Compare_PID_Outputs_GT.OUT, Select_Max_MV_SEL.G
+PIC-402.XOUT, Select_Max_MV_SEL.IN0
+PIC-401.XOUT, Select_Max_MV_SEL.IN1
+Select_Max_MV_SEL.OUT, CD-401.Speed_SP
+PH-401.High_Alarm, CD401_Inhibit_OR.IN1
+PH-401.Low_Alarm, CD401_Inhibit_OR.IN2
+AC-401.High_Alarm, CD401_Inhibit_OR.IN3
+AC-401.Low_Alarm, CD401_Inhibit_OR.IN4
+PH-401.General_Fault, SensorFaults_OR.IN1
+AC-401.General_Fault, SensorFaults_OR.IN2
+FT-101.Low_Alarm, CD401_Inhibit_OR.IN5
+FT-101.General_Fault, CD401_Inhibit_OR.IN6
+LT-401.Low_Alarm, CD401_Inhibit_OR.IN7
+TS-401.Low_Alarm, CD401_Inhibit_OR.IN8
+SensorFaults_OR.OUT, CD401_Inhibit_OR.IN9
+CD401_Inhibit_OR.OUT, CD-401.Inhibit
+SensorFaults_OR.OUT, PIC-401.Inhibit
+SensorFaults_OR.OUT, PIC-402.Inhibit
+PH-401.PV, PH_401_pH_PV
+AC-401.PV, AC_401_Alkalinity_PV
+FT-101.PV, FT_101_InfluentFlow_PV
+LT-401.PV, LT_401_TankLevel_PV
+TS-401.PV, TS_401_Temperature_PV
+PIC-401.XOUT, PIC_401_pH_MV_Percent
+PIC-402.XOUT, PIC_402_Alkalinity_MV_Percent
+
+* Parameter Data Connections *
+8.0, PH-401.PV_High
+6.0, PH-401.PV_Low
+TRUE, PH-401.Alarm_Enable
+0.875, PH-401.Scaling_Slope
+-3.5, PH-401.Scaling_Offset
+300.0, AC-401.PV_High
+50.0, AC-401.PV_Low
+TRUE, AC-401.Alarm_Enable
+31.25, AC-401.Scaling_Slope
+-125.0, AC-401.Scaling_Offset
+50.0, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+20.0, LT-401.PV_Low
+TRUE, LT-401.Alarm_Enable
+6.25, LT-401.Scaling_Slope
+-25.0, LT-401.Scaling_Offset
+10.0, TS-401.PV_Low
+TRUE, TS-401.Alarm_Enable
+7.0, PIC-401.SP
+2.0, PIC-401.KP
+1.0, PIC-401.TR
+0.2, PIC-401.TD
+0.0, PIC-401.MV_MIN
+100.0, PIC-401.MV_MAX
+8.0, PIC-401.PV_High
+6.0, PIC-401.PV_Low
+0.1, PIC-401.Deviation_Limit
+TRUE, PIC-401.AUTO
+150.0, PIC-402.SP
+1.5, PIC-402.KP
+0.8, PIC-402.TR
+0.1, PIC-402.TD
+0.0, PIC-402.MV_MIN
+75.0, PIC-402.MV_MAX
+300.0, PIC-402.PV_High
+50.0, PIC-402.PV_Low
+5.0, PIC-402.Deviation_Limit
+TRUE, PIC-402.AUTO
+

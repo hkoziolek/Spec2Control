@@ -1,0 +1,29 @@
+## 5 ** Basic Oxygen Furnace (BOF) ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|BOF-401 | Furnace | Basic Oxygen Furnace for steelmaking process. |
+|BOF-402 | Lance | Oxygen lance for adjusting flowrate during blowing. |
+|DA-401 | Deviation Alarm | Activates on excessive deviation between temperature sensors. |
+|FA-401 | Flow Alarm | Monitors and alarms abnormal flow conditions. |
+|FT-401 | Flow Transmitter | Measures oxygen flowrate to the lance. |
+|I-401 | Interlock | Prevents lance operation unless permissive conditions are met. |
+|MA-401 | Manual Adjustment | Allows manual bypass of sensors during maintenance. |
+|PT-401A | Pressure Transmitter | Measures system pressure for interlock voting. |
+|PT-401B | Pressure Transmitter | Measures system pressure for interlock voting. |
+|PT-401C | Pressure Transmitter | Measures system pressure for interlock voting. |
+|TT-401 | Temperature Transmitter | Measures furnace temperature during operation. |
+|TT-401A | Temperature Transmitter | Redundant sensor for furnace temperature monitoring. |
+|TT-401B | Temperature Transmitter | Redundant sensor for furnace temperature monitoring. |
+|TT-401C | Temperature Transmitter | Redundant sensor for furnace temperature monitoring. |
+
+### 5.1) Control Strategy Description
+
+The Basic Oxygen Furnace (BOF-401) utilizes redundant temperature transmitters TT-401A, TT-401B, and TT-401C for critical process monitoring during oxygen blowing. A 2oo3 voting configuration is implemented to ensure reliable temperature measurement and control. The system continuously evaluates the process variable (PV) signals from TT-401A, TT-401B, and TT-401C. If two out of three transmitters report a temperature exceeding the setpoint of 1650°C, the voted output signal TT-401-V triggers the oxygen lance (BOF-402) to adjust flowrate via FT-401. The maximum allowable deviation between any two sensors is set at ±5% of the median value. If the deviation exceeds this limit, deviation alarm DA-401 activates. Signal quality checks are performed to detect bad PV conditions, defined as signals below 3.8 mA or above 20.5 mA. In degraded mode operation, if one transmitter fails, the voting logic transitions from 2oo3 to 1oo2, allowing the system to continue operation with reduced redundancy. Manual bypass of any sensor is permitted during maintenance via the HMI, which disables the corresponding input in the voting logic.
+
+### 5.2) Interlocks and Permissives
+
+The oxygen lance (BOF-402) is interlocked with the temperature voting logic to prevent operation unless the voted temperature TT-401-V exceeds 1450°C and all pressure transmitters PT-401A, PT-401B, and PT-401C report values within the range of 90–120 psig using a 2oo3 voting scheme. Flowmeter FT-401 must confirm a minimum oxygen flowrate of 500 Nm³/h as a permissive condition before oxygen blowing can commence. If any transmitter reports a bad PV condition or deviation alarm DA-401 is active, the interlock I-401 inhibits oxygen lance operation. The system also includes a startup permissive requiring all three temperature transmitters TT-401A, TT-401B, and TT-401C to pass signal quality checks before initiating the refining sequence.
+
+### 5.3) Alarm and Fault Handling
+
+Deviation alarm DA-401 is triggered if the temperature readings from TT-401A, TT-401B, or TT-401C differ by more than ±5% from the median value. If a transmitter fails and reports a bad PV condition (signal <3.8 mA or >20.5 mA), fault alarm FA-401 activates, and the failed transmitter is automatically bypassed in the voting logic. In degraded mode, the system transitions to 1oo2 voting, allowing continued operation with reduced redundancy. If two transmitters fail, the system enters a fault state, and the oxygen lance (BOF-402) is shut down. All alarms are aggregated in the HMI for operator acknowledgment. Maintenance override is available to manually bypass any transmitter, but this action requires confirmation of permissive conditions and acknowledgment of a maintenance mode alarm MA-401.

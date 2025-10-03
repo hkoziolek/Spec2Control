@@ -1,0 +1,40 @@
+## 2 **Seawater and Reservoir Intake Pipelines**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|AT-101 | Analyzer Transmitter | Measures specific process parameters for seawater pipeline analysis |
+|AT-103 | Analyzer Transmitter | Monitors reservoir pipeline quality parameters |
+|FC-101 | Flow Controller | Regulates seawater pipeline flow using PID control logic |
+|FC-102 | Flow Controller | Controls reservoir pipeline flow via PID algorithm |
+|FT-101 | Flow Transmitter | Measures flow rate in the seawater pipeline (0-5000 m³/h) |
+|FT-102 | Flow Transmitter | Monitors flow rate in the reservoir pipeline (0-3000 m³/h) |
+|FV-101 | Flow Valve | Adjusts seawater pipeline flow; pneumatically actuated, fail-closed |
+|FV-102 | Flow Valve | Modulates reservoir pipeline flow; pneumatically actuated, fail-closed |
+|LT-104 | Level Transmitter | Measures liquid level in associated reservoir or tank |
+|LT-105 | Level Transmitter | Monitors liquid level for process control or safety |
+|XV-102 | On-Off Valve | Provides isolation for reservoir pipeline during maintenance or emergencies |
+
+### 2.1) Control Strategy Description
+
+The control logic for the seawater and reservoir intake pipelines utilizes a PID control algorithm to regulate the flow rate of water through the respective pipelines. The process variable (PV) is the flow rate measured by the flow transmitter FT-101 for the seawater pipeline and FT-102 for the reservoir pipeline. The operator-defined setpoint (SP) for flow is clamped between 16% and 75% of the transmitter range to maintain safe operating conditions. The manipulated variable (MV) is the position of the flow control valves FV-101 and FV-102, which are pneumatically actuated and fail-closed upon loss of control signal.
+
+For the seawater pipeline, the PID controller (FC-101) is configured as reverse-acting to ensure that an increase in flow setpoint results in an increase in the valve opening. The tuning parameters for FC-101 are set as follows: proportional gain (Kp) = 2.5, integral time (Ki) = 0.8 minutes, and derivative time (Kd) = 0.2 minutes. The controller output is limited to a range of 0% to 100% to prevent overdriving the actuator. The transmitter FT-101 has a calibrated range of 0 to 5000 m³/h and provides a 4-20 mA signal to the controller.
+
+For the reservoir pipeline, the PID controller (FC-102) operates with identical tuning parameters: Kp = 2.5, Ki = 0.8 minutes, and Kd = 0.2 minutes. The transmitter FT-102 has a calibrated range of 0 to 3000 m³/h and also provides a 4-20 mA signal. The control output adjusts the position of FV-102, which is similarly pneumatically actuated and fails closed.
+
+Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes. In manual mode, the operator can directly adjust the valve position, while in automatic mode, the PID controller maintains the flow rate at the setpoint. Anti-windup protection is enabled by clamping the integral term to prevent excessive accumulation during output saturation.
+
+### 2.2) Interlocks and Permissives
+
+The operation of the flow control valves FV-101 and FV-102 is subject to several interlocks and permissives to ensure safe and reliable operation. The valves will not open unless the corresponding pipeline shut-off valve (XV-102) is confirmed to be in the fully open position, as indicated by the limit switch feedback. Additionally, the associated analyzer transmitters AT-101 and AT-103 continuously monitor water quality parameters. If contamination is detected beyond the predefined threshold (e.g., turbidity > 50 NTU or salinity > 35 PSU), the control system will initiate a safe shutdown sequence by closing FV-101 and FV-102.
+
+A low-level permissive is implemented to prevent pump cavitation. If the water level in the intake sump, as measured by LT-104, falls below 2.0 meters, the valves FV-101 and FV-102 are forced closed, and an alarm is generated. Similarly, a high-level permissive ensures that the valves do not open if the downstream storage tank level, monitored by LT-105, exceeds 95% of its capacity.
+
+### 2.3) Alarm and Fault Handling
+
+The control system is equipped with comprehensive alarm and fault-handling mechanisms to address abnormal conditions. High and low flow rate alarms are generated if the flow rate deviates beyond ±10% of the setpoint for more than 30 seconds. The high flow alarm is triggered at 5500 m³/h for FT-101 and 3300 m³/h for FT-102, while the low flow alarm is triggered at 450 m³/h for FT-101 and 270 m³/h for FT-102.
+
+In the event of a transmitter fault, such as a loss of signal from FT-101 or FT-102 (signal < 3.6 mA or > 21 mA), the corresponding PID controller will enter a fail-safe mode, driving the control valve (FV-101 or FV-102) to its fail-closed position. An alarm indicating "Flow Transmitter Fault" will be displayed on the HMI.
+
+If the analyzer transmitters AT-101 or AT-103 detect contamination, the system will trigger a "Water Quality Alarm" and execute a safe shutdown by closing the shut-off valve XV-102 and the flow control valve. The operator must acknowledge the alarm and manually reset the system after the contamination is resolved.
+
+All alarms are logged with a timestamp and priority level. Critical alarms, such as "Contamination Detected" or "Low Sump Level," are classified as high-priority and require immediate operator intervention.

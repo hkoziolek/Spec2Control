@@ -1,0 +1,73 @@
+      <pou name="VALVE_ON_OFF" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Open_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Close_Cmd">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Timeout">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="FB_Opened">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="FB_Closed">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Valve_Open_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Valve_Close_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_Position_Error">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Alarm_General">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

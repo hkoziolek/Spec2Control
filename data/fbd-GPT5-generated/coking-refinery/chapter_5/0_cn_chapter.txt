@@ -1,0 +1,38 @@
+## 5 **Delayed Coking Unit**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FT-401A | Flow Transmitter | Measures flow rate of process fluid. |
+|FV-401 | Flow Valve | Modulates fuel gas flow to furnace burners. |
+|P-401A | Pump | Primary pump for fluid circulation. |
+|P-401B | Pump | Backup pump for fluid circulation. |
+|PC-401 | Pressure Controller | Maintains pressure setpoint in the system. |
+|PT-402 | Pressure Transmitter | Measures pressure in the process line. |
+|PT-403 | Pressure Transmitter | Monitors pressure downstream of equipment. |
+|TC-401 | Temperature Controller | Regulates furnace outlet temperature. |
+|TIT-101 | Temperature Transmitter | Measures furnace outlet temperature. |
+
+### 5.1) Control Strategy Description
+
+The primary control objective for the delayed coking unit is to maintain the furnace outlet temperature at a precise setpoint to ensure optimal thermal cracking of the vacuum residue feedstock. The process variable (PV) is the furnace outlet temperature measured by TIT-101, with a target setpoint (SP) of 495°C. The temperature control loop is implemented using PID controller TC-401.
+
+TC-401 is configured as a reverse-acting controller, where an increase in PV results in a decrease in manipulated variable (MV) to maintain stability. The PID tuning parameters are set as follows: proportional gain (Kp) = 3.2, integral time (Ki) = 0.9 minutes, and derivative time (Kd) = 0.3 minutes. The controller output (MV) adjusts the control valve FV-401, which modulates the flow of fuel gas to the furnace burners. The control valve FV-401 is specified as fail-closed to ensure safe shutdown in the event of a loss of instrument air.
+
+The measurement signal from TIT-101 is transmitted as a 4-20mA signal corresponding to a temperature range of 400°C to 550°C. The signal is scaled linearly within the controller to normalize the PV between 0-100%. The output of TC-401 is clamped between 0% and 100%, corresponding to the fully closed and fully open positions of FV-401. Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes, with the manual bias value synchronized to the current MV during mode switching.
+
+To prevent control hunting, a deadband of ±2°C is applied around the SP. This ensures that minor fluctuations in PV do not result in unnecessary control actions. The control loop is designed to achieve a response time of less than 30 seconds and a settling time of under 2 minutes for typical process disturbances.
+
+### 5.2) Interlocks and Permissives
+
+The operation of TC-401 is subject to several interlocks and permissives to ensure safe and reliable control of the furnace. The control loop will not engage unless the following conditions are met: the fuel gas pressure, monitored by PC-401, is within the range of 2.5-4.0 bar; the furnace draft pressure, measured by PT-402, is between -0.1 and -0.5 kPa; and the feed pump P-401A or P-401B is running with a discharge pressure above 8.0 bar, as verified by PT-403.
+
+An interlock is configured to immediately close FV-401 if TIT-101 detects a temperature exceeding 550°C, indicating a high-temperature trip condition. Additionally, the control logic includes a permissive that prevents the opening of FV-401 if the furnace pilot burners are not confirmed lit by flame detectors FT-401A/B. This ensures that fuel gas is not introduced into the furnace without proper ignition.
+
+A timer delay of 5 seconds is applied to the fuel gas flow interlock to account for transient conditions during startup. This prevents nuisance trips while maintaining safety.
+
+### 5.3) Alarm and Fault Handling
+
+The control system generates high and low temperature alarms based on the PV from TIT-101. A high-temperature alarm (TIT-101 > 510°C) alerts the operator to potential overheating, while a low-temperature alarm (TIT-101 < 480°C) indicates insufficient thermal cracking conditions. Both alarms are configured with a 3-second delay to avoid spurious triggers due to transient fluctuations.
+
+In the event of a sensor fault or signal loss from TIT-101, the control loop enters a fail-safe mode, driving FV-401 to its fail-closed position. The fault is indicated by a system alarm, and the PV is flagged as invalid. Operators are required to manually intervene and switch TC-401 to manual mode until the fault is resolved.
+
+Anti-windup logic is implemented in TC-401 to prevent integral action from accumulating during periods when the valve is at its output limit. This ensures stable control performance when the loop returns to normal operation.

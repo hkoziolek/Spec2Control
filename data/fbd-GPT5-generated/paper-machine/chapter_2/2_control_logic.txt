@@ -1,0 +1,96 @@
+* Function Blocks *
+ANALOG_IN LT-101
+PID_BASIC FC-101
+MOTOR_VSD M-102
+VALVE_ELECTRIC FV-106
+VALVE_ON_OFF XV-102
+VALVE_ON_OFF XV-104
+VALVE_ON_OFF XV-105
+BOOL_IN ILK-FC-101-XV-102-OPEN
+BOOL_IN ILK-FC-101-XV-104-OPEN
+BOOL_IN ILK-FC-101-LT-101-VALID
+BOOL_IN PERM-M-102-LEVEL-ABOVE-20
+BOOL_IN PERM-M-102-XV-105-CLOSED
+TON M102RestartDelay_TON
+
+* Variables *
+REAL LT101_Flow_PV_m3ph
+REAL FC101_MV_Percent
+BOOL HopperLevel_Above20
+
+* Functions *
+NOT LT101Valid_NOT
+AND FC101ValvesOpen_AND
+AND FC101Interlock_AND
+NOT FC101Inhibit_NOT
+OR FC101Fault_OR
+AND M102Permissive_AND
+NOT M102Permissive_NOT
+OR M102Fault_OR
+OR M102Inhibit_OR
+NOT M102AllowedRun_NOT
+AND M102Start_AND
+
+* Data Connections * 
+LT-101.PV, FC-101.PV
+FC-101.XOUT, M-102.Speed_SP
+XV-102.FB_Opened, ILK-FC-101-XV-102-OPEN.Bool_In
+XV-104.FB_Opened, ILK-FC-101-XV-104-OPEN.Bool_In
+LT-101.General_Fault, LT101Valid_NOT.IN
+LT101Valid_NOT.OUT, ILK-FC-101-LT-101-VALID.Bool_In
+ILK-FC-101-XV-102-OPEN.Bool_Out, FC101ValvesOpen_AND.IN1
+ILK-FC-101-XV-104-OPEN.Bool_Out, FC101ValvesOpen_AND.IN2
+FC101ValvesOpen_AND.OUT, FC101Interlock_AND.IN1
+ILK-FC-101-LT-101-VALID.Bool_Out, FC101Interlock_AND.IN2
+FC101Interlock_AND.OUT, FC-101.AUTO
+FC101Interlock_AND.OUT, FC101Inhibit_NOT.IN
+FC101Inhibit_NOT.OUT, FC101Fault_OR.IN1
+M-102.FB_Fault, FC101Fault_OR.IN2
+FC101Fault_OR.OUT, FC-101.Inhibit
+XV-105.FB_Closed, PERM-M-102-XV-105-CLOSED.Bool_In
+HopperLevel_Above20, PERM-M-102-LEVEL-ABOVE-20.Bool_In
+PERM-M-102-LEVEL-ABOVE-20.Bool_Out, M102Permissive_AND.IN1
+PERM-M-102-XV-105-CLOSED.Bool_Out, M102Permissive_AND.IN2
+M102Permissive_AND.OUT, M102Permissive_NOT.IN
+M102Permissive_NOT.OUT, M102Inhibit_OR.IN1
+LT-101.General_Fault, M102Fault_OR.IN1
+M-102.FB_Fault, M102Fault_OR.IN2
+M102Fault_OR.OUT, M102Inhibit_OR.IN2
+M102Inhibit_OR.OUT, M-102.Inhibit
+M102Inhibit_OR.OUT, M-102.Stop_Cmd
+M102Inhibit_OR.OUT, M102AllowedRun_NOT.IN
+M102AllowedRun_NOT.OUT, M102RestartDelay_TON.IN
+M102AllowedRun_NOT.OUT, M102Start_AND.IN1
+M102RestartDelay_TON.Q, M102Start_AND.IN2
+M102Start_AND.OUT, M-102.Start_Cmd
+M-102.FB_Fault, XV-102.Inhibit
+M-102.FB_Fault, XV-104.Inhibit
+LT-101.General_Fault, FV-106.Inhibit
+LT-101.PV, LT101_Flow_PV_m3ph
+FC-101.XOUT, FC101_MV_Percent
+
+* Parameter Data Connections *
+25.0, LT-101.Scaling_Slope
+-100.0, LT-101.Scaling_Offset
+TRUE, LT-101.Alarm_Enable
+380.0, LT-101.PV_High
+20.0, LT-101.PV_Low
+250.0, FC-101.SP
+0.0, FC-101.MV_MIN
+100.0, FC-101.MV_MAX
+0.0, FC-101.X0
+3.0, FC-101.KP
+1.2, FC-101.TR
+0.3, FC-101.TD
+380.0, FC-101.PV_High
+20.0, FC-101.PV_Low
+25.0, FC-101.Deviation_Limit
+T#5s, M-102.Accel_Ramp
+T#5s, M-102.Decel_Ramp
+T#5s, FV-106.Timeout
+100.0, FV-106.Open_Limit
+0.0, FV-106.Close_Limit
+TRUE, FV-106.Manual_Mode
+0.0, FV-106.Manual_Position
+T#60s, M102RestartDelay_TON.PT
+

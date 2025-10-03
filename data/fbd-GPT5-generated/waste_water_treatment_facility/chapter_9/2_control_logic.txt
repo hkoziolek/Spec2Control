@@ -1,0 +1,91 @@
+* Function Blocks *
+ANALOG_IN FT-801
+ANALOG_IN FT-CL-801
+ANALOG_IN FT-DC-801
+RATIO_CONTROL FIC-101
+RATIO_CONTROL FIC-102
+VALVE_ELECTRIC LV-105
+VALVE_ON_OFF XV-106
+DIGITAL_IN XV-106-OPEN-LS
+DIGITAL_IN XV-106-CLOSED-LS
+MOTOR_VSD CL-801
+MOTOR_VSD DC-801
+MOTOR_ON_OFF UV-801
+
+* Variables *
+REAL FT801_EffluentFlow_PV_m3h
+REAL FTCL801_ChlorineFlow_PV_m3h
+REAL FTDC801_DechlorFlow_PV_m3h
+REAL CL801_DoseFlow_SP_m3h
+REAL DC801_DoseFlow_SP_m3h
+
+* Functions *
+MULT Chl_MinBound_MULT
+MULT Chl_MaxBound_MULT
+MULT DChl_MinBound_MULT
+MULT DChl_MaxBound_MULT
+OR FlowCutoff_OR
+NOT XV106NotOpen_NOT
+OR CL801_Inhibit_OR
+NOT CL801NotRunning_NOT
+OR DC_Inhibit_OR
+OR UV_ChemActive_OR
+
+* Data Connections * 
+FT-801.PV, FIC-101.PrimaryPV
+FT-CL-801.PV, FIC-101.SecondaryPV
+Chl_MinBound_MULT.OUT, FIC-101.MV_MIN
+Chl_MaxBound_MULT.OUT, FIC-101.MV_MAX
+FIC-101.SlaveSP, CL-801.Speed_SP
+FT-801.PV, FIC-102.PrimaryPV
+FT-DC-801.PV, FIC-102.SecondaryPV
+DChl_MinBound_MULT.OUT, FIC-102.MV_MIN
+DChl_MaxBound_MULT.OUT, FIC-102.MV_MAX
+FIC-102.SlaveSP, DC-801.Speed_SP
+FT-801.PV, Chl_MinBound_MULT.IN1
+FT-801.PV, Chl_MaxBound_MULT.IN1
+FT-801.PV, DChl_MinBound_MULT.IN1
+FT-801.PV, DChl_MaxBound_MULT.IN1
+FT-801.Low_Alarm, FlowCutoff_OR.IN1
+FT-801.High_Alarm, FlowCutoff_OR.IN2
+FT-801.General_Fault, FlowCutoff_OR.IN3
+FlowCutoff_OR.OUT, FIC-101.Inhibit
+FlowCutoff_OR.OUT, FIC-102.Inhibit
+XV-106-OPEN-LS.DI_Out, XV106NotOpen_NOT.IN
+XV106NotOpen_NOT.OUT, CL801_Inhibit_OR.IN2
+XV-106.Alarm_Position_Error, CL801_Inhibit_OR.IN3
+XV-106.Alarm_General, CL801_Inhibit_OR.IN5
+FlowCutoff_OR.OUT, CL801_Inhibit_OR.IN1
+LV-105.Alarm, CL801_Inhibit_OR.IN4
+CL801_Inhibit_OR.OUT, CL-801.Inhibit
+CL-801.FB_Running, CL801NotRunning_NOT.IN
+CL801NotRunning_NOT.OUT, DC_Inhibit_OR.IN2
+FlowCutoff_OR.OUT, DC_Inhibit_OR.IN1
+LV-105.Alarm, DC_Inhibit_OR.IN3
+DC_Inhibit_OR.OUT, DC-801.Inhibit
+CL-801.FB_Running, UV_ChemActive_OR.IN1
+DC-801.FB_Running, UV_ChemActive_OR.IN2
+UV_ChemActive_OR.OUT, UV-801.Inhibit
+FT-801.PV, FT801_EffluentFlow_PV_m3h
+FT-CL-801.PV, FTCL801_ChlorineFlow_PV_m3h
+FT-DC-801.PV, FTDC801_DechlorFlow_PV_m3h
+FIC-101.SlaveSP, CL801_DoseFlow_SP_m3h
+FIC-102.SlaveSP, DC801_DoseFlow_SP_m3h
+
+* Parameter Data Connections *
+2.5, FIC-101.RatioSP
+TRUE, FIC-101.Auto
+1.2, FIC-102.RatioSP
+TRUE, FIC-102.Auto
+2.0, Chl_MinBound_MULT.IN2
+3.0, Chl_MaxBound_MULT.IN2
+1.0, DChl_MinBound_MULT.IN2
+1.5, DChl_MaxBound_MULT.IN2
+1000.0, FT-801.PV_High
+50.0, FT-801.PV_Low
+TRUE, FT-801.Alarm_Enable
+62.5, FT-801.Scaling_Slope
+-250.0, FT-801.Scaling_Offset
+T#5s, LV-105.Timeout
+T#5s, XV-106.Timeout
+

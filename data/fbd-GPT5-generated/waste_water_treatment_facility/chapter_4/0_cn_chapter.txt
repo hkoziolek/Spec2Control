@@ -1,0 +1,24 @@
+## 4 **Primary Treatment**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CL-301A | Clarifier | Primary clarifier for sludge separation (Unit A) |
+|CL-301B | Clarifier | Primary clarifier for sludge separation (Unit B) |
+|FFIC-303 | Flow Controller | Calculates sludge withdrawal flow setpoint based on influent flow ratio |
+|FT-301 | Flow Transmitter | Measures influent flow rate to primary clarifiers |
+|FT-302 | Flow Transmitter | Measures sludge withdrawal flow rate |
+|FV-102 | Flow Valve | Modulates sludge withdrawal flow to maintain setpoint |
+|LS-301 | Level Transmitter | Monitors weir level in primary clarifiers |
+|PS-301 | Pressure Transmitter | Measures pressure in sludge withdrawal system |
+|SS-301 | Speed Switch | Monitors rotational speed of associated equipment |
+
+### 4.1) Control Strategy Description
+
+The ratio control logic for the Primary Treatment section ensures precise proportional relationships between the sludge withdrawal flow and the influent flow entering the primary clarifiers, CL-301A and CL-301B. Flow measurement FT-301 monitors the influent flow rate, designated as the wild flow variable, with a range of 0-500 GPM. The controlled variable, sludge withdrawal flow, is measured by FT-302, with a range of 0-200 GPM. The ratio controller FFIC-303 calculates the sludge withdrawal flow setpoint (FT-302 SP) as a function of the influent flow measurement (FT-301) multiplied by the operator-defined ratio setpoint, which is adjustable between 0.2:1 and 0.4:1. For example, at an influent flow of 400 GPM, FFIC-303 sets FT-302 SP to 120 GPM based on a ratio of 0.3:1. The flow control valve FV-102 modulates to maintain FT-302 at the calculated setpoint. Ratio adjustments can be manually biased via operator input or automatically trimmed based on downstream sludge quality measurements. Low flow cutoff logic disables ratio control if FT-301 drops below 50 GPM to prevent operational instability.
+
+### 4.2) Interlocks and Permissives
+
+The ratio control loop FFIC-303 is interlocked with LS-301, which monitors the weir level in the primary clarifiers. If LS-301 detects a weir level outside the operational range of 2.0-5.0 feet, the ratio control loop is disabled, and FV-102 is commanded to close. Additionally, permissives ensure that sludge withdrawal pumps PS-301 are operational and that scum skimmers SS-301 are not actively engaged before enabling ratio control. Boolean logic verifies that FT-301 is within its calibrated range (0-500 GPM) and that FT-302 does not exceed its maximum capacity of 200 GPM before allowing FFIC-303 to calculate and apply the sludge withdrawal setpoint. A manual override mode is available to bypass ratio control during maintenance or abnormal operating conditions.
+
+### 4.3) Alarm and Fault Handling
+
+An alarm is triggered if FT-301 deviates from its expected range or if the calculated sludge withdrawal flow setpoint exceeds the allowable ratio limits (0.2:1 to 0.4:1). FFIC-303 generates a fault signal if the ratio calculation fails due to invalid inputs or if FV-102 cannot achieve the commanded setpoint within 5% accuracy. LS-301 generates a high-level alarm if the weir level exceeds 5.0 feet, initiating a shutdown of the sludge withdrawal pumps PS-301 and disabling ratio control. Similarly, a low-level alarm at LS-301 below 2.0 feet disables ratio control and closes FV-102 to prevent air entrainment in the sludge withdrawal system. All alarms and faults are logged in the SCADA system and require operator acknowledgment before resuming normal operation.

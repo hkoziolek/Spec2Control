@@ -1,0 +1,93 @@
+      <pou name="RATIO_CONTROL" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Auto">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="PrimaryPV">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="SecondaryPV">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="RatioSP">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Bias">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="TrimKp">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="TrimTi">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="MV_MIN">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="MV_MAX">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="ManOut">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="Inhibit">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="SlaveSP">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="ActiveRatio">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+            <variable name="RatioErr">
+              <type>
+                <REAL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

@@ -1,0 +1,97 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN LS-101
+PID_BASIC PIC-101
+MOTOR_VSD P-101A
+MOTOR_VSD P-101B
+VALVE_ON_OFF XV-101
+BOOL_IN BS-101
+MOTOR_ON_OFF VG-101
+
+* Variables *
+REAL LS_101_WetWellLevel_PV_m
+REAL FT_101_InfluentFlow_PV_m3ph
+REAL PIC_101_WetWellLevel_MV_Pct
+REAL P_101A_Speed_Command_Pct
+REAL P_101B_Speed_Command_Pct
+BOOL P101_LevelTrips_Active
+BOOL VG101_Inhibit_Active
+BOOL BS101_Disable_Active
+BOOL P_101A_Start_Cmd
+BOOL P_101B_Start_Cmd
+
+* Functions *
+OR P101_LevelTrips_OR
+OR VG101_Inhibit_OR
+OR BS101_Disable_OR
+GT PID_Output_Positive_GT
+NOT P101_LevelTrips_NOT
+AND PumpRunEnable_AND
+NOT StartA_NOT
+NOT StartB_NOT
+NOT P101A_Running_NOT
+OR P101A_Failure_OR
+AND P101B_Start_AND
+NOT LS101_HighAlarm_NOT
+
+* Data Connections * 
+LS-101.PV, PIC-101.PV
+PIC-101.XOUT, P-101A.Speed_SP
+PIC-101.XOUT, P-101B.Speed_SP
+PIC-101.PV_Low_Alarm, P101_LevelTrips_OR.IN1
+PIC-101.PV_High_Alarm, P101_LevelTrips_OR.IN2
+LS-101.High_Alarm, P101_LevelTrips_OR.IN3
+P101_LevelTrips_OR.OUT, P-101A.Inhibit
+P101_LevelTrips_OR.OUT, P-101B.Inhibit
+P101_LevelTrips_OR.OUT, P101_LevelTrips_Active
+LS-101.Low_Alarm, VG101_Inhibit_OR.IN1
+FT-101.Low_Alarm, VG101_Inhibit_OR.IN2
+VG101_Inhibit_OR.OUT, VG-101.Inhibit
+VG101_Inhibit_OR.OUT, VG101_Inhibit_Active
+PIC-101.PV_Low_Alarm, BS101_Disable_OR.IN1
+LS-101.Low_Alarm, BS101_Disable_OR.IN2
+BS101_Disable_OR.OUT, BS-101.Bool_In
+BS101_Disable_OR.OUT, BS101_Disable_Active
+P101_LevelTrips_OR.OUT, P101_LevelTrips_NOT.IN
+P101_LevelTrips_NOT.OUT, PumpRunEnable_AND.IN2
+PumpRunEnable_AND.OUT, P-101A.Start_Cmd
+PumpRunEnable_AND.OUT, StartA_NOT.IN
+StartA_NOT.OUT, P-101A.Stop_Cmd
+PumpRunEnable_AND.OUT, P_101A_Start_Cmd
+P-101A.FB_Running, P101A_Running_NOT.IN
+P101A_Running_NOT.OUT, P101A_Failure_OR.IN2
+P-101A.FB_Fault, P101A_Failure_OR.IN1
+PumpRunEnable_AND.OUT, P101B_Start_AND.IN1
+P101A_Failure_OR.OUT, P101B_Start_AND.IN2
+P101B_Start_AND.OUT, P-101B.Start_Cmd
+P101B_Start_AND.OUT, StartB_NOT.IN
+StartB_NOT.OUT, P-101B.Stop_Cmd
+P101B_Start_AND.OUT, P_101B_Start_Cmd
+LS-101.High_Alarm, XV-101.Close_Cmd
+LS-101.High_Alarm, LS101_HighAlarm_NOT.IN
+LS101_HighAlarm_NOT.OUT, XV-101.Open_Cmd
+LS-101.PV, LS_101_WetWellLevel_PV_m
+FT-101.PV, FT_101_InfluentFlow_PV_m3ph
+PIC-101.XOUT, PIC_101_WetWellLevel_MV_Pct
+P-101A.Speed_Out, P_101A_Speed_Command_Pct
+P-101B.Speed_Out, P_101B_Speed_Command_Pct
+
+* Parameter Data Connections *
+0.625, LS-101.Scaling_Slope
+-2.5, LS-101.Scaling_Offset
+8.5, LS-101.PV_High
+1.5, LS-101.PV_Low
+TRUE, LS-101.Alarm_Enable
+31.25, FT-101.Scaling_Slope
+-125.0, FT-101.Scaling_Offset
+TRUE, FT-101.Alarm_Enable
+5.5, PIC-101.SP
+30.0, PIC-101.MV_MIN
+90.0, PIC-101.MV_MAX
+-2.0, PIC-101.KP
+1.5, PIC-101.TR
+0.3, PIC-101.TD
+0.1, PIC-101.Deviation_Limit
+TRUE, PIC-101.AUTO
+0.0, PIC-101.X0
+

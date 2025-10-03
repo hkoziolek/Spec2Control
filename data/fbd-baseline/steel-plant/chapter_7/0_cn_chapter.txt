@@ -1,0 +1,34 @@
+## 7 ** Continuous Casting ** 
+|Tagname | Type | Description |
+|---------|------|-------------|
+|CC-601 | Equipment | Continuous casting machine for steel solidification process |
+|CC-603 | Equipment | Secondary continuous casting machine for steel processing |
+|FT-601 | Flow Transmitter | Measures flow rate of molten steel into the mold |
+|LIC-101 | Level Controller | Regulates mold level using PID control logic |
+|LIT-101 | Level Transmitter | Measures mold level in millimeters |
+|MV-101 | Control Valve | Modulates flow of molten steel into the mold |
+|TT-601 | Temperature Transmitter | Monitors temperature of molten steel during casting process |
+
+### 7.1) Control Strategy Description
+
+The continuous casting process in CC-601 requires precise mold level control to ensure uniform solidification of liquid steel. The primary control loop regulates the mold level (PV) using the signal from LIT-101, which measures the mold level in millimeters. The target setpoint (SP) for the mold level is 150 mm. The final control element is the mold inlet valve (MV-101), which modulates the flow of molten steel into the mold.
+
+The PID controller LIC-101 is configured for reverse-acting control, as an increase in the mold level (PV) requires a reduction in the valve opening (MV). The tuning parameters are set as follows: Kp = 3.0, Ki = 1.2 min, and Kd = 0.1 min. The controller output is clamped between 0% and 100% to prevent overdriving the valve. Anti-windup logic is implemented to limit integral action during output saturation.
+
+The LIT-101 transmitter has a calibrated range of 0-300 mm, with a 4-20 mA signal representing this span. The signal is scaled to engineering units before entering LIC-101. The mold inlet valve MV-101 is a fail-closed valve, ensuring flow stops in the event of a control system failure. The response time of the control loop is tuned to achieve a settling time of less than 10 seconds under normal operating conditions.
+
+Bumpless transfer logic is implemented to ensure smooth transitions between manual and automatic modes. In manual mode, the operator directly adjusts the valve position, and the controller bias is updated continuously to match the manual output.
+
+### 7.2) Interlocks and Permissives
+
+The mold level control loop LIC-101 is interlocked with the cooling water system (CC-603) to ensure safe operation. The control loop is inhibited if the cooling water flow, as measured by FT-601, falls below 50% of its nominal flow rate (SP = 75 m³/h). Additionally, the mold level control is disabled if the mold temperature, measured by TT-601, exceeds 950°C, as this indicates a potential overheating condition.
+
+A permissive is in place to prevent the mold inlet valve MV-101 from opening unless the mold level, as measured by LIT-101, is below 250 mm. This ensures that the mold does not overflow during startup or transient conditions. The permissive logic is hardwired to the valve actuator to provide an additional layer of safety.
+
+### 7.3) Alarm and Fault Handling
+
+An alarm is triggered if the mold level, as measured by LIT-101, deviates from the setpoint by more than ±20 mm for a duration exceeding 5 seconds. The alarm is classified as high priority and is displayed on the operator interface as "Mold Level Deviation Alarm." If the mold level exceeds 280 mm, a high-high alarm is activated, and the mold inlet valve MV-101 is forced closed to prevent overflow.
+
+If the signal from LIT-101 is lost or falls outside the valid range (4-20 mA), the LIC-101 controller enters a fault state, and the mold inlet valve MV-101 is driven to its fail-closed position. An alarm is generated as "Mold Level Sensor Fault," and the operator is required to investigate and rectify the issue before resuming automatic control.
+
+In the event of a cooling water flow fault, indicated by FT-601 falling below 50% of its nominal flow, the control system shuts down the mold inlet valve MV-101 and activates a "Cooling Water Flow Low" alarm. Similarly, if TT-601 detects a mold temperature exceeding 950°C, the system forces the valve closed and generates a "Mold Overtemperature" alarm. These interlocks ensure safe operation and prevent damage to the equipment.

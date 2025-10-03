@@ -1,0 +1,58 @@
+* Function Blocks *
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+ANALOG_IN TIT-101
+RATIO_CONTROL FFIC-103
+PID_BASIC FIC-102
+VALVE_ELECTRIC FV-102
+
+* Variables *
+REAL FT101_WildFlow_PV
+REAL FT102_FluxFlow_PV
+REAL TIT101_Temperature_PV
+REAL FFIC103_FluxFlow_SP
+
+* Functions *
+GT LowFlow_OK_GT
+OR FFIC103_LowTempOrLowFlow_OR
+OR FFIC103_SensorFaults_OR
+OR FFIC103_RangeOrLowTempLowFlow_OR
+OR FFIC103_Inhibit_OR
+
+* Data Connections *
+FT-101.PV, FFIC-103.PrimaryPV
+FT-102.PV, FFIC-103.SecondaryPV
+FFIC-103.SlaveSP, FIC-102.SP
+FT-102.PV, FIC-102.PV
+FIC-102.XOUT, FV-102.Control_Signal
+FT-101.PV, LowFlow_OK_GT.IN1
+LowFlow_OK_GT.OUT, FFIC-103.Auto
+LowFlow_OK_GT.OUT, FIC-102.AUTO
+FT-101.Low_Alarm, FFIC103_LowTempOrLowFlow_OR.IN1
+TIT-101.Low_Alarm, FFIC103_LowTempOrLowFlow_OR.IN2
+FT-101.General_Fault, FFIC103_SensorFaults_OR.IN1
+FT-102.General_Fault, FFIC103_SensorFaults_OR.IN2
+FT-101.High_Alarm, FFIC103_RangeOrLowTempLowFlow_OR.IN1
+FFIC103_LowTempOrLowFlow_OR.OUT, FFIC103_RangeOrLowTempLowFlow_OR.IN2
+FFIC103_SensorFaults_OR.OUT, FFIC103_Inhibit_OR.IN1
+FFIC103_RangeOrLowTempLowFlow_OR.OUT, FFIC103_Inhibit_OR.IN2
+FFIC103_Inhibit_OR.OUT, FFIC-103.Inhibit
+FFIC103_LowTempOrLowFlow_OR.OUT, FV-102.Inhibit
+FT-101.PV, FT101_WildFlow_PV
+FT-102.PV, FT102_FluxFlow_PV
+TIT-101.PV, TIT101_Temperature_PV
+FFIC-103.SlaveSP, FFIC103_FluxFlow_SP
+
+* Parameter Data Connections *
+62.5, FT-101.Scaling_Slope
+-250.0, FT-101.Scaling_Offset
+50.0, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+TRUE, FT-102.Alarm_Enable
+800.0, TIT-101.PV_Low
+TRUE, TIT-101.Alarm_Enable
+0.4, FFIC-103.RatioSP
+200.0, FFIC-103.MV_MIN
+300.0, FFIC-103.MV_MAX
+50.0, LowFlow_OK_GT.IN2
+

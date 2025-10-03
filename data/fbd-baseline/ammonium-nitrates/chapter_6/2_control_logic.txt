@@ -1,0 +1,88 @@
+* Function Blocks *
+ANALOG_IN LT-501
+ANALOG_IN WB-505
+VALVE_ON_OFF AP-503
+VALVE_ON_OFF PRV-502
+RATIO_CONTROL RIC-506
+PID_BASIC FIC-507
+MOTOR_VSD SC-504
+
+* Variables *
+REAL LT501_Level_Pct
+REAL WB505_Flow_Pct
+REAL RIC506_SC504_FlowSP
+REAL Ratio_Bias_Manual
+
+* Functions *
+NOT AP503_NotActive_NOT
+NOT PRV502_NotClosed_NOT
+OR SC504_Shutdown_OR
+OR RIC506_Inhibit_OR
+GT LT501_Above80_GT
+LT LT501_Below20_LT
+OR Level_OutOfRange_OR
+NOT LevelInNominal_NOT
+ADD RatioSP_NominalBias_ADD
+MULT RatioSP_HighTerm_MULT
+MULT RatioSP_LowTerm_MULT
+MULT RatioSP_NominalTerm_MULT
+ADD RatioSP_HL_ADD
+ADD RatioSP_Final_ADD
+
+* Data Connections * 
+LT-501.PV, LT501_Level_Pct
+WB-505.PV, WB505_Flow_Pct
+RIC-506.SlaveSP, RIC506_SC504_FlowSP
+WB-505.PV, RIC-506.PrimaryPV
+SC-504.FB_ActualSpeed, RIC-506.SecondaryPV
+RIC-506.SlaveSP, FIC-507.SP
+SC-504.FB_ActualSpeed, FIC-507.PV
+FIC-507.XOUT, SC-504.Speed_SP
+AP-503.FB_Opened, AP503_NotActive_NOT.IN
+PRV-502.FB_Closed, PRV502_NotClosed_NOT.IN
+RIC506_Inhibit_OR.OUT, SC504_Shutdown_OR.IN1
+LT-501.Low_Alarm, SC504_Shutdown_OR.IN3
+SC504_Shutdown_OR.OUT, SC-504.Inhibit
+AP503_NotActive_NOT.OUT, RIC506_Inhibit_OR.IN1
+PRV502_NotClosed_NOT.OUT, RIC506_Inhibit_OR.IN2
+WB-505.Low_Alarm, RIC506_Inhibit_OR.IN3
+RIC506_Inhibit_OR.OUT, RIC-506.Inhibit
+LT-501.PV, LT501_Above80_GT.IN1
+LT-501.PV, LT501_Below20_LT.IN1
+LT501_Above80_GT.OUT, Level_OutOfRange_OR.IN1
+LT501_Below20_LT.OUT, Level_OutOfRange_OR.IN2
+Level_OutOfRange_OR.OUT, LevelInNominal_NOT.IN
+LT501_Above80_GT.OUT, RatioSP_HighTerm_MULT.IN1
+LT501_Below20_LT.OUT, RatioSP_LowTerm_MULT.IN1
+RatioSP_NominalBias_ADD.OUT, RatioSP_NominalTerm_MULT.IN2
+LevelInNominal_NOT.OUT, RatioSP_NominalTerm_MULT.IN1
+RatioSP_HighTerm_MULT.OUT, RatioSP_HL_ADD.IN1
+RatioSP_LowTerm_MULT.OUT, RatioSP_HL_ADD.IN2
+RatioSP_HL_ADD.OUT, RatioSP_Final_ADD.IN1
+RatioSP_NominalTerm_MULT.OUT, RatioSP_Final_ADD.IN2
+RatioSP_Final_ADD.OUT, RIC-506.RatioSP
+Ratio_Bias_Manual, RatioSP_NominalBias_ADD.IN2
+
+* Parameter Data Connections *
+TRUE, LT-501.Alarm_Enable
+90.0, LT-501.PV_High
+10.0, LT-501.PV_Low
+TRUE, WB-505.Alarm_Enable
+6.25, WB-505.Scaling_Slope
+-25.0, WB-505.Scaling_Offset
+100.0, WB-505.PV_Low
+TRUE, RIC-506.Auto
+0.0, RIC-506.MV_MIN
+100.0, RIC-506.MV_MAX
+0.0, RIC-506.Bias
+TRUE, FIC-507.AUTO
+0.0, FIC-507.MV_MIN
+100.0, FIC-507.MV_MAX
+T#2s, SC-504.Accel_Ramp
+T#2s, SC-504.Decel_Ramp
+80.0, LT501_Above80_GT.IN2
+20.0, LT501_Below20_LT.IN2
+1.0, RatioSP_HighTerm_MULT.IN2
+2.0, RatioSP_LowTerm_MULT.IN2
+1.5, RatioSP_NominalBias_ADD.IN1
+

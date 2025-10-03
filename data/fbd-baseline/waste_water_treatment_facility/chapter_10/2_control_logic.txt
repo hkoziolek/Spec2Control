@@ -1,0 +1,108 @@
+* Function Blocks *
+ANALOG_IN FT-901
+ANALOG_IN LS-901
+MOTOR_ON_OFF P-901A
+MOTOR_ON_OFF P-901B
+VALVE_ON_OFF XV-102
+DUTY_STANDBY P-901AB
+
+* Variables *
+REAL FT_901_FlowRate
+REAL LS_901_LevelPercent
+BOOL P_901A_Running
+BOOL P_901B_Running
+BOOL P_901AB_DutyActiveIsA
+BOOL P_901AB_SwitchedDueToDuty
+BOOL P_901AB_SwitchedDueToFailure
+
+* Functions *
+OR AnyRunning_OR
+AND StartBand_AND
+GT LevelAbove60_GT
+GT LevelAbove40_GT
+GT LevelAbove85_GT
+OR StartRequest_OR
+TON DutyTimer_TON
+GT FlowLessThan15_GT
+AND FailCondA_AND
+TON FailA_TON
+AND FailCondB_AND
+TON FailB_TON
+OR Failure_OR
+TON SwitchoverDelay_TON
+OR StartCmdA_OR
+OR StartCmdB_OR
+OR PumpA_Inhibit_OR
+OR PumpB_Inhibit_OR
+AND BothPumpsFailed_AND
+
+* Data Connections * 
+LS-901.PV, LevelAbove60_GT.IN1
+LS-901.PV, LevelAbove40_GT.IN1
+LS-901.PV, LevelAbove85_GT.IN1
+P-901A.FB_Running, AnyRunning_OR.IN1
+P-901B.FB_Running, AnyRunning_OR.IN2
+AnyRunning_OR.OUT, StartBand_AND.IN1
+LevelAbove40_GT.OUT, StartBand_AND.IN2
+LevelAbove60_GT.OUT, StartRequest_OR.IN1
+StartBand_AND.OUT, StartRequest_OR.IN2
+StartRequest_OR.OUT, P-901AB.StartRequest
+AnyRunning_OR.OUT, DutyTimer_TON.IN
+DutyTimer_TON.Q, P-901AB.DutyElapsed
+FT-901.PV, FlowLessThan15_GT.IN2
+P-901A.FB_Running, FailCondA_AND.IN1
+FlowLessThan15_GT.OUT, FailCondA_AND.IN2
+FailCondA_AND.OUT, FailA_TON.IN
+FailA_TON.Q, P-901AB.PumpA_Fault
+P-901B.FB_Running, FailCondB_AND.IN1
+FlowLessThan15_GT.OUT, FailCondB_AND.IN2
+FailCondB_AND.OUT, FailB_TON.IN
+FailB_TON.Q, P-901AB.PumpB_Fault
+FailA_TON.Q, Failure_OR.IN1
+FailB_TON.Q, Failure_OR.IN2
+Failure_OR.OUT, SwitchoverDelay_TON.IN
+SwitchoverDelay_TON.Q, P-901AB.SwitchoverDelayElapsed
+P-901A.FB_Running, P-901AB.PumpA_RunFB
+P-901B.FB_Running, P-901AB.PumpB_RunFB
+LevelAbove85_GT.OUT, StartCmdA_OR.IN1
+P-901AB.CmdPumpA, StartCmdA_OR.IN2
+LevelAbove85_GT.OUT, StartCmdB_OR.IN1
+P-901AB.CmdPumpB, StartCmdB_OR.IN2
+StartCmdA_OR.OUT, P-901A.Start_Cmd
+StartCmdB_OR.OUT, P-901B.Start_Cmd
+LS-901.Low_Alarm, PumpA_Inhibit_OR.IN1
+FailA_TON.Q, PumpA_Inhibit_OR.IN2
+P-901A.FB_Trip, PumpA_Inhibit_OR.IN3
+PumpA_Inhibit_OR.OUT, P-901A.Inhibit
+LS-901.Low_Alarm, PumpB_Inhibit_OR.IN1
+FailB_TON.Q, PumpB_Inhibit_OR.IN2
+P-901B.FB_Trip, PumpB_Inhibit_OR.IN3
+PumpB_Inhibit_OR.OUT, P-901B.Inhibit
+FailA_TON.Q, BothPumpsFailed_AND.IN1
+FailB_TON.Q, BothPumpsFailed_AND.IN2
+BothPumpsFailed_AND.OUT, XV-102.Inhibit
+FT-901.PV, FT_901_FlowRate
+LS-901.PV, LS_901_LevelPercent
+P-901A.FB_Running, P_901A_Running
+P-901B.FB_Running, P_901B_Running
+P-901AB.ActiveIsA, P_901AB_DutyActiveIsA
+P-901AB.SwitchedDueToDuty, P_901AB_SwitchedDueToDuty
+P-901AB.SwitchedDueToFailure, P_901AB_SwitchedDueToFailure
+
+* Parameter Data Connections *
+REAL#60.0, LevelAbove60_GT.IN2
+REAL#40.0, LevelAbove40_GT.IN2
+REAL#85.0, LevelAbove85_GT.IN2
+TRUE, P-901AB.Enable
+TRUE, P-901AB.AlternateEnable
+T#48h, DutyTimer_TON.PT
+REAL#15.0, FlowLessThan15_GT.IN1
+T#10s, FailA_TON.PT
+T#10s, FailB_TON.PT
+T#5s, SwitchoverDelay_TON.PT
+T#30m, P-901A.MinRunTime
+T#30m, P-901B.MinRunTime
+90.0, LS-901.PV_High
+TRUE, LS-901.Alarm_Enable
+TRUE, FT-901.Alarm_Enable
+

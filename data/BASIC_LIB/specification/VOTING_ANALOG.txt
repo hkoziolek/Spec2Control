@@ -1,0 +1,16 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of the block's purpose
+Input,Input1,REAL,First analog input.
+Input,Input2,REAL,Second analog input.
+Input,Input3,REAL,Third analog input (for 2oo3).
+Input,Deviation_Limit,REAL,Maximum allowed deviation between inputs for agreement.
+Input,Voting_Scheme,ENUM,Selection of voting scheme (e.g. 2oo3 or Median or Average).
+Input,EnableAlarm,BOOL,Enables or disables alarm monitoring.
+Input,Inhibit,BOOL,Inhibits voting functionality and can receive alarm signals.
+Output,Voted_Output,REAL,The validated analog output value.
+Output,Sensor1_Fault,BOOL,Indicates if Input1 is deemed faulty.
+Output,Sensor2_Fault,BOOL,Indicates if Input2 is deemed faulty.
+Output,Sensor3_Fault,BOOL,Indicates if Input3 is deemed faulty.
+Output,Alarm_Voting_Error,BOOL,Indicates a disagreement among inputs or insufficient healthy sensors.
+Output,Healthy_Sensors_Count,INT,Number of currently healthy sensors.

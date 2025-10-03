@@ -1,0 +1,8 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of the measurement purpose.
+Input,DI_Raw,BOOL,Raw digital input from the field.
+Input,DebounceTime,TIME,Time for debouncing the input to prevent false triggers.
+Input,EnableAlarm,BOOL,Enables or disables alarm monitoring for the digital input.
+Output,DI_Out,BOOL,,Debounced and stable digital output.
+Output,Fault_State,BOOL,Indicates a fault in the input signal (e.g. wiring fault).

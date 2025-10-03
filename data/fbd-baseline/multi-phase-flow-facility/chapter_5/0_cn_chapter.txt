@@ -1,0 +1,31 @@
+## 5 **Water Tank and Pump Control**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-101 | Flow Controller | Maintains flow rate at 50 GPM using FT-102 as PV |
+|FIC-102 | Flow Controller | Maintains flow rate at 45 GPM using FT-104 as PV |
+|FT-102 | Flow Transmitter | Measures flow rate for FIC-101 control loop |
+|FT-104 | Flow Transmitter | Measures flow rate for FIC-102 control loop |
+|FV-103 | Control Valve | Modulates flow based on FIC-101 output |
+|LI-101 | Level Transmitter | Measures water tank level in T-100 |
+|P-001 | Pump | Adjusts flow rate based on FIC-102 output |
+|T-100 | Tank | Stores water for circulation loop system |
+
+### 5.1) Control Strategy Description
+
+The primary control objective for the water tank (T100) system is to maintain a stable flow rate through the circulation loop using FIC101 and FIC102. The process variable (PV) for FIC101 is the flow rate measured by FT102, while the PV for FIC102 is the flow rate measured by FT104. The setpoint (SP) for FIC101 is 50 GPM, and the SP for FIC102 is 45 GPM. Both controllers operate in single-loop feedback control mode.
+
+FIC101 and FIC102 are configured as reverse-acting PID controllers. The proportional gain (Kp) for both controllers is set to 2.0, the integral time (Ki) is set to 1.0 minute, and the derivative time (Kd) is set to 0.1 minute. The control output (MV) from FIC101 modulates FV-103, which is a fail-closed valve with a control range of 0% to 100%. The control output from FIC102 adjusts the speed of pump P01 using a 4-20mA signal. The output limits of both controllers are clamped between 0% and 100% to prevent actuator saturation.
+
+The flow transmitters FT102 and FT104 provide 4-20mA signals corresponding to a flow range of 0 to 100 GPM. These signals are linearly scaled within the controllers to ensure accurate control calculations. Bumpless transfer logic is implemented to allow seamless transition between manual and automatic modes. Anti-windup protection is enabled to prevent integrator saturation during manual operation or output clamping.
+
+### 5.2) Interlocks and Permissives
+
+The operation of FIC101 and FIC102 is interlocked with the level in water tank T100, monitored by LI101. If the level in T100 falls below 20% or exceeds 90%, both controllers are forced to manual mode, and the outputs are set to 0%. Additionally, pump P01 will not start unless the level in T100 is greater than 25% and the downstream valve FV-103 is confirmed open via position feedback.
+
+A permissive is included to ensure that FV-103 does not open unless pump P01 is running and the flow rate measured by FT102 exceeds 10 GPM. A timer introduces an 8-second delay to validate the flow condition and avoid transient interlock trips during startup.
+
+### 5.3) Alarm and Fault Handling
+
+An alarm is triggered if the flow rate measured by FT102 deviates from the setpoint of FIC101 by more than ±10 GPM for a duration exceeding 15 seconds. Similarly, an alarm is generated if the flow rate measured by FT104 deviates from the setpoint of FIC102 by more than ±8 GPM for the same duration. Both alarms are classified as high-priority process alarms.
+
+A fault in FT102 or FT104, such as a signal loss or out-of-range condition, will result in the associated controller (FIC101 or FIC102) transitioning to manual mode with its output frozen at the last valid value. A fault in LI101 will trigger a system-level shutdown, stopping pump P01 and closing FV-103 to prevent damage to downstream equipment.

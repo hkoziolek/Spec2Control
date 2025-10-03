@@ -1,0 +1,112 @@
+PV Alarm Parameter Analysis - lng-production
+Generated: 2025-09-24 16:37:22
+====================================================================================================
+
+Chapter      Required PVs Accuracy % Additional PVs
+-------------------------------------------------
+chapter_2    0/0          0.0        10           
+chapter_3    2/2          100.0      5            
+chapter_4    2/3          66.7       2            
+chapter_5    0/6          0.0        8            
+chapter_6    1/1          100.0      7            
+chapter_7    4/4          100.0      4            
+
+Plant Summary: Required PVs: 9/16 (56.2%), Additional PVs: 36
+
+====================================================================================================
+DETAILED PV ANALYSIS
+====================================================================================================
+
+chapter_2
+------------------------------------------------------------
+[ADD] Additional PVs (10):
+  - DP-101.PV_High: 10
+  - DP-101.PV_Low: 0
+  - DP-102.PV_High: 10
+  - DP-102.PV_Low: 0
+  - FT-101.PV_High: 5000
+  - FT-101.PV_Low: 100
+  - IT-102.PV_High: 2000
+  - IT-102.PV_Low: 0
+  - LT-101.PV_High: 80
+  - LT-101.PV_Low: 0
+
+
+chapter_3
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] PT-201.PV_Low: reviewed=0.5, output=0.5
+  [=] TT-201.PV_High: reviewed=50, output=50
+
+[ADD] Additional PVs (5):
+  - AI-201.PV_High: 1
+  - LT-201.PV_Low: 20
+  - TIC-201.PV_High: 50
+  - TIC-201.PV_Low: 0
+  - TT-201.PV_Low: 0
+
+
+chapter_4
+------------------------------------------------------------
+[OK] Found Required PVs (2):
+  [=] AI-304.PV_High: reviewed=10, output=10
+  [=] DP-301.PV_High: reviewed=20, output=20
+
+[FALSE] Found but Wrong Values (1):
+  [!=] FT-301.PV_Low: reviewed=500, output=5
+
+[ADD] Additional PVs (2):
+  - AI-302.PV_High: 0.01
+  - AI-303.PV_High: 0.01
+
+
+chapter_5
+------------------------------------------------------------
+[MISS] Missed Required PVs (6):
+  - PT-401A.PV_High: 2.0
+  - PT-401A.PV_Low: 1.6
+  - PT-401B.PV_High: 2.0
+  - PT-401B.PV_Low: 1.6
+  - PT-401C.PV_High: 2.0
+  - PT-401C.PV_Low: 1.6
+
+[ADD] Additional PVs (8):
+  - PV-102_Control.PV_High: 2.0
+  - PV-102_Control.PV_Low: 1.6
+  - TT-105.PV_High: 70.0
+  - TT-105.PV_Low: 60.0
+  - TT-106.PV_High: 70.0
+  - TT-106.PV_Low: 60.0
+  - TT-107.PV_High: 70.0
+  - TT-107.PV_Low: 60.0
+
+
+chapter_6
+------------------------------------------------------------
+[OK] Found Required PVs (1):
+  [=] TIT-102.PV_High: reviewed=-155.0, output=-155.0
+
+[ADD] Additional PVs (7):
+  - FIC-504.PV_High: 2000.0
+  - FIC-504.PV_Low: 200.0
+  - FT-501.PV_High: 5000.0
+  - FT-501.PV_Low: 500.0
+  - FT-502.PV_High: 2000.0
+  - FT-502.PV_Low: 200.0
+  - PT-501.PV_Low: 2.0
+
+
+chapter_7
+------------------------------------------------------------
+[OK] Found Required PVs (4):
+  [=] FT-601A.PV_High: reviewed=4500, output=4500
+  [=] FT-601A.PV_Low: reviewed=100, output=100
+  [=] FT-601B.PV_High: reviewed=900, output=900
+  [=] FT-601B.PV_Low: reviewed=50, output=50
+
+[ADD] Additional PVs (4):
+  - FIC-601B.PV_High: 900
+  - FIC-601B.PV_Low: 50
+  - LIT-601.PV_High: 90
+  - LT-601.PV_Low: 10
+

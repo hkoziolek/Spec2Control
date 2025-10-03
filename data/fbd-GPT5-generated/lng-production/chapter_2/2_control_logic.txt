@@ -1,0 +1,89 @@
+* Function Blocks *
+ANALOG_IN DP-101
+ANALOG_IN DP-102
+ANALOG_IN FT-101
+ANALOG_IN IT-102
+ANALOG_IN LT-101
+RATIO_CONTROL IIC-101
+VALVE_ELECTRIC LCV-101
+
+* Variables *
+REAL FT101_FeedGasFlow_PV
+REAL IT102_LiqSepFlow_PV
+REAL LT101_SlugCatcherLevel_PV
+REAL DP101_InletSepDP_PV
+REAL DP102_InletSepDP_PV
+REAL IIC101_LiqSepFlow_SP
+REAL IIC101_CalculatedRatio
+
+* Functions *
+OR DP_Trip_OR
+OR IIC_Permissive1_OR
+OR IIC_Permissive_OR
+OR IT_OutOfRange_OR
+OR LCV_Inhibit1_OR
+OR LCV_Inhibit_OR
+
+* Data Connections * 
+FT-101.PV, IIC-101.PrimaryPV
+IT-102.PV, IIC-101.SecondaryPV
+IIC-101.SlaveSP, LCV-101.Control_Signal
+DP-101.High_Alarm, DP_Trip_OR.IN1
+DP-102.High_Alarm, DP_Trip_OR.IN2
+DP_Trip_OR.OUT, IIC_Permissive1_OR.IN1
+LT-101.High_Alarm, IIC_Permissive1_OR.IN2
+IIC_Permissive1_OR.OUT, IIC_Permissive_OR.IN1
+FT-101.Low_Alarm, IIC_Permissive_OR.IN2
+IIC_Permissive_OR.OUT, IIC-101.Inhibit
+IT-102.High_Alarm, IT_OutOfRange_OR.IN1
+IT-102.Low_Alarm, IT_OutOfRange_OR.IN2
+IT_OutOfRange_OR.OUT, LCV_Inhibit1_OR.IN1
+FT-101.Low_Alarm, LCV_Inhibit1_OR.IN2
+LCV_Inhibit1_OR.OUT, LCV_Inhibit_OR.IN1
+IT-102.General_Fault, LCV_Inhibit_OR.IN2
+LCV_Inhibit_OR.OUT, LCV-101.Inhibit
+FT-101.PV, FT101_FeedGasFlow_PV
+IT-102.PV, IT102_LiqSepFlow_PV
+LT-101.PV, LT101_SlugCatcherLevel_PV
+DP-101.PV, DP101_InletSepDP_PV
+DP-102.PV, DP102_InletSepDP_PV
+IIC-101.SlaveSP, IIC101_LiqSepFlow_SP
+IIC-101.ActiveRatio, IIC101_CalculatedRatio
+
+* Parameter Data Connections *
+10, DP-101.PV_High
+0, DP-101.PV_Low
+TRUE, DP-101.Alarm_Enable
+0.625, DP-101.Scaling_Slope
+-2.5, DP-101.Scaling_Offset
+10, DP-102.PV_High
+0, DP-102.PV_Low
+TRUE, DP-102.Alarm_Enable
+0.625, DP-102.Scaling_Slope
+-2.5, DP-102.Scaling_Offset
+5000, FT-101.PV_High
+100, FT-101.PV_Low
+TRUE, FT-101.Alarm_Enable
+312.5, FT-101.Scaling_Slope
+-1250, FT-101.Scaling_Offset
+2000, IT-102.PV_High
+0, IT-102.PV_Low
+TRUE, IT-102.Alarm_Enable
+125, IT-102.Scaling_Slope
+-500, IT-102.Scaling_Offset
+80, LT-101.PV_High
+0, LT-101.PV_Low
+TRUE, LT-101.Alarm_Enable
+6.25, LT-101.Scaling_Slope
+-25, LT-101.Scaling_Offset
+TRUE, IIC-101.Auto
+2.5, IIC-101.RatioSP
+0, IIC-101.Bias
+0, IIC-101.MV_MIN
+2000, IIC-101.MV_MAX
+500, IIC-101.ManOut
+FALSE, LCV-101.Manual_Mode
+0, LCV-101.Manual_Position
+100, LCV-101.Open_Limit
+0, LCV-101.Close_Limit
+

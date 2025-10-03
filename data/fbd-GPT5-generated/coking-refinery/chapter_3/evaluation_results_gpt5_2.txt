@@ -1,0 +1,90 @@
+Evaluation Results for coking-refinery - chapter_3
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_3\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_3\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_3\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+Output blocks: ANALOG_IN(1), PID_BASIC(1), VALVE_ELECTRIC(1)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\coking-refinery\chapter_3\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\coking-refinery\chapter_3\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN PIT-103
+PID_BASIC PIC-102
+VALVE_ELECTRIC PV-101
+BOOL_IN VDU_START_OK
+BOOL_IN MAINT_BYPASS_OK
+BOOL_IN PV-101_FAULT
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN PIT-103
+PID_BASIC PIC-102
+VALVE_ELECTRIC PV-101
+
+ALL DATA CONNECTIONS:
+PV-101.Position_Error, PV-101_FAULT.Bool_In
+PIT-103.PV, PIC-102.PV
+PIC-102.XOUT, PV-101.Control_Signal
+PIT-103.PV, HPTrip_GT.IN1
+Reset_NOT.OUT, Latch_AND.IN1
+HPTrip_GT.OUT, Trip_OR.IN1
+Latch_AND.OUT, Trip_OR.IN2
+Trip_OR.OUT, Latch_AND.IN2
+VDU_START_OK.Bool_Out, PID_AutoEnable_AND.IN1
+ValveManual_NOT.OUT, PID_AutoEnable_AND.IN2
+TxFault_NOT.OUT, PID_AutoEnable_AND.IN3
+LowPressure_OK_NOT.OUT, PID_AutoEnable_AND.IN4
+PID_AutoEnable_AND.OUT, PIC-102.AUTO
+MAINT_BYPASS_OK.Bool_Out, ValveManual_OR.IN1
+PIT-103.General_Fault, TxFault_NOT.IN
+PIC-102.PV_Low_Alarm, LowPressure_OK_NOT.IN
+PIT-103.General_Fault, PIDInhibit_OR.IN1
+Trip_OR.OUT, PIDInhibit_OR.IN2
+PIDInhibit_OR.OUT, PIC-102.Inhibit
+Trip_OR.OUT, ValveInhibit_OR.IN1
+PV-101_FAULT.Bool_Out, ValveInhibit_OR.IN2
+ValveInhibit_OR.OUT, PV-101.Inhibit
+Trip_OR.OUT, ValveManual_OR.IN2
+ValveManual_OR.OUT, PV-101.Manual_Mode
+ValveManual_OR.OUT, ValveManual_NOT.IN
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN=PIT-103, PID_BASIC=PIC-102
+- Actual Connection: PIT-103.PV, PIC-102.PV
+- Notes: Additional use of PIT-103.PV for HPTrip_GT.IN1 is present but does not affect the PID PV feed. PID inhibit/auto logic exists around PIC-102, but the PV wiring is correctly direct.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC=PIC-102, VALVE_ELECTRIC=PV-101
+- Actual Connection: PIC-102.XOUT, PV-101.Control_Signal
+- Notes: The allowed indirect alternative (PIC-102.XOUT -> MOTOR_VSD.Speed_SP) is not present, but a direct connection to the valve is correctly implemented. Valve inhibit and manual-mode interlocks (Trip_OR, ValveManual_OR) are present around PV-101; these do not break the control signal connection.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Direct mappings are correctly implemented with appropriate interlocks and auto/inhibit logic surrounding the PID and valve. The design appears coherent and robust.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

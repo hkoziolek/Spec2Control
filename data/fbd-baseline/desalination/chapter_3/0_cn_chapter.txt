@@ -1,0 +1,32 @@
+## 3 **Intake Screens and Air-Blast Cleaning System**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|FIC-104 | Flow Controller | Modulates FV-105 to achieve FT-102 setpoint based on FFIC-103 output |
+|FT-101 | Flow Transmitter | Measures real-time compressed air supply rate to the air-blast system |
+|FT-102 | Flow Transmitter | Measures air delivered to individual screens during cleaning bursts |
+|FV-105 | Flow Valve | Regulates air flow to maintain the setpoint determined by FIC-104 |
+|HIS-101 | Human-Machine Interface | Allows operator input for adjusting ratio setpoint and monitoring system |
+|HMI-101 | Human-Machine Interface | Provides interface for operator control and system status visualization |
+|PIT-105 | Pressure Transmitter | Measures pressure in the compressed air system for monitoring purposes |
+|PIT-106 | Pressure Transmitter | Monitors pressure in the air-blast cleaning system for safety and control |
+|PT-103 | Pressure Transmitter | Measures pressure upstream of the cleaning system for control feedback |
+|PT-104 | Pressure Transmitter | Monitors pressure downstream of the cleaning system for operational checks |
+|PT-108 | Pressure Transmitter | Provides pressure data for system diagnostics and performance analysis |
+
+### 3.1) Control Strategy Description
+
+The intake screens cleaning system utilizes ratio control to maintain precise proportional relationships between the compressed air flow delivered to each screen and the cleaning cycle duration. The wild flow, measured by flow transmitter FT-101, represents the real-time compressed air supply rate to the air-blast system, ranging from 0 to 500 Nm³/hr. The controlled flow, measured by flow transmitter FT-102, governs the air delivered to individual screens during cleaning bursts. Ratio controller FFIC-103 calculates the controlled flow setpoint based on the configured ratio of 2.0:1, ensuring that FT-102 setpoint equals twice the value of FT-101. The flow control loop is closed by flow controller FIC-104, which modulates control valve FV-105 to achieve the calculated setpoint.
+
+Raw flow signals from FT-101 and FT-102 undergo linear scaling within FFIC-103 to ensure accurate ratio calculation. The ratio setpoint is adjustable between 1.5:1 and 3.0:1 via operator input through HMI-101, allowing flexibility in cleaning intensity. A low-flow cutoff is implemented such that FFIC-103 disables control if FT-101 falls below 50 Nm³/hr, preventing insufficient cleaning bursts. Hysteresis of 2% is applied to the ratio setpoint to avoid rapid oscillations near threshold values.
+
+### 3.2) Interlocks and Permissives
+
+The air-blast cleaning system operates under strict interlocks to ensure safe ratio control. Compressor status permissives are tied to PT-103 and PT-104, which monitor receiver pressures. If either PT-103 or PT-104 falls below 6.0 bar, FFIC-103 enters a HOLD state, freezing the ratio calculation and preventing air delivery. Additionally, FV-105 is interlocked with PIT-105 and PIT-106 to ensure that the downstream pressure remains within 4.0–8.0 bar during cleaning bursts. If PIT-105 or PIT-106 detects pressure outside this range, FV-105 closes, and FFIC-103 outputs a FAIL signal.
+
+Boolean interlocks are implemented to prevent simultaneous cleaning of multiple screens. Cleaning sequence permissives are managed by discrete signals from SW-SCREEN-1 to SW-SCREEN-6 and RES-SCREEN-1 to RES-SCREEN-4. FFIC-103 only calculates the controlled flow setpoint for one screen at a time, ensuring proportional air delivery to the active screen. Mode selection logic ensures bumpless transfer between automatic ratio control and manual operation, verified by permissives on HMI-101.
+
+### 3.3) Alarm and Fault Handling
+
+Alarms are generated for deviations in ratio control and system faults. If the ratio deviates by more than 5% from the configured setpoint, FFIC-103 triggers a RATIO_DEVIATION alarm visible on HMI-101. Low-flow conditions on FT-101 below 50 Nm³/hr activate a LOW_FLOW alarm, and FFIC-103 transitions to MANUAL mode. Pressure transmitter PT-108 monitors the compressed air supply line; readings below 5.0 bar or above 9.0 bar generate a SUPPLY_PRESSURE alarm and initiate a system shutdown sequence.
+
+Valve position feedback from FV-105 is continuously monitored. If FV-105 fails to achieve the commanded position within 2 seconds, a VALVE_FAILURE alarm is triggered, and FFIC-103 halts ratio control. In the event of multiple screen activation signals, FFIC-103 outputs a SCREEN_CONFLICT alarm, requiring operator intervention to resolve the cleaning sequence. All alarms are logged in the plant historian system (HIS-101) for diagnostic analysis.

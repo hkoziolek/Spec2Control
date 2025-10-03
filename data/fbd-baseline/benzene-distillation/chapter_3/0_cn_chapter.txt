@@ -1,0 +1,35 @@
+## 3 **Reboiler Heat Exchanger (E-106)**
+|Tagname | Type | Description |
+|---------|------|-------------|
+|E-106 | Heat Exchanger | Provides heat to the distillation column via steam. |
+|FAH-104 | Flow Alarm High | High steam flow alarm for safety interlock. |
+|FIC-104 | Flow Controller | Regulates steam flow to maintain reboiler temperature. |
+|FIT-101 | Flow Transmitter | Measures steam flow rate to the reboiler. |
+|LIC-002 | Level Controller | Monitors and controls condensate level in the reboiler. |
+|PT-101 | Pressure Transmitter | Measures pressure in the steam line. |
+|T-101 | Distillation Column | Separates toluene and benzene via vaporization. |
+|TAH-106 | Temperature Alarm High | High temperature alarm for reboiler safety. |
+|TAL-106 | Temperature Alarm Low | Low temperature alarm for reboiler operation. |
+|TCV-106 | Temperature Control Valve | Regulates steam flow to the reboiler. |
+|TI-106 | Temperature Transmitter | Measures reboiler temperature for feedback control. |
+
+### 3.1) Control Strategy Description
+
+The reboiler heat exchanger (E-106) is controlled using a single-loop PID feedback system to regulate the steam flow rate via the control valve TCV-106, ensuring the desired temperature at the bottom of the distillation column T-101. The process variable (PV) is the temperature measured by TI-106, with a setpoint (SP) of 180°C for optimal toluene-benzene vaporization. The PID controller FIC-104 is configured as reverse-acting to decrease steam flow when the measured temperature exceeds the setpoint.
+
+The PID tuning parameters are set as follows: proportional gain (Kp) = 3.0, integral time (Ki) = 1.2 minutes, and derivative time (Kd) = 0.3 minutes. The controller output (MV) is scaled to drive TCV-106 within its operating range of 0-100% open. The temperature transmitter TI-106 provides a 4-20mA signal corresponding to a measurement span of 100°C to 250°C. Bumpless transfer is implemented to allow seamless switching between manual and automatic modes without disturbing the process. Anti-windup logic is enabled to prevent integral accumulation during saturation of the control valve.
+
+### 3.2) Interlocks and Permissives
+
+The steam flow control loop is interlocked to ensure safe operation of E-106. The control valve TCV-106 will remain closed (fail-closed position) under the following conditions:
+1. Low condensate level in the reboiler, detected by LIC-002, with a trip setpoint of 20% level.
+2. High temperature in the reboiler shell, detected by TI-106, exceeding 200°C.
+3. Loss of signal from TI-106 or FIC-104, indicated by a transmitter fault.
+
+Permissive logic ensures that the control loop is active only when the distillation column T-101 is operational, verified by a minimum column pressure of 50 psig as measured by PT-101.
+
+### 3.3) Alarm and Fault Handling
+
+Alarm conditions are configured to alert operators of deviations from normal operation. A high-temperature alarm (TAH-106) is triggered when TI-106 exceeds 190°C, while a low-temperature alarm (TAL-106) is activated if TI-106 drops below 170°C. Additionally, a flow failure alarm (FAH-104) is generated if the steam flow measured by FIT-101 falls below 10% of the maximum flow rate.
+
+In the event of a fault in TI-106 or FIC-104, the control valve TCV-106 will default to its fail-closed position, and the system will transition to manual mode. Operators are required to verify the integrity of the temperature measurement and controller output before reactivating automatic control. Hysteresis of 1% is applied to prevent frequent toggling between alarm states near the threshold values.

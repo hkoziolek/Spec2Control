@@ -1,0 +1,48 @@
+      <pou name="DIGITAL_IN" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Name">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="Description">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="DI_Raw">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="DebounceTime">
+              <type>
+                <string/>
+              </type>
+            </variable>
+            <variable name="EnableAlarm">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="DI_Out">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+            <variable name="Fault_State">
+              <type>
+                <BOOL/>
+              </type>
+            </variable>
+          </outputVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml:p><![CDATA[]]></xhtml:p>
+          </ST>
+        </body>
+      </pou>

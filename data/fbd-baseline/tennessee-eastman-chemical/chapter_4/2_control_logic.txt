@@ -1,0 +1,72 @@
+* Function Blocks *
+ANALOG_IN FIT-103
+ANALOG_IN LT-104
+PID_BASIC LIC-101
+VALVE_ELECTRIC PV-102
+
+* Variables *
+REAL FIT103_FlowRate
+REAL LT104_Level
+REAL LIC101_PV102_ValveCommand
+BOOL LAH101_Alarm
+BOOL LAL101_Alarm
+BOOL LT104_FaultAlarm
+BOOL OverCapacity_Active
+BOOL LevelAbove10_OK
+
+* Functions *
+GT OverCapCompare
+SEL SPOverrideSelector
+GT LevelAbove10Compare
+NOT LevelLowInvert
+OR PV102InhibitLogic
+NOT LT104AutoInvert
+
+* Data Connections * 
+LT-104.PV, LIC-101.PV
+LIC-101.XOUT, PV-102.Control_Signal
+FIT-103.PV, OverCapCompare.IN1
+OverCapCompare.OUT, SPOverrideSelector.G
+SPOverrideSelector.OUT, LIC-101.SP
+LT-104.PV, LevelAbove10Compare.IN1
+LevelAbove10Compare.OUT, LevelLowInvert.IN
+LevelLowInvert.OUT, PV102InhibitLogic.IN1
+LT-104.General_Fault, PV102InhibitLogic.IN2
+PV102InhibitLogic.OUT, PV-102.Inhibit
+LT-104.General_Fault, LT104AutoInvert.IN
+LT104AutoInvert.OUT, LIC-101.AUTO
+FIT-103.PV, FIT103_FlowRate
+LT-104.PV, LT104_Level
+LIC-101.XOUT, LIC101_PV102_ValveCommand
+LIC-101.PV_High_Alarm, LAH101_Alarm
+LIC-101.PV_Low_Alarm, LAL101_Alarm
+LT-104.General_Fault, LT104_FaultAlarm
+OverCapCompare.OUT, OverCapacity_Active
+LevelAbove10Compare.OUT, LevelAbove10_OK
+
+* Parameter Data Connections *
+3.125, FIT-103.Scaling_Slope
+-12.5, FIT-103.Scaling_Offset
+TRUE, FIT-103.Alarm_Enable
+6.25, LT-104.Scaling_Slope
+-25, LT-104.Scaling_Offset
+TRUE, LT-104.Alarm_Enable
+1.8, LIC-101.KP
+0.6, LIC-101.TR
+0.1, LIC-101.TD
+0, LIC-101.MV_MIN
+100, LIC-101.MV_MAX
+0, LIC-101.X0
+90, LIC-101.PV_High
+15, LIC-101.PV_Low
+5, LIC-101.Deviation_Limit
+100, PV-102.Open_Limit
+0, PV-102.Close_Limit
+T#10s, PV-102.Timeout
+FALSE, PV-102.Manual_Mode
+0, PV-102.Manual_Position
+65, SPOverrideSelector.IN0
+50, SPOverrideSelector.IN1
+60, OverCapCompare.IN2
+10, LevelAbove10Compare.IN2
+

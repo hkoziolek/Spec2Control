@@ -1,0 +1,49 @@
+# EVAL-1
+## Selected Control Strategy
+PID Control
+## Generated Control Strategy
+PID Control
+## STATUS
+PASS
+
+# EVAL-2: Q2M2
+## Instantiated function blocks
+Block_Type,Required,Generated_Count,Generated_Instances,Status
+ANALOG_IN,1,2,"FT-301, LT-301",SUFFICIENT (+1)
+PID_BASIC,1,1,"FIC-301",SUFFICIENT
+VALVE_ELECTRIC,1,1,"FV-301",SUFFICIENT
+BOOL_IN,0,1,"ANK-301",EXTRA
+DIGITAL_IN,0,6,"FAH-301, FAL-301, LAL-301, PAH-103, PFA-301, TAH-101",EXTRA
+MOTOR_VSD,0,1,"UMP-301A",EXTRA
+VALVE_ON_OFF,0,1,"XV-107",EXTRA
+## STATUS
+PASS
+## Control Strategy Block Identification Rate
+100.0%
+
+# EVAL-3: Block-to-Block Connection Analysis
+## Intended Connections (from categorization)
+ANALOG_IN.PV -> PID_BASIC.PV
+PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+## Mapped Specific Connections
+ANALOG_IN.PV -> PID_BASIC.PV
+PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+## Block Instance Mapping
+BOOL_IN: ANK-301
+DIGITAL_IN: FAH-301, FAL-301, LAL-301, PAH-103, PFA-301, TAH-101
+PID_BASIC: FIC-301
+ANALOG_IN: FT-301, LT-301
+VALVE_ELECTRIC: FV-301
+MOTOR_VSD: UMP-301A, UMP-301B
+VALVE_ON_OFF: XV-107
+## Connection Analysis Results
+Total Intended Connections: 2
+Successfully Matched: 0
+Success Rate: 0.00%
+
+## Matched Connections
+## Missing Connections
+✗ ANALOG_IN.PV -> PID_BASIC.PV
+✗ PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+## STATUS
+FAIL

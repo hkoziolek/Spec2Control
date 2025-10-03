@@ -1,0 +1,102 @@
+Evaluation Results for desalination - chapter_2
+============================================================
+
+EVAL-1: Control Strategy Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_2\1_categorization.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_2\1_categorization.txt
+Ground truth strategy: PID Control
+Output strategy: 
+EVAL-1 Result: FAIL
+
+EVAL-2: Function Block Types Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_2\2_control_logic.txt
+Ground truth blocks: ANALOG_IN(6), PID_BASIC(2), VALVE_ELECTRIC(2)
+Output blocks: ANALOG_IN(6), PID_BASIC(2), VALVE_ELECTRIC(2)
+EVAL-2 Coverage: 1.00%
+
+EVAL-3: Data Connections Comparison
+Ground truth file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\reviewed-output\desalination\chapter_2\2_control_logic.txt
+Output file: c:\Users\NOKAGRO\source\repos\control-narrative-workbench\apps\automation\output\desalination\chapter_2\2_control_logic.txt
+LLM-BASED EVAL-3 CONNECTION ANALYSIS
+==================================================
+
+INTENDED CONNECTIONS TEMPLATE:
+ANALOG_IN.PV, PID_BASIC.PV
+PID_BASIC.XOUT, VALVE_ELECTRIC.Control_Signal
+
+ALL FUNCTION BLOCKS:
+ANALOG_IN AT-101
+ANALOG_IN AT-103
+PID_BASIC FC-101
+PID_BASIC FC-102
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+ANALOG_IN LT-104
+ANALOG_IN LT-105
+VALVE_ON_OFF XV-102
+DIGITAL_IN XV-102_OPEN_LS
+DIGITAL_IN XV-102_CLOSE_LS
+
+FILTERED FUNCTION BLOCKS (only types from template):
+ANALOG_IN AT-101
+ANALOG_IN AT-103
+PID_BASIC FC-101
+PID_BASIC FC-102
+ANALOG_IN FT-101
+ANALOG_IN FT-102
+VALVE_ELECTRIC FV-101
+VALVE_ELECTRIC FV-102
+ANALOG_IN LT-104
+ANALOG_IN LT-105
+
+ALL DATA CONNECTIONS:
+FT-101.PV, FC-101.PV
+FT-102.PV, FC-102.PV
+SP_Seawater_LowClamp_MAX.OUT, SP_Seawater_HighClamp_MIN.IN1
+SP_Reservoir_LowClamp_MAX.OUT, SP_Reservoir_HighClamp_MIN.IN1
+FT-101.General_Fault, FC-101.Inhibit
+FT-102.General_Fault, FC-102.Inhibit
+FC-101.XOUT, FV-101.Control_Signal
+FC-102.XOUT, FV-102.Control_Signal
+AT-101.High_Alarm, WaterQualityShutdown_OR.IN1
+AT-103.High_Alarm, WaterQualityShutdown_OR.IN2
+WaterQualityShutdown_OR.OUT, XV-102.Inhibit
+XV-102_CLOSE_LS.DI_Out, FV101_Inhibit_OR.IN1
+WaterQualityShutdown_OR.OUT, FV101_Inhibit_OR.IN2
+LT-104.Low_Alarm, FV101_Inhibit_OR.IN3
+LT-105.High_Alarm, FV101_Inhibit_OR.IN4
+FT-101.General_Fault, FV101_Inhibit_OR.IN5
+FV101_Inhibit_OR.OUT, FV-101.Inhibit
+XV-102_CLOSE_LS.DI_Out, FV102_Inhibit_OR.IN1
+WaterQualityShutdown_OR.OUT, FV102_Inhibit_OR.IN2
+LT-104.Low_Alarm, FV102_Inhibit_OR.IN3
+LT-105.High_Alarm, FV102_Inhibit_OR.IN4
+FT-102.General_Fault, FV102_Inhibit_OR.IN5
+FV102_Inhibit_OR.OUT, FV-102.Inhibit
+
+==================================================
+LLM EVALUATION RESULT:
+CONNECTION ANALYSIS:
+
+Intended: ANALOG_IN.PV -> PID_BASIC.PV
+- Status: FOUND DIRECT
+- Mapping: ANALOG_IN1=FT-101 to PID_BASIC1=FC-101; ANALOG_IN2=FT-102 to PID_BASIC2=FC-102
+- Actual Connection: FT-101.PV, FC-101.PV; FT-102.PV, FC-102.PV
+- Notes: Other available analog inputs (AT-101, AT-103, LT-104, LT-105) are used for alarms/inhibit logic, not for PID PVs. The PV-to-PID links are correctly implemented using flow transmitters FT-101 and FT-102.
+
+Intended: PID_BASIC.XOUT -> VALVE_ELECTRIC.Control_Signal
+- Status: FOUND DIRECT
+- Mapping: PID_BASIC1=FC-101 to VALVE_ELECTRIC1=FV-101; PID_BASIC2=FC-102 to VALVE_ELECTRIC2=FV-102
+- Actual Connection: FC-101.XOUT, FV-101.Control_Signal; FC-102.XOUT, FV-102.Control_Signal
+- Notes: Indirect allowance via MOTOR_VSD.Speed_SP is noted but not applicable here (no MOTOR_VSD present). Additional inhibit interlocks (faults, level alarms, water quality shutdown) are correctly wired to FV-101 and FV-102, indicating robust safety integration around the control signals.
+
+OVERALL ASSESSMENT:
+Coverage: 2/2
+Quality: Implementation is solid; PID PVs are correctly sourced from flow transmitters and PID outputs directly drive the corresponding control valves, with comprehensive inhibit logic for safety.
+Missing Connections: None
+==================================================
+
+EVAL-3 Coverage: 100.00%

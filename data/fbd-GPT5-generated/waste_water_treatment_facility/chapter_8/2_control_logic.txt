@@ -1,0 +1,71 @@
+* Function Blocks *
+RATIO_CONTROL FFIC-703
+PID_BASIC FIC-702
+ANALOG_IN FT-701
+ANALOG_IN FT-702
+VALVE_ELECTRIC FV-702
+ANALOG_IN TT-701
+BOOL_IN TF-701
+
+* Variables *
+REAL FT701_InfluentFlow_PV
+REAL FT702_BackwashFlow_PV
+REAL FIC702_BackwashFlow_SP
+REAL FFIC703_ActiveRatio
+REAL TT701_Turbidity_PV
+BOOL TF701_InOperation
+
+* Functions *
+OR RatioInhibit_OR
+OR ValveInhibit_OR
+NOT TurbidityNotBelow5_NOT
+
+* Data Connections * 
+FT-701.PV, FFIC-703.PrimaryPV
+FT-702.PV, FFIC-703.SecondaryPV
+FT-702.PV, FIC-702.PV
+FFIC-703.SlaveSP, FIC-702.SP
+FIC-702.XOUT, FV-702.Control_Signal
+TT-701.Low_Alarm, TurbidityNotBelow5_NOT.IN
+FT-701.Low_Alarm, RatioInhibit_OR.IN1
+TT-701.High_Alarm, RatioInhibit_OR.IN2
+FT-701.General_Fault, RatioInhibit_OR.IN3
+TT-701.General_Fault, RatioInhibit_OR.IN4
+RatioInhibit_OR.OUT, FFIC-703.Inhibit
+RatioInhibit_OR.OUT, FIC-702.Inhibit
+TF-701.Alarm_Active, ValveInhibit_OR.IN1
+TurbidityNotBelow5_NOT.OUT, ValveInhibit_OR.IN2
+TT-701.High_Alarm, ValveInhibit_OR.IN3
+ValveInhibit_OR.OUT, FV-702.Inhibit
+FT-701.PV, FT701_InfluentFlow_PV
+FT-702.PV, FT702_BackwashFlow_PV
+FFIC-703.SlaveSP, FIC702_BackwashFlow_SP
+FFIC-703.ActiveRatio, FFIC703_ActiveRatio
+TT-701.PV, TT701_Turbidity_PV
+TF701_InOperation, TF-701.Bool_In
+
+* Parameter Data Connections *
+0.1, FFIC-703.RatioSP
+0, FFIC-703.MV_MIN
+500, FFIC-703.MV_MAX
+TRUE, FFIC-703.Auto
+TRUE, FIC-702.AUTO
+0, FIC-702.X0
+0, FIC-702.MV_MIN
+100, FIC-702.MV_MAX
+0, FIC-702.PV_Low
+500, FIC-702.PV_High
+5000, FT-701.PV_High
+50, FT-701.PV_Low
+TRUE, FT-701.Alarm_Enable
+500, FT-702.PV_High
+0, FT-702.PV_Low
+TRUE, FT-702.Alarm_Enable
+10, TT-701.PV_High
+5, TT-701.PV_Low
+TRUE, TT-701.Alarm_Enable
+FALSE, FV-702.Manual_Mode
+100, FV-702.Open_Limit
+0, FV-702.Close_Limit
+TRUE, TF-701.Alarm_OnFalse
+

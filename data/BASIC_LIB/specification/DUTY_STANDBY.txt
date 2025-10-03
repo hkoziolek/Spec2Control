@@ -1,0 +1,26 @@
+Direction,Pin Name,Type,Description
+Input,Name,STRING,Descriptive name of the function block
+Input,Description,STRING,Longer description of function block's purpose.
+Input,Enable,BOOL,Enable the function (TRUE=active).
+Input,StartRequest,BOOL,Plant demand to have exactly one pump running.
+Input,AlternateEnable,BOOL,Enable automatic alternation on each duty-cycle completion.
+Input,ForcePumpA,BOOL,Force select Pump A as active (overrides alternation when TRUE).
+Input,ForcePumpB,BOOL,Force select Pump B as active (overrides alternation when TRUE).
+Input,DutyElapsed,BOOL,Timer output indicating the current duty period is over and a switchover is permitted.
+Input,MinRunElapsed,BOOL,Timer output indicating the minimum run time has elapsed (prevents short cycling).
+Input,SwitchoverDelayElapsed,BOOL,Timer output indicating the inter-pump pause is complete (safe to start standby).
+Input,StartTimeoutElapsed,BOOL,Timer output indicating start confirmation timeout has expired for the running/starting pump.
+Input,PumpA_RunFB,BOOL,Feedback that Pump A is proven running.
+Input,PumpB_RunFB,BOOL,Feedback that Pump B is proven running.
+Input,PumpA_Fault,BOOL,Fault input for Pump A (TRUE=faulted or not available).
+Input,PumpB_Fault,BOOL,Fault input for Pump B (TRUE=faulted or not available).
+Input,Reset,BOOL,Reset latched alarms/lockouts.
+Input,Inhibit,BOOL,Inhibits starting the duty standby functionality and can receive alarm signals.
+Output,CmdPumpA,BOOL,Command to run Pump A (exclusive with CmdPumpB).
+Output,CmdPumpB,BOOL,Command to run Pump B (exclusive with CmdPumpA).
+Output,ActiveIsA,BOOL,Status bit indicating Pump A is the selected active unit.
+Output,SwitchedDueToDuty,BOOL,Pulse TRUE for one cycle when a switchover occurred due to DutyElapsed.
+Output,SwitchedDueToFailure,BOOL,Pulse TRUE for one cycle when a switchover occurred due to a fault or failed start.
+Output,Alarm_FailedStart_A,BOOL,Latched alarm when Pump A command did not achieve RunFB before StartTimeoutElapsed.
+Output,Alarm_FailedStart_B,BOOL,Latched alarm when Pump B command did not achieve RunFB before StartTimeoutElapsed.
+Output,Alarm_NoAvailablePump,BOOL,Latched alarm when neither pump is available to fulfill StartRequest.
