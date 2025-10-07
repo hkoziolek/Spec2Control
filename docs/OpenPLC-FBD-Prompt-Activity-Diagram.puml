@@ -1,0 +1,115 @@
+@startuml openplc-fbd-prompt-activity-diagram
+!theme plain
+title OpenPLC Function Block Diagram Generation - Prompt Activity Workflow\nSequential Execution of 10 Prompt Steps
+
+start
+
+:Input: Control Narrative +\nContext Generation Output;
+note right
+  Contains:
+  - Original control narrative
+  - Identified sensor types
+  - Identified actuator types  
+  - Selected control strategy
+  - BASIC_LIB specifications
+end note
+
+:Execute Prompt 1\n**openplc-function-blocks-v2**\nAnalyze specification to identify\nall required function blocks;
+note right
+  Output: Function Blocks list
+  Focus: Sensors, transmitters,
+  actuators, controllers
+end note
+
+:Execute Prompt 2\n**openplc-function-blocks-validation**\nValidate and update function block list\nfor completeness against specifications;
+note right
+  Input: Original specification +
+  Function blocks from Step 1
+  Output: Validated function blocks
+  Focus: Cross-reference tagnames
+end note
+
+:Execute Prompt 3\n**openplc-block-connections-and-logic**\nCreate connections and logic functions\nfor main control strategy only;
+note right
+  Input: Original specification +
+  Validated function blocks
+  Output: Functions + Block connections
+  Focus: Main control logic only
+end note
+
+:Execute Prompt 4\n**openplc-block-connections-interlocks**\nImplement interlock and alarm logic\nwith boolean functions and connections;
+note right
+  Input: Original specification +
+  Function blocks + Data connections
+  Output: Interlock functions + connections
+  Focus: Safety systems and alarms
+end note
+
+:Execute Prompt 5\n**openplc-parameter-data-connections**\nIdentify specific parameter values\nfor function blocks and functions;
+note right
+  Input: Original specification +
+  Function blocks + Functions/connections
+  Output: Parameter data connections
+  Focus: Configuration values, setpoints
+end note
+
+:Execute Prompt 6\n**openplc-input-variables-and-connections**\nUpdate and refine parameter data\nconnections for full coverage;
+note right
+  Input: Original specification +
+  Function blocks + Connections +
+  Parameter data connections
+  Output: Complete parameter connections
+  Focus: Ranges, alarm limits
+end note
+
+:Execute Prompt 7\n**openplc-output-variables-and-connections**\nCreate output variables and connections\nfor system interfacing;
+note right
+  Input: Original specification +
+  Function blocks from Step 2
+  Output: Output variables + connections
+  Focus: Monitoring points, interfaces
+end note
+
+:Execute Prompt 8\n**openplc-rule-checks**\nPerform comprehensive validation\nand consolidate all connections;
+note right
+  Input: Original specification +
+  All outputs from Steps 2,3,4,6,7
+  Output: Validated consolidated FBD
+  Focus: IEC 61131-3 compliance
+end note
+
+:Execute Prompt 9\n**openplc-rule-checks2**\nAdditional rule checks for function\ncategorization and cleanup;
+note right
+  Input: Consolidated FBD from Step 8
+  Output: Cleaned FBD specification
+  Focus: Function vs FB categorization
+end note
+
+:Execute Prompt 10\n**append_two_inputs**\nOptimize boolean expressions\nand handle multiple inputs;
+note right
+  Input: Cleaned FBD from Step 9
+  Output: Optimized final FBD
+  Focus: Boolean minimization
+end note
+
+:Output: Complete OpenPLC\nFunction Block Diagram;
+note right
+  Final deliverable:
+  - Function Blocks
+  - Variables  
+  - Functions
+  - Data Connections
+  - Parameter Data Connections
+end note
+
+stop
+
+legend right
+  |= Phase |= Steps |
+  | Identification | Steps 1-2 |
+  | Connection Logic | Steps 3-4 |
+  | Parameter Config | Steps 5-6 |
+  | Validation & Optimization | Steps 7-10 |
+endlegend
+
+@enduml

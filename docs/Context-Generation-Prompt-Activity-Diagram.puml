@@ -1,0 +1,76 @@
+@startuml context-generation-prompt-activity-diagram
+!theme plain
+title Context Generation for Control System Analysis - Prompt Activity Workflow\nFirst Phase of Spec2Control - Preparing Context for FBD Generation
+
+start
+
+:Input: Control Narrative\n(User-provided control requirements);
+note right
+  Contains:
+  - Control narrative description
+  - Process requirements
+  - Control objectives
+  - System specifications
+end note
+
+:Execute Prompt 1\n**contextgen1-sensors**\nDetermine required sensor function\nblock types from control narrative;
+note right
+  Input: {{control-narrative}} ← autoContent
+  Output: Sensor function block specifications
+  Focus: ANALOG_IN, DIGITAL_IN, BOOL_IN
+  **Include in Output: YES**
+end note
+
+:Execute Prompt 2\n**contextgen1-actuators**\nDetermine required actuator function\nblock types from control narrative;
+note right
+  Input: {{control-narrative}} ← autoContent
+  Output: Actuator function block specifications
+  Focus: Motors, valves with intelligent defaults
+  **Include in Output: YES**
+end note
+
+:Execute Prompt 3\n**contextgen1-strategies**\nSelect most appropriate control strategy\nand provide function block specifications;
+note right
+  Input: {{control-narrative}} ← autoContent
+  Output: 
+  - Control strategy selection with probability
+  - Complete function block specifications
+  - Intended block connections
+  Focus: Strategy evaluation and selection
+  **Include in Output: YES**
+end note
+
+:Combine Context Generation Output\nfrom Steps 1, 2, 3;
+note right
+  All steps contribute to final context:
+  - Sensor specifications
+  - Actuator specifications  
+  - Control strategy selection
+  - Function block specifications
+end note
+
+:Context Generation Output:\n• Identified Sensor Types\n• Identified Actuator Types\n• Selected Control Strategy\n• BASIC_LIB Function Block Specifications\n• Intended Block-to-Block Connections;
+note right
+  This context feeds into the
+  OpenPLC FBD Generation
+  prompt chain as {{specification}}
+end note
+
+:Feed to OpenPLC FBD\nGeneration Prompt Chain;
+note right
+  Context + Control Narrative
+  becomes {{specification}} input
+  for the 10-step FBD generation
+end note
+
+stop
+
+legend right
+  |= Symbol |= Meaning |
+  | <- | Data Source |
+  |= Phase |= Purpose |
+  | Context Generation | Analyze narrative and identify components |
+  | FBD Generation | Create complete function block diagram |
+endlegend
+
+@enduml

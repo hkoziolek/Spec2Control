@@ -25,15 +25,17 @@ start-backend.bat    # Windows
 ## Documentation
 
 - **[USAGE_GUIDE.md](USAGE_GUIDE.md)** - Quick start guide with examples
+- **[Spec2Control-Screencast.mp4](docs/Spec2Control-Screencast.mp4)**: screencast with a test run (2:17 min)
+- LLM workflows: **[Context Generation](docs/Context-Generation-Prompts.md)** + **[FBD Generation](docs/OpenPLC-FBD-Prompts.md)**
+- PlantUML activity diagrams for LLM worfklows: **[Context Generation UML](docs/Context-Generation-Prompt-Activity-Diagram.puml)** + **[FBD Generation UML](docs/OpenPLC-FBD-Prompt-Activity-Diagram.puml)**
 
 ## Features
 
 - Converts natural language control narratives to PLCOpen TC6 XML
-- Multi-step LLM prompt chain for structured FBD generation
+- Multi-step LLM prompt chain for structured FBD generation: 
 - Auto-layout engine with IEC 61131-3 semantic awareness
 - OpenPLC compatible output
 - Configurable via YAML or command-line arguments
-- **[Spec2Control-Screencast.mp4](docs/Spec2Control-Screencast.mp4)**: screencast with a test run (2:17 min)
 
 ## Experiment Data
 
